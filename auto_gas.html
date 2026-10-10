@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEPM Form/GAS Generator Ver.3.8</title>
+<style>
+  body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+  .container { max-width: 900px; margin: auto; }
+  h1 { font-size: 20px; color: #1a73e8; }
+  .panel { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+  .section { border: 2px solid #4285f4; padding: 15px; border-radius: 6px; margin-bottom: 20px; background: #fafbfc; transition: all 0.3s ease; }
+  .question { border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-top: 15px; background: #fff; border-left: 4px solid #34a853; transition: all 0.3s ease; }
+  .choice-list { margin-top: 10px; padding-left: 20px; }
+  .choice-item { margin-bottom: 5px; display: flex; align-items: center; gap: 10px; }
+  input[type="text"], textarea, select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+  textarea { resize: vertical; }
+  .row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .row > * { flex: 1; }
+  .row > .narrow { flex: 0 0 auto; width: auto; }
+  button { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; background: #e0e0e0; transition: background 0.2s; }
+  button:hover { background: #d5d5d5; }
+  button.primary { background: #1a73e8; color: #fff; font-weight: bold; }
+  button.primary:hover { background: #1557b0; }
+  button.danger { background: #ea4335; color: #fff; }
+  button.danger:hover { background: #c5221f; }
+  button.add-btn { background: #34a853; color: #fff; margin-top: 10px; }
+  button.add-btn:hover { background: #2b8441; }
+  button.icon-btn { padding: 6px 10px; font-weight: bold; }
+  .header-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+  .branch-settings { background: #fff3e0; padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px solid #ffcc80; }
+  #output-area { display: none; }
+  #gas-code { width: 100%; height: 350px; font-family: monospace; font-size: 13px; background: #f8f9fa; }
+  .scale-settings { display: flex; gap: 10px; margin-top: 10px; background: #f1f3f4; padding: 10px; border-radius: 4px; }
+  .ctrl-group { display: flex; gap: 5px; }
+
+  *{box-sizing:border-box}body{font-family:system-ui,"Yu Gothic","Meiryo",sans-serif;background:#f4f5f8;color:#243047;padding:28px 24px;line-height:1.7}.container{max-width:1100px}
+  .hero{position:relative;overflow:hidden;border-radius:18px;padding:28px 34px;margin-bottom:22px;color:#fff;background:radial-gradient(520px 180px at 86% 50%,#4b68ff3d,transparent 65%),linear-gradient(110deg,#090d18,#12182a 55%,#171d34);box-shadow:0 14px 34px #080b1638}
+  .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#ffffff09 1px,transparent 1px),linear-gradient(#ffffff06 1px,transparent 1px);background-size:42px 42px;pointer-events:none}.hero:after{content:"";position:absolute;width:300px;height:300px;right:-80px;top:-80px;border:1px solid #ffffff18;border-radius:50%;box-shadow:0 0 0 34px #ffffff05,0 0 0 68px #ffffff03;pointer-events:none}
+  .hero>*{position:relative;z-index:1}.eyebrow{font-size:11px;letter-spacing:.18em;color:#aeb9d8;margin:0 0 8px;font-weight:700}.hero h1{color:white;font-size:30px;line-height:1.35;margin:0}.tagline{margin:8px 0;color:#e4e8f5}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.badge{font-size:12px;border:1px solid #ffffff30;background:#ffffff0a;border-radius:5px;padding:3px 9px}
+  .guide{background:#edf2fb;border:1px solid #d5dff1;border-radius:12px;padding:20px 24px;margin-bottom:20px}.guide h2{font-size:18px;margin:0 0 8px}.guide p,.guide ol{margin:6px 0}.guide ol{padding-left:24px}.help{font-size:13px;color:#58677e;margin:5px 0 12px}.field-label{display:block;font-size:13px;font-weight:700;margin:10px 0 5px}.section-help{border-bottom:1px solid #d9e2f0;padding-bottom:12px}.question-help{margin-top:0}.header-actions{display:flex;flex-wrap:wrap;gap:12px}.header-actions button{flex:1;min-width:210px;text-align:left;padding:14px 18px}.button-hint{display:block;font-size:12px;font-weight:400;margin-top:4px;opacity:.9}button{font:inherit;font-size:14px;border-radius:8px;padding:9px 14px}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8dafff;outline-offset:2px}.panel{border:1px solid #dde3ec;border-radius:14px;box-shadow:0 3px 12px #20304706}.panel h3{margin-top:0}.section{border-color:#a9bce0;border-radius:14px;padding:22px;background:#f7f9fd}.question{border-radius:10px;border-left-color:#658b79;padding:18px}.row{flex-wrap:wrap}.row>*{min-width:0}input[type=text],textarea,select{font:inherit;font-size:14px;padding:10px 12px;border-color:#cbd4e1;border-radius:7px}input[type=checkbox]{accent-color:#315fa7}.choices-area{background:#f6f8fc;padding:12px;border-radius:8px}.choice-item{flex-wrap:wrap}.choice-item input{min-width:140px}.choice-item select{min-width:170px}.scale-settings{flex-wrap:wrap}.scale-settings select{width:80px}.scale-settings input{flex:1;min-width:140px}.options label{display:block;margin:10px 0}.footer-note{font-size:12px;color:#66748a;text-align:center;margin:26px 0 0}
+  @media(max-width:650px){body{padding:14px 10px}.hero{padding:24px 20px}.hero h1{font-size:23px}.section{padding:15px}.row{gap:8px}.row>.ctrl-group{margin-left:auto}.question>.row:first-child>select{flex-basis:100%}.header-actions button{min-width:100%}.guide{padding:16px}.choice-item input,.choice-item select{flex-basis:100%!important}}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header class="hero">
+    <p class="eyebrow">NEPM · FORM DESIGN WORKSHOP</p>
+    <h1>Googleフォーム 自動作成ツール</h1>
+    <p class="tagline">聞きたいことを画面で組み立て、アンケートの形に。</p>
+    <div class="badges"><span class="badge">Ver.3.8 · UI改訂版</span><span class="badge">回答に合わせた分岐</span><span class="badge">設定の保存・再利用</span></div>
+  </header>
+  <section class="guide" aria-labelledby="guide-title">
+    <h2 id="guide-title">まずは「何を聞くか」を決めましょう</h2>
+    <ol><li><b>アンケートの名前</b>と説明を入力します。</li><li><b>ページ（セクション）</b>を作り、その中へ<b>質問</b>を追加します。</li><li>入力ができたら<b>作成用コードを生成</b>し、Google Apps Scriptへ貼り付けて実行します。</li></ol>
+    <p class="help">「ページ」は質問をまとめる区切りです。例：1ページ目は基本情報、2ページ目は参加希望。Googleフォームでは、この区切りを「セクション」と呼びます。</p>
+    <p class="help">この画面ではアンケートの設計を行います。Googleフォームと回答用スプレッドシートは、生成したコードをGoogle側で実行すると作成されます。</p>
+  </section>
+  
+  <div class="header-actions">
+    <button class="primary" onclick="generateGAS()">作成用コードを生成<span class="button-hint">入力した内容から、フォームを作るGASコードを出します</span></button>
+    <button onclick="saveJSON()">入力した内容を保存<span class="button-hint">編集を再開できる設定ファイル（JSON）を保存します</span></button>
+    <input type="file" id="load-file" accept=".json" style="display:none" onchange="loadJSON(event)">
+    <button onclick="document.getElementById('load-file').click()">保存した内容を開く<span class="button-hint">設定ファイル（JSON）を選び、編集を再開します</span></button>
+  </div>
+
+  <div id="output-area" class="panel">
+    <h3>フォームを作るためのコード</h3>
+    <p>下のコードをコピーし、Google Apps Scriptの編集画面へ貼り付けて実行します。</p><ol class="help"><li>Google Apps Scriptで新しいプロジェクトを開きます。</li><li>最初に入っているコードを、下のコードで置き換えます。</li><li>保存し、関数「createFormAndSheet」を選んで実行します。</li><li>権限の確認を行い、実行ログに出るフォームURLを開いて、質問と分岐を試します。</li></ol><p class="help">実行するたびに、新しいフォームと回答用シートが作られます。回答者へ案内する前に、Googleフォーム側の共有・回答受付設定も確認してください。</p>
+    <textarea id="gas-code" readonly></textarea>
+    <button class="primary" onclick="copyCode()" style="margin-top:10px;">コードをコピー</button>
+    <button onclick="document.getElementById('output-area').style.display='none'">閉じる</button>
+  </div>
+
+  <div class="panel" id="form-settings">
+    <h3>1. アンケート全体の内容</h3><p class="help">回答する人に見せる名前と説明を入力します。</p>
+    <div class="row">
+      <label class="field-label" for="form-title">アンケートの名前（必須）</label></div><div class="row"><input type="text" id="form-title" placeholder="例：研修の参加希望アンケート" value="新規アンケート">
+    </div>
+    <div class="row">
+      <label class="field-label" for="form-desc">最初に表示する説明（任意）</label></div><div class="row"><textarea id="form-desc" placeholder="例：参加を希望する日程を教えてください。回答期限は○月○日です。"></textarea>
+    </div>
+    <div class="options" style="font-size:13px; line-height:1.9;">
+      <label><input type="checkbox" id="opt-mail"> 完了時に自分宛にメールでURLを送る（初回実行時にメール送信の許可画面が出ます）</label><br>
+      <label><input type="checkbox" id="opt-trash" checked> 失敗したとき、作りかけのフォーム/シートを自動でゴミ箱に入れる</label>
+    </div>
+  </div>
+
+  <div id="sections-container"></div>
+  
+  <button class="add-btn" onclick="addSection()">＋ 質問をまとめるページを追加<span class="button-hint">話題を分けたいときに使います（セクション）</span></button>
+<p class="footer-note">NEPM · Designed &amp; Developed by N. Nakata<br>Ver.3.8の動作を基に、画面の説明とデザインを改訂</p>
+</div>
+
+<template id="tpl-section">
+  <div class="section" data-id="">
+    <div class="row">
+      <h4 style="margin:0; color:#1a73e8;" class="sec-label">質問をまとめるページ</h4>
+      <div class="ctrl-group narrow">
+        <button class="icon-btn" onclick="moveUp(this, '.section')" title="上に移動">↑</button>
+        <button class="icon-btn" onclick="moveDown(this, '.section')" title="下に移動">↓</button>
+        <button class="danger" onclick="removeEl(this, '.section', 'セクション')">削除</button>
+      </div>
+    </div>
+    <div class="row">
+      <input type="text" class="sec-title" aria-label="ページの見出し" placeholder="ページの見出し（任意）例：参加希望について" oninput="updateAllGotoDropdowns()">
+    </div>
+    <div class="row">
+      <input type="text" class="sec-desc" aria-label="ページの説明" placeholder="このページの説明（任意）">
+    </div>
+    <p class="help section-help">この枠の中に、答えてもらいたい質問を追加します。↑↓でページの順番を変えられます。</p><div class="questions-container"></div>
+    <button class="add-btn" onclick="addQuestion(this)">＋ 答えてもらう質問を追加<span class="button-hint">例：お名前、参加希望日、感想など</span></button>
+  </div>
+</template>
+
+<template id="tpl-question">
+  <div class="question"><p class="help question-help"><b>質問と答え方</b>を設定します。↑↓で、このページ内の質問の順番を変えられます。</p>
+    <div class="row">
+      <select class="q-type" onchange="toggleQuestionType(this)">
+        <option value="TEXT">短い文章で答える（名前など）</option>
+        <option value="PARAGRAPH">長い文章で答える（感想など）</option>
+        <option value="RADIO">候補から1つ選ぶ（ラジオボタン）</option>
+        <option value="DROPDOWN">一覧を開いて1つ選ぶ（プルダウン）</option>
+        <option value="CHECKBOX">候補から複数選ぶ（チェックボックス）</option>
+        <option value="DATE">日付を答える</option>
+        <option value="SCALE">数字で評価する（満足度など）</option>
+      </select>
+      <label class="narrow"><input type="checkbox" class="q-required"> 回答必須</label>
+      <div class="ctrl-group narrow">
+        <button class="icon-btn" onclick="moveUp(this, '.question')" title="上に移動">↑</button>
+        <button class="icon-btn" onclick="moveDown(this, '.question')" title="下に移動">↓</button>
+        <button class="danger" onclick="removeEl(this, '.question', '設問')">削除</button>
+      </div>
+    </div>
+    <div class="row">
+      <input type="text" class="q-title" aria-label="答えてもらう質問" placeholder="答えてもらう質問（必須）例：参加を希望する日はいつですか？">
+    </div>
+    <div class="row">
+      <input type="text" class="q-desc" aria-label="質問の補足説明" placeholder="質問の補足説明（任意）例：候補から1つ選んでください。">
+    </div>
+    
+    <div class="choices-area" style="display:none;">
+      <div class="row branch-toggle" style="display:none;">
+        <label><input type="checkbox" class="q-branch-enable" onchange="toggleBranching(this)"> 答えによって、次に表示するページを変える（分岐）</label>
+      </div>
+      <p class="help">回答者が選ぶ候補を入力します。分岐を使う場合は、各候補の移動先も選びます。移動先のページは先に追加してください。</p><div class="choices-container"></div>
+      <button onclick="addChoice(this)" style="margin-top:5px;">＋ 選べる答えを追加</button>
+    </div>
+
+    <div class="scale-settings" style="display:none;">
+      <select class="s-lower"><option value="0">0</option><option value="1" selected>1</option></select>
+      <span>から</span>
+      <select class="s-upper">
+        <option value="2">2</option><option value="3">3</option><option value="4">4</option>
+        <option value="5" selected>5</option><option value="6">6</option><option value="7">7</option>
+        <option value="8">8</option><option value="9">9</option><option value="10">10</option>
+      </select>
+      <input type="text" class="s-label-lower" placeholder="下限ラベル(任意)">
+      <input type="text" class="s-label-upper" placeholder="上限ラベル(任意)">
+    </div>
+  </div>
+</template>
+
+<template id="tpl-choice">
+  <div class="choice-item">
+    <input type="text" class="c-value" aria-label="選べる答え" placeholder="選べる答え（必須）例：参加する" style="flex:2;">
+    <select class="c-goto" style="display:none; flex:3;" onchange="delete this.dataset.hasWarning; if(this.parentElement.nextElementSibling?.classList.contains('goto-warning')) this.parentElement.nextElementSibling.style.display='none';"></select>
+    <button class="danger narrow" onclick="removeChoice(this)" aria-label="この答えの候補を削除" title="この答えの候補を削除">×</button>
+  </div>
+</template>
+
+<script>
+  function generateId() {
+    return 'sec_' + Math.random().toString(36).slice(2, 11);
+  }
+
+  function addSection(data = null) {
+    const container = document.getElementById('sections-container');
+    const tpl = document.getElementById('tpl-section').content.cloneNode(true);
+    const secDiv = tpl.querySelector('.section');
+    secDiv.dataset.id = data ? data.id : generateId();
+    container.appendChild(secDiv);
+    
+    if (data) {
+      secDiv.querySelector('.sec-title').value = data.title || '';
+      secDiv.querySelector('.sec-desc').value = data.desc || '';
+    }
+    
+    updateSectionLabels();
+    updateAllGotoDropdowns();
+    return secDiv;
+  }
+
+  function addQuestion(btn, data = null) {
+    const container = btn.parentElement.querySelector('.questions-container');
+    const tpl = document.getElementById('tpl-question').content.cloneNode(true);
+    const qDiv = tpl.querySelector('.question');
+    
+    if (data) {
+      qDiv.querySelector('.q-type').value = data.type;
+      qDiv.querySelector('.q-required').checked = data.isRequired;
+      qDiv.querySelector('.q-title').value = data.title || '';
+      qDiv.querySelector('.q-desc').value = data.desc || '';
+      if (data.isBranching && ['RADIO', 'DROPDOWN'].includes(data.type)) {
+        qDiv.querySelector('.q-branch-enable').checked = true;
+      }
+      if (data.scale) {
+        qDiv.querySelector('.s-lower').value = String(data.scale.lower);
+        qDiv.querySelector('.s-upper').value = String(data.scale.upper);
+        qDiv.querySelector('.s-label-lower').value = data.scale.lowerLabel || '';
+        qDiv.querySelector('.s-label-upper').value = data.scale.upperLabel || '';
+      }
+    }
+    
+    container.appendChild(qDiv);
+    toggleQuestionType(qDiv.querySelector('.q-type'));
+    
+    if (data && data.choices) {
+      const cBtn = qDiv.querySelector('.choices-area > button');
+      qDiv.querySelector('.choices-container').innerHTML = '';
+      data.choices.forEach(c => addChoice(cBtn, c));
+    } else if (['RADIO', 'DROPDOWN', 'CHECKBOX'].includes(qDiv.querySelector('.q-type').value)) {
+      addChoice(qDiv.querySelector('.choices-area > button'));
+    }
+    if (data) toggleBranching(qDiv.querySelector('.q-branch-enable'));
+  }
+
+  function addChoice(btn, data = null) {
+    const container = btn.parentElement.querySelector('.choices-container');
+    const tpl = document.getElementById('tpl-choice').content.cloneNode(true);
+    const cDiv = tpl.querySelector('.choice-item');
+    if (data) {
+      cDiv.querySelector('.c-value').value = data.value || '';
+      cDiv.dataset.tempGoto = data.goto || 'CONTINUE'; 
+    }
+    container.appendChild(cDiv);
+    
+    const isBranching = btn.parentElement.querySelector('.q-branch-enable').checked;
+    const gotoSelect = cDiv.querySelector('.c-goto');
+    gotoSelect.style.display = isBranching ? 'block' : 'none';
+    
+    updateGotoDropdown(gotoSelect);
+  }
+
+  function toggleQuestionType(select) {
+    const qDiv = select.closest('.question');
+    const type = select.value;
+    const choicesArea = qDiv.querySelector('.choices-area');
+    const branchToggle = qDiv.querySelector('.branch-toggle');
+    const scaleSettings = qDiv.querySelector('.scale-settings');
+
+    choicesArea.style.display = ['RADIO', 'DROPDOWN', 'CHECKBOX'].includes(type) ? 'block' : 'none';
+    scaleSettings.style.display = type === 'SCALE' ? 'flex' : 'none';
+    
+    if (['RADIO', 'DROPDOWN'].includes(type)) {
+      branchToggle.style.display = 'block';
+    } else {
+      branchToggle.style.display = 'none';
+      qDiv.querySelector('.q-branch-enable').checked = false;
+      toggleBranching(qDiv.querySelector('.q-branch-enable'));
+    }
+    
+    if (choicesArea.style.display === 'block' && qDiv.querySelector('.choices-container').children.length === 0) {
+      addChoice(choicesArea.querySelector('button'));
+    }
+  }
+
+  function toggleBranching(checkbox) {
+    const qDiv = checkbox.closest('.question');
+    const selects = qDiv.querySelectorAll('.c-goto');
+    selects.forEach(sel => {
+      sel.style.display = checkbox.checked ? 'block' : 'none';
+      if (!checkbox.checked) {
+        delete sel.dataset.hasWarning;
+      }
+      if (checkbox.checked) updateGotoDropdown(sel);
+    });
+  }
+
+  function removeEl(btn, selector, typeName) {
+    if (confirm(`この${typeName}を削除してもよろしいですか？`)) {
+      btn.closest(selector).remove();
+      updateAllGotoDropdowns();
+      if(selector === '.section') updateSectionLabels();
+    }
+  }
+
+  function removeChoice(btn) {
+    if (confirm('この選択肢を削除してもよろしいですか？')) {
+      const container = btn.closest('.choices-container');
+      const item = btn.parentElement;
+      const warning = item.nextElementSibling;
+      if (warning && warning.classList.contains('goto-warning')) warning.remove();
+      item.remove();
+      if(container.children.length === 0) {
+         addChoice(container.nextElementSibling);
+      }
+    }
+  }
+
+  function moveUp(btn, selector) {
+    const el = btn.closest(selector);
+    const prev = el.previousElementSibling;
+    if (prev && prev.matches(selector)) {
+      el.parentNode.insertBefore(el, prev);
+      updateAllGotoDropdowns();
+      if (selector === '.section') updateSectionLabels();
+    }
+  }
+
+  function moveDown(btn, selector) {
+    const el = btn.closest(selector);
+    const next = el.nextElementSibling;
+    if (next && next.matches(selector)) {
+      el.parentNode.insertBefore(next, el);
+      updateAllGotoDropdowns();
+      if (selector === '.section') updateSectionLabels();
+    }
+  }
+
+  function updateSectionLabels() {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach((sec, idx) => {
+      sec.querySelector('.sec-label').textContent = 'セクション ' + (idx + 1);
+    });
+  }
+
+  function updateAllGotoDropdowns() {
+    document.querySelectorAll('.c-goto').forEach(sel => updateGotoDropdown(sel));
+  }
+
+  function updateGotoDropdown(select) {
+    const wasPending = !!select.parentElement.dataset.tempGoto;
+    const currentVal = select.parentElement.dataset.tempGoto || select.value || 'CONTINUE';
+    select.innerHTML = '';
+    
+    const parentSec = select.closest('.section');
+    const parentSecId = parentSec ? parentSec.dataset.id : null;
+
+    const optCont = document.createElement('option');
+    optCont.value = 'CONTINUE';
+    optCont.textContent = '次のセクションへ進む (CONTINUE)';
+    select.appendChild(optCont);
+    
+    const optSub = document.createElement('option');
+    optSub.value = 'SUBMIT';
+    optSub.textContent = 'フォームを送信 (SUBMIT)';
+    select.appendChild(optSub);
+
+    const sections = document.querySelectorAll('.section');
+    sections.forEach((sec, idx) => {
+      const opt = document.createElement('option');
+      opt.value = sec.dataset.id;
+      const title = sec.querySelector('.sec-title').value || `セクション ${idx + 1}`;
+      
+      if (idx === 0) {
+        opt.disabled = true;
+        opt.textContent = `${title} (分岐不可: 先頭)`;
+      } else if (sec.dataset.id === parentSecId) {
+        opt.disabled = true;
+        opt.textContent = `${title} (分岐不可: 自己)`;
+      } else {
+        opt.textContent = title;
+      }
+      select.appendChild(opt);
+    });
+
+    const isBranching = select.closest('.question').querySelector('.q-branch-enable')?.checked;
+    let warningEl = select.parentElement.nextElementSibling;
+    
+    if (warningEl && !warningEl.classList.contains('goto-warning')) {
+      warningEl = null;
+    }
+
+    if (!isBranching) {
+      if (warningEl) warningEl.remove();
+    } else {
+      if (!warningEl) {
+        warningEl = document.createElement('div');
+        warningEl.className = 'goto-warning';
+        warningEl.style.color = '#ea4335';
+        warningEl.style.fontSize = '12px';
+        warningEl.style.marginTop = '2px';
+        warningEl.style.marginBottom = '5px';
+        warningEl.style.paddingLeft = '5px';
+        warningEl.style.display = 'none';
+        select.parentElement.after(warningEl);
+      }
+    }
+
+    const targetOption = Array.from(select.options).find(opt => opt.value === currentVal);
+
+    if (targetOption) {
+      if (!targetOption.disabled) {
+        select.value = currentVal;
+      } else {
+        select.value = 'CONTINUE';
+        if (currentVal !== 'CONTINUE' && currentVal !== 'SUBMIT') {
+          select.dataset.hasWarning = 'true';
+        }
+      }
+      delete select.parentElement.dataset.tempGoto;
+    } else {
+      select.value = 'CONTINUE';
+      if (!wasPending) {
+        if (currentVal !== 'CONTINUE' && currentVal !== 'SUBMIT') {
+          select.dataset.hasWarning = 'true';
+        }
+        delete select.parentElement.dataset.tempGoto;
+      }
+    }
+
+    if (warningEl) {
+      if (select.dataset.hasWarning) {
+        warningEl.textContent = '分岐先が無効になったため「次のセクションへ進む」に戻しました。';
+        warningEl.style.display = 'block';
+      } else {
+        warningEl.style.display = 'none';
+      }
+    }
+  }
+
+  function validateInput() {
+    const title = document.getElementById('form-title').value.trim();
+    if (!title) {
+      alert("エラー: フォーム名が入力されていません。");
+      return false;
+    }
+
+    const sections = document.querySelectorAll('.section');
+    if (sections.length === 0) {
+      alert("エラー: セクションが1つもありません。");
+      return false;
+    }
+
+    const firstSecId = sections[0].dataset.id;
+
+    for (let sIdx = 0; sIdx < sections.length; sIdx++) {
+      const sec = sections[sIdx];
+      let branchCount = 0;
+      const questions = sec.querySelectorAll('.question');
+      
+      for (let qIdx = 0; qIdx < questions.length; qIdx++) {
+        const q = questions[qIdx];
+        if (!q.querySelector('.q-title').value.trim()) {
+          alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} の設問文が未入力です。`);
+          return false;
+        }
+
+        const type = q.querySelector('.q-type').value;
+        const isBranching = q.querySelector('.q-branch-enable')?.checked;
+        
+        if (isBranching) {
+          branchCount++;
+          const gotoSelects = q.querySelectorAll('.c-goto');
+          for (let i = 0; i < gotoSelects.length; i++) {
+            const gotoVal = gotoSelects[i].value;
+            if (gotoVal === sec.dataset.id) {
+              alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} で現在のセクション(自己)への分岐が設定されています。`);
+              return false;
+            }
+            if (gotoVal === firstSecId) {
+              alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} で先頭セクションへの分岐が設定されています。`);
+              return false;
+            }
+          }
+        }
+
+        if (['RADIO', 'DROPDOWN', 'CHECKBOX'].includes(type)) {
+          const choices = q.querySelectorAll('.c-value');
+          if (choices.length === 0) {
+            alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} に選択肢がありません。`);
+            return false;
+          }
+          const seenChoices = new Set();
+          for (let i = 0; i < choices.length; i++) {
+            const cv = choices[i].value.trim();
+            if (!cv) {
+              alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} の選択肢${i + 1}が未入力です。`);
+              choices[i].focus();
+              return false;
+            }
+            const key = cv.normalize('NFKC');
+            if (seenChoices.has(key)) {
+              alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} の選択肢「${cv}」が重複しています。Googleフォームは同じ設問内の同一選択肢を許可しません。`);
+              choices[i].focus();
+              return false;
+            }
+            seenChoices.add(key);
+          }
+        }
+
+        if (type === 'SCALE') {
+          const lower = parseInt(q.querySelector('.s-lower').value, 10);
+          const upper = parseInt(q.querySelector('.s-upper').value, 10);
+          if (lower !== 0 && lower !== 1) {
+            alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} のスケール下限値は0または1である必要があります。`);
+            return false;
+          }
+          if (isNaN(upper) || upper < 2 || upper > 10) {
+            alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} のスケール上限値は2〜10の範囲である必要があります。`);
+            return false;
+          }
+          if (lower >= upper) {
+            alert(`エラー: セクション${sIdx + 1} の 設問${qIdx + 1} のスケール下限値(${lower})は上限値(${upper})より小さく設定してください。`);
+            return false;
+          }
+        }
+      }
+
+      if (branchCount > 1) {
+        alert(`エラー: セクション${sIdx + 1} に複数の分岐設問が含まれています。1セクションにつき分岐設問は1つまでです。`);
+        return false;
+      }
+
+      if (sIdx === sections.length - 1 && branchCount > 0) {
+        alert(`エラー: 最後のセクション(セクション${sIdx + 1})に分岐設問が設定されています。Googleフォームの仕様上、最後のページでの分岐設定は無効です。`);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function serializeForm(skipValidation = false) {
+    if (!skipValidation && !validateInput()) return null;
+
+    const data = {
+      formTitle: document.getElementById('form-title').value.trim() || "",
+      formDesc: document.getElementById('form-desc').value.trim(),
+      options: {
+        sendMail: document.getElementById('opt-mail').checked,
+        trashOnError: document.getElementById('opt-trash').checked
+      },
+      sections: []
+    };
+
+    const sections = document.querySelectorAll('.section');
+    for (let sec of sections) {
+      const secData = {
+        id: sec.dataset.id,
+        title: sec.querySelector('.sec-title').value.trim(),
+        desc: sec.querySelector('.sec-desc').value.trim(),
+        questions: []
+      };
+
+      const questions = sec.querySelectorAll('.question');
+      for (let q of questions) {
+        const type = q.querySelector('.q-type').value;
+        const isBranching = q.querySelector('.q-branch-enable')?.checked || false;
+
+        const qData = {
+          type: type,
+          title: q.querySelector('.q-title').value.trim(),
+          desc: q.querySelector('.q-desc').value.trim(),
+          isRequired: q.querySelector('.q-required').checked,
+          isBranching: isBranching,
+          choices: [],
+          scale: null
+        };
+
+        if (['RADIO', 'DROPDOWN', 'CHECKBOX'].includes(type)) {
+          q.querySelectorAll('.choice-item').forEach(c => {
+            qData.choices.push({
+              value: c.querySelector('.c-value').value.trim(),
+              goto: isBranching ? c.querySelector('.c-goto').value : null
+            });
+          });
+        }
+
+        if (type === 'SCALE') {
+          qData.scale = {
+            lower: parseInt(q.querySelector('.s-lower').value, 10),
+            upper: parseInt(q.querySelector('.s-upper').value, 10),
+            lowerLabel: q.querySelector('.s-label-lower').value.trim(),
+            upperLabel: q.querySelector('.s-label-upper').value.trim()
+          };
+        }
+
+        secData.questions.push(qData);
+      }
+      data.sections.push(secData);
+    }
+    return data;
+  }
+
+  function validateJSONSchema(data) {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error("不正なデータ形式です。ルートがオブジェクトではありません。");
+    }
+    if (typeof data.formTitle !== 'string') {
+      throw new Error("フォーム名(formTitle)が不正です。");
+    }
+    if (!Array.isArray(data.sections) || data.sections.length === 0) {
+      throw new Error("セクション(sections)が配列ではないか、空です。");
+    }
+    
+    const validTypes = ['TEXT', 'PARAGRAPH', 'RADIO', 'DROPDOWN', 'CHECKBOX', 'DATE', 'SCALE'];
+    const secIds = new Set();
+    let warnings = [];
+    
+    data.sections.forEach((sec, sIdx) => {
+      if (!sec || typeof sec !== 'object' || Array.isArray(sec)) {
+        throw new Error(`セクション${sIdx + 1}のデータ構造が不正です。`);
+      }
+      if (typeof sec.id !== 'string' || !sec.id.trim()) {
+        throw new Error(`セクション${sIdx + 1}のIDが不正です。`);
+      }
+      if (!/^sec_[a-zA-Z0-9_]+$/.test(sec.id)) {
+        throw new Error(`セクション${sIdx + 1}のID(${sec.id})の形式が不正です。英数字とアンダースコアのみ使用可能です。`);
+      }
+      
+      if (secIds.has(sec.id)) throw new Error(`セクションIDが重複しています: ${sec.id}`);
+      secIds.add(sec.id);
+      
+      if (!Array.isArray(sec.questions)) throw new Error(`セクション${sIdx + 1}の設問データ(questions)が配列ではありません。`);
+      
+      let branchCount = 0;
+
+      sec.questions.forEach((q, qIdx) => {
+        if (!q || typeof q !== 'object' || Array.isArray(q)) throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}の構造が不正です。`);
+        if (!validTypes.includes(q.type)) throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}の型(${q.type})が不正です。`);
+        if (typeof q.title !== 'string') {
+          throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}のタイトル(title)が文字列ではありません。`);
+        }
+
+        if (q.isBranching === true) {
+          if (!['RADIO', 'DROPDOWN'].includes(q.type)) {
+            throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}: ${q.type}形式では分岐(isBranching)を有効にできません。`);
+          }
+          branchCount++;
+        } else if (q.isBranching !== false && q.isBranching !== undefined) {
+          throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}: isBranchingはtrue, false, または未定義である必要があります。`);
+        }
+        
+        if (['RADIO', 'DROPDOWN', 'CHECKBOX'].includes(q.type)) {
+          if (!Array.isArray(q.choices) || q.choices.length === 0) {
+            throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}に選択肢(choices)が存在しないか空です。`);
+          }
+          const seenJ = new Set();
+          q.choices.forEach((c, cIdx) => {
+            if (!c || typeof c !== 'object' || Array.isArray(c)) throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}の選択肢${cIdx + 1}の構造が不正です。`);
+            if (typeof c.value !== 'string') {
+              throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}の選択肢${cIdx + 1}の値(value)が文字列ではありません。`);
+            }
+            const jk = c.value.trim().normalize('NFKC');
+            if (jk && seenJ.has(jk)) {
+              warnings.push(`セクション${sIdx + 1}、設問${qIdx + 1}の選択肢「${c.value}」が重複しています。GAS実行時にエラーになります。`);
+            }
+            seenJ.add(jk);
+          });
+        }
+
+        if (q.type === 'SCALE') {
+          if (!q.scale || typeof q.scale !== 'object' || Array.isArray(q.scale)) {
+            throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}: SCALE形式の設問にscaleオブジェクトが存在しません。`);
+          }
+          if (typeof q.scale.lower !== 'number' || (q.scale.lower !== 0 && q.scale.lower !== 1)) {
+            throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}: スケール下限値(lower)は数値の0または1である必要があります。`);
+          }
+          if (typeof q.scale.upper !== 'number' || !Number.isInteger(q.scale.upper) || q.scale.upper < 2 || q.scale.upper > 10) {
+            throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}: スケール上限値(upper)は2〜10の整数である必要があります。`);
+          }
+          if (q.scale.lower >= q.scale.upper) {
+            throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}: スケール下限値(${q.scale.lower})は上限値(${q.scale.upper})より小さく設定してください。`);
+          }
+        }
+      });
+
+      if (branchCount > 1) {
+        warnings.push(`セクション${sIdx + 1}に複数の分岐設問が存在します。1セクションにつき分岐設問は1つまでです。`);
+      }
+
+      if (sIdx === data.sections.length - 1 && branchCount > 0) {
+        warnings.push(`最後のセクション(セクション${sIdx + 1})に分岐設問が存在します。Googleフォームの仕様上、最後のページでの分岐設定は無効です。`);
+      }
+    });
+
+    data.sections.forEach((sec, sIdx) => {
+      sec.questions.forEach((q, qIdx) => {
+        if (q.isBranching === true) {
+          q.choices.forEach((c, cIdx) => {
+            if (typeof c.goto !== 'string') {
+              throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}、選択肢${cIdx + 1}: 分岐先(goto)が指定されていないか不正な型です。`);
+            }
+            if (c.goto !== 'CONTINUE' && c.goto !== 'SUBMIT') {
+               if (!secIds.has(c.goto)) {
+                 throw new Error(`存在しない分岐先IDが指定されています: ${c.goto}`);
+               }
+               if (data.sections[0].id === c.goto) {
+                 throw new Error("先頭セクションへの分岐はGoogle Forms仕様上許可されていません。");
+               }
+               if (sec.id === c.goto) {
+                 throw new Error(`セクション${sIdx + 1}、設問${qIdx + 1}、選択肢${cIdx + 1}: 現在のセクション(自己)への分岐は許可されていません。`);
+               }
+            }
+          });
+        }
+      });
+    });
+    return warnings;
+  }
+
+  function saveJSON() {
+    const data = serializeForm(true);
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'form_design.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function loadJSON(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const titleEl = document.getElementById('form-title');
+      const descEl = document.getElementById('form-desc');
+      const containerEl = document.getElementById('sections-container');
+      
+      const backupTitle = titleEl.value;
+      const backupDesc = descEl.value;
+      const backupNodes = Array.from(containerEl.childNodes);
+
+      try {
+        const data = JSON.parse(evt.target.result);
+        const warnings = validateJSONSchema(data);
+        
+        titleEl.value = data.formTitle || '';
+        descEl.value = data.formDesc || '';
+        if (data.options && typeof data.options === 'object') {
+          document.getElementById('opt-mail').checked = data.options.sendMail === true;
+          document.getElementById('opt-trash').checked = data.options.trashOnError !== false;
+        }
+        containerEl.replaceChildren(); 
+        
+        data.sections.forEach(sec => {
+          const secEl = addSection(sec);
+          sec.questions.forEach(q => addQuestion(secEl.querySelector('.add-btn'), q));
+        });
+        
+        updateAllGotoDropdowns();
+        
+        if (warnings && warnings.length > 0) {
+          alert("読み込み警告（修正が必要です）:\n" + warnings.join("\n"));
+        }
+        
+      } catch (err) {
+        titleEl.value = backupTitle;
+        descEl.value = backupDesc;
+        containerEl.replaceChildren(...backupNodes);
+        alert("読み込みエラー: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
+  function generateGAS() {
+    const state = serializeForm();
+    if (!state) return; 
+
+    let gas = `function createFormAndSheet() {\n`;
+    gas += `  var form = null;\n`;
+    gas += `  var ss = null;\n`;
+    gas += `  try {\n`;
+    gas += `    form = FormApp.create(${JSON.stringify(state.formTitle)});\n`;
+    gas += `    form.setDescription(${JSON.stringify(state.formDesc)});\n`;
+    
+    gas += `\n    // --- パス1: セクションと設問の生成 ---\n`;
+    let branchQs = [];
+    
+    state.sections.forEach((sec, sIdx) => {
+      let secVar = `sec_${sIdx}`;
+      if (sIdx > 0) {
+        gas += `    var ${secVar} = form.addPageBreakItem();\n`;
+        gas += `    ${secVar}.setTitle(${JSON.stringify(sec.title)}).setHelpText(${JSON.stringify(sec.desc)});\n`;
+      } else {
+        if (sec.title || sec.desc) {
+          gas += `    form.addSectionHeaderItem().setTitle(${JSON.stringify(sec.title)}).setHelpText(${JSON.stringify(sec.desc)});\n`;
+        }
+      }
+
+      sec.questions.forEach((q, qIdx) => {
+        let qVar = `q_${sIdx}_${qIdx}`;
+        let itemMethod = '';
+        switch(q.type) {
+          case 'TEXT': itemMethod = 'addTextItem()'; break;
+          case 'PARAGRAPH': itemMethod = 'addParagraphTextItem()'; break;
+          case 'RADIO': itemMethod = 'addMultipleChoiceItem()'; break;
+          case 'DROPDOWN': itemMethod = 'addListItem()'; break;
+          case 'CHECKBOX': itemMethod = 'addCheckboxItem()'; break;
+          case 'DATE': itemMethod = 'addDateItem()'; break;
+          case 'SCALE': itemMethod = 'addScaleItem()'; break;
+        }
+
+        gas += `    var ${qVar} = form.${itemMethod};\n`;
+        gas += `    ${qVar}.setTitle(${JSON.stringify(q.title)}).setHelpText(${JSON.stringify(q.desc)}).setRequired(${q.isRequired});\n`;
+
+        if (q.type === 'SCALE') {
+          gas += `    ${qVar}.setBounds(${q.scale.lower}, ${q.scale.upper}).setLabels(${JSON.stringify(q.scale.lowerLabel)}, ${JSON.stringify(q.scale.upperLabel)});\n`;
+        } else if (['RADIO', 'DROPDOWN', 'CHECKBOX'].includes(q.type)) {
+          if (q.isBranching && q.type !== 'CHECKBOX') {
+            branchQs.push({ qVar, q, sIdx });
+          } else {
+            let choiceVals = q.choices.map(c => JSON.stringify(c.value)).join(', ');
+            gas += `    ${qVar}.setChoiceValues([${choiceVals}]);\n`;
+          }
+        }
+      });
+    });
+
+    if (branchQs.length > 0) {
+      gas += `\n    // --- パス2: 分岐設定の適用 ---\n`;
+      branchQs.forEach(bq => {
+        gas += `    var choices_${bq.qVar} = [];\n`;
+        bq.q.choices.forEach(c => {
+          let gotoTarget = c.goto || 'CONTINUE';
+          let navArg = 'FormApp.PageNavigationType.CONTINUE';
+          
+          if (gotoTarget === 'SUBMIT') {
+            navArg = 'FormApp.PageNavigationType.SUBMIT';
+          } else if (gotoTarget !== 'CONTINUE') {
+            let targetIdx = state.sections.findIndex(s => s.id === gotoTarget);
+            if (targetIdx > 0) {
+              navArg = `sec_${targetIdx}`;
+            }
+          }
+          gas += `    choices_${bq.qVar}.push(${bq.qVar}.createChoice(${JSON.stringify(c.value)}, ${navArg}));\n`;
+        });
+        gas += `    ${bq.qVar}.setChoices(choices_${bq.qVar});\n`;
+      });
+    }
+
+    gas += `\n    // --- シート連携と保存先の制御 ---\n`;
+    gas += `    ss = SpreadsheetApp.create(${JSON.stringify(state.formTitle + " (回答)")});\n`;
+    gas += `    form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());\n`;
+    
+    gas += `\n    // ※注意: デフォルトではマイドライブのルートディレクトリに作成されます。\n`;
+    gas += `    // 特定のフォルダに移動させたい場合は、以下のコメントアウトを解除し、FOLDER_IDを指定してください。\n`;
+    gas += `    /*\n`;
+    gas += `    try {\n`;
+    gas += `      var folder = DriveApp.getFolderById('YOUR_FOLDER_ID_HERE');\n`;
+    gas += `      DriveApp.getFileById(form.getId()).moveTo(folder);\n`;
+    gas += `      DriveApp.getFileById(ss.getId()).moveTo(folder);\n`;
+    gas += `    } catch (driveError) {\n`;
+    gas += `      console.warn("フォルダへの移動に失敗しました。IDが正しいか、権限があるか確認してください: " + driveError.message);\n`;
+    gas += `    }\n`;
+    gas += `    */\n`;
+    
+    const opt = state.options || {};
+    gas += `\n    // --- 完了通知 ---\n`;
+    gas += `    var editUrl = form.getEditUrl();\n`;
+    gas += `    var pubUrl = form.getPublishedUrl();\n`;
+    gas += `    var sheetUrl = ss.getUrl();\n`;
+    gas += `    var doneMsg = "\\n================================\\n"\n`;
+    gas += `      + "★★ フォームができました ★★\\n"\n`;
+    gas += `      + "================================\\n"\n`;
+    gas += `      + "【編集用URL】(まずここを開く)\\n" + editUrl + "\\n\\n"\n`;
+    gas += `      + "【回答者に送るURL】\\n" + pubUrl + "\\n\\n"\n`;
+    gas += `      + "【回答の集計シート】\\n" + sheetUrl + "\\n\\n"\n`;
+    gas += `      + "※マイドライブ直下に保存されています。\\n"\n`;
+    gas += `      + "※上のURLをクリックするか、ブラウザに貼り付けてください。";\n`;
+    gas += `    console.log(doneMsg);\n`;
+    if (opt.sendMail) {
+      gas += `\n    // --- メール通知 ---\n`;
+      gas += `    try {\n`;
+      gas += `      var mailTo = Session.getEffectiveUser().getEmail();\n`;
+      gas += `      if (mailTo) {\n`;
+      gas += `        MailApp.sendEmail(mailTo, "【フォーム作成完了】" + form.getTitle(), doneMsg);\n`;
+      gas += `      } else {\n`;
+      gas += `        console.warn("メールアドレスを取得できなかったため、メール通知は行いませんでした。");\n`;
+      gas += `      }\n`;
+      gas += `    } catch (mailError) {\n`;
+      gas += `      console.warn("メール通知に失敗しました(フォームは作成済みです): " + mailError.message);\n`;
+      gas += `    }\n`;
+    }
+    gas += `  } catch(e) {\n`;
+    gas += `    console.error("エラーが発生しました: " + e.message);\n`;
+    gas += `    if (form) {\n`;
+    if (opt.trashOnError) {
+      gas += `      try {\n`;
+      gas += `        DriveApp.getFileById(form.getId()).setTrashed(true);\n`;
+      gas += `        if (ss) { DriveApp.getFileById(ss.getId()).setTrashed(true); }\n`;
+      gas += `        console.error("途中まで作成されたフォーム/シートはゴミ箱に移動しました。入力内容を直して再実行してください。");\n`;
+      gas += `      } catch (trashError) {\n`;
+      gas += `        console.error("ゴミ箱への移動に失敗しました。手動で削除してください。\\n確認用URL: " + form.getEditUrl());\n`;
+      gas += `      }\n`;
+    } else {
+      gas += `      console.error("途中まで作成されたフォームが存在します。\\n確認用URL: " + form.getEditUrl());\n`;
+    }
+    gas += `    }\n`;
+    gas += `    throw e;\n`;
+    gas += `  }\n`;
+    gas += `}\n`;
+
+    const outArea = document.getElementById('output-area');
+    document.getElementById('gas-code').value = gas;
+    outArea.style.display = 'block';
+    outArea.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function copyCode() {
+    const code = document.getElementById('gas-code').value;
+    const fallbackCopy = () => {
+      const textArea = document.getElementById('gas-code');
+      textArea.select();
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          alert('コピーしました。');
+        } else {
+          alert('コピーに失敗しました。');
+        }
+      } catch (err) {
+        alert('コピーに失敗しました。');
+      }
+    };
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(() => {
+        alert('クリップボードにコピーしました。');
+      }).catch(err => {
+        fallbackCopy();
+      });
+    } else {
+      fallbackCopy();
+    }
+  }
+
+  window.onload = () => { addSection(); };
+</script>
+</body>
+</html>
