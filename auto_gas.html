@@ -41,6 +41,7 @@
   .guide{background:#edf2fb;border:1px solid #d5dff1;border-radius:12px;padding:20px 24px;margin-bottom:20px}.guide h2{font-size:18px;margin:0 0 8px}.guide p,.guide ol{margin:6px 0}.guide ol{padding-left:24px}.help{font-size:13px;color:#58677e;margin:5px 0 12px}.field-label{display:block;font-size:13px;font-weight:700;margin:10px 0 5px}.section-help{border-bottom:1px solid #d9e2f0;padding-bottom:12px}.question-help{margin-top:0}.header-actions{display:flex;flex-wrap:wrap;gap:12px}.header-actions button{flex:1;min-width:210px;text-align:left;padding:14px 18px}.button-hint{display:block;font-size:12px;font-weight:400;margin-top:4px;opacity:.9}button{font:inherit;font-size:14px;border-radius:8px;padding:9px 14px}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #8dafff;outline-offset:2px}.panel{border:1px solid #dde3ec;border-radius:14px;box-shadow:0 3px 12px #20304706}.panel h3{margin-top:0}.section{border-color:#a9bce0;border-radius:14px;padding:22px;background:#f7f9fd}.question{border-radius:10px;border-left-color:#658b79;padding:18px}.row{flex-wrap:wrap}.row>*{min-width:0}input[type=text],textarea,select{font:inherit;font-size:14px;padding:10px 12px;border-color:#cbd4e1;border-radius:7px}input[type=checkbox]{accent-color:#315fa7}.choices-area{background:#f6f8fc;padding:12px;border-radius:8px}.choice-item{flex-wrap:wrap}.choice-item input{min-width:140px}.choice-item select{min-width:170px}.scale-settings{flex-wrap:wrap}.scale-settings select{width:80px}.scale-settings input{flex:1;min-width:140px}.options label{display:block;margin:10px 0}.footer-note{font-size:12px;color:#66748a;text-align:center;margin:26px 0 0}
   @media(max-width:650px){body{padding:14px 10px}.hero{padding:24px 20px}.hero h1{font-size:23px}.section{padding:15px}.row{gap:8px}.row>.ctrl-group{margin-left:auto}.question>.row:first-child>select{flex-basis:100%}.header-actions button{min-width:100%}.guide{padding:16px}.choice-item input,.choice-item select{flex-basis:100%!important}}
 
+  .tool-nav{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}.tool-nav a{display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border:1px solid #ffffff55;border-radius:8px;color:#fff;background:#ffffff0d;text-decoration:none;font-size:14px;font-weight:600}.tool-nav a:hover{background:#ffffff20}.tool-nav a:focus-visible{outline:3px solid #8dafff;outline-offset:3px}.guide-link{color:#2458a0;text-underline-offset:3px}
 </style>
 </head>
 <body>
@@ -51,12 +52,17 @@
     <h1>Googleフォーム 自動作成ツール</h1>
     <p class="tagline">聞きたいことを画面で組み立て、アンケートの形に。</p>
     <div class="badges"><span class="badge">Ver.3.8 · UI改訂版</span><span class="badge">回答に合わせた分岐</span><span class="badge">設定の保存・再利用</span></div>
+    <nav class="tool-nav" aria-label="関連ページ">
+      <a href="./index.html">ホームに戻る</a>
+      <a href="https://note.com/nepm_prompt_ai/n/nc266c26725f5" target="_blank" rel="noopener noreferrer">使い方と活用例を読む（note・別タブ）</a>
+    </nav>
   </header>
   <section class="guide" aria-labelledby="guide-title">
     <h2 id="guide-title">まずは「何を聞くか」を決めましょう</h2>
     <ol><li><b>アンケートの名前</b>と説明を入力します。</li><li><b>ページ（セクション）</b>を作り、その中へ<b>質問</b>を追加します。</li><li>入力ができたら<b>作成用コードを生成</b>し、Google Apps Scriptへ貼り付けて実行します。</li></ol>
     <p class="help">「ページ」は質問をまとめる区切りです。例：1ページ目は基本情報、2ページ目は参加希望。Googleフォームでは、この区切りを「セクション」と呼びます。</p>
     <p class="help">この画面ではアンケートの設計を行います。Googleフォームと回答用スプレッドシートは、生成したコードをGoogle側で実行すると作成されます。</p>
+    <p class="help"><a class="guide-link" href="https://note.com/nepm_prompt_ai/n/nc266c26725f5" target="_blank" rel="noopener noreferrer">画像付きの操作手順と、学校・研修での活用例はこちら（note・別タブ）</a></p>
   </section>
   
   <div class="header-actions">
