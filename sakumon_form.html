@@ -1,0 +1,888 @@
+<!doctype html>
+<!--
+  NEPM 作問Web＋ 配信フォーム自動作成
+  バージョン管理: 版数・日付・更新履歴はスクリプト冒頭の NEPM_VERSION だけが唯一の正。
+  更新時は NEPM_VERSION と CHANGELOG.md、ファイル名(VerX_Y)を同時に更新すること。
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEPM 作問Web＋ 配信フォーム自動作成 Ver.1.9</title>
+<style>
+:root {
+  --bg:#f4f7fb; --card:#fff; --text:#172033; --muted:#5f6b7a;
+  --line:#dce4ef; --brand:#2157a6; --brand2:#143f7d;
+  --ok:#edf8f1; --warn:#fff8e7; --info:#eef5ff; --danger:#fff0f0;
+  --shadow:0 10px 28px rgba(26,52,92,.09);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;line-height:1.6}
+header{background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;padding:30px 18px 26px}
+.header-inner{max-width:920px;margin:auto}
+.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.08em;opacity:.88}
+h1{font-size:clamp(1.8rem,5vw,2.5rem);margin:4px 0 2px;line-height:1.2}
+.subtitle{margin:4px 0 0;opacity:.94}
+.meta{margin-top:10px;font-size:.86rem;opacity:.85;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.meta-tag{padding:2px 8px;border-radius:6px;font-weight:700;font-size:.78rem;color:var(--text);background:#eef5ff;border:1px solid #cbdcf6}
+main{max-width:920px;margin:0 auto;padding:20px 14px 50px}
+.assurances{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-2px 0 18px}
+.assurance{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.assurance b{display:block;margin-bottom:3px}
+.assurance small{color:var(--muted)}
+.notice{border-radius:14px;padding:14px 16px;margin:12px 0;border:1px solid var(--line);background:var(--card)}
+.notice.verify{background:var(--info);border-color:#cbdcf6}
+.notice.privacy{background:var(--warn);border-color:#eedba7}
+.notice.alert-danger{background:#fff8e7;border-color:#eedba7;color:#926c05;display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:var(--shadow)}
+.step{font-weight:850;font-size:1.06rem;margin-bottom:12px}
+.step span{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;margin-right:7px;font-size:.88rem}
+label.note{display:block;font-weight:700;margin:10px 0 5px}
+.hint{font-size:.84rem;color:var(--muted);margin-top:4px}
+input[type=text],input[type=number],select,textarea{width:100%;padding:12px 13px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:var(--text);font:inherit}
+textarea{min-height:92px;resize:vertical}
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.choices.three{grid-template-columns:repeat(3,1fr)}
+.choice{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fbfcfe;cursor:pointer}
+.choice:has(input:checked){border-color:#7fa6dc;background:#f0f6ff}
+button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:14px 18px;cursor:pointer}
+.primary{width:100%;background:var(--brand);color:#fff;box-shadow:0 6px 16px rgba(33,87,166,.18)}
+.primary:hover{background:var(--brand2)}
+.secondary{width:100%;background:#eef2f7;color:#243247;margin-top:9px}
+.result{display:none;margin-top:18px}
+.guide{background:#fff;border:2px solid #9db9df;border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.guide h2{font-size:1.15rem;margin:0 0 10px}
+.flow{display:grid;gap:9px}
+.flow-item{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;background:#f7f9fc}
+.badge{flex:0 0 auto;min-width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--brand);color:#fff;font-weight:900}
+.command{font-weight:900;color:#b42318;background:#fff0f0;border-radius:6px;padding:1px 6px}
+.docs{margin-top:12px;background:var(--ok);border:1px solid #b9dfc7;border-radius:12px;padding:13px}
+.status{margin:10px 0 0;font-weight:750}
+pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;padding:15px;border-radius:12px;max-height:430px;overflow:auto;font-size:.78rem}
+.footer-note{font-size:.82rem;color:var(--muted);text-align:center;margin-top:24px}
+details.changelog{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:.86rem}
+details.changelog summary{cursor:pointer;font-weight:800}
+details.changelog h3{font-size:.95rem;margin:14px 0 4px}
+details.changelog ul{margin:4px 0 0;padding-left:1.2em}
+@media(max-width:680px){
+  .assurances,.choices,.choices.three{grid-template-columns:1fr}
+  header{padding-top:24px}
+  .card{padding:16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">NEPM™ / Nakata Educational Prompt Method</div>
+    <h1>NEPM 作問Web＋ 配信フォーム自動作成</h1>
+    <p class="subtitle">問題・解説の作成から、Googleフォーム作成用GASコードの一括出力までサポート</p>
+    <div class="meta">
+      <span class="meta-tag">✨ Ver. <span class="js-ver">1.9</span></span>
+      <span>Auto-Scoring & Robust Engine</span>
+      <span>｜</span>
+      <span>© N. Nakata  NEPM™ All Rights Reserved.</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="assurances">
+    <div class="assurance"><b>✓ 構成・配点の機械チェック</b><small>満点合計・問題数・選択肢の形式を、GAS実行時に検査します。</small></div>
+    <div class="assurance"><b>✓ 半自動採点エンジン搭載</b><small>スプレッドシートに採点関数を自動構築します。</small></div>
+    <div class="assurance"><b>✓ 整理しやすい自動命名</b><small>作成日の日付がタイトルに自動で付与されます。</small></div>
+  </div>
+
+  <div class="notice privacy"><b>🔒 入力前に確認</b><br>生徒の氏名、個人を特定できる情報、校内の機密情報は入力しないでください。コピー後に外部AIへ送信した内容は、そのサービスの利用条件・ポリシーに従って扱われます。<br><small>※ 正答の正しさそのものはシステムでは検証できません。承認前に必ず先生が確認してください。</small></div>
+
+  <form id="maker">
+    <section class="card">
+      <div class="step"><span>0</span>記述問題の有無</div>
+      <div class="choices">
+        <label class="choice">
+          <input type="radio" name="written_mode" value="CHOICE_ONLY" checked onchange="updateWrittenModeNotice(this.value)">
+          <div>
+            <b>含めない（選択問題のみ）</b><br>
+            <small style="color:var(--muted)">フォーム標準機能で全問自動採点されます。</small>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="written_mode" value="WITH_WRITTEN" onchange="updateWrittenModeNotice(this.value)">
+          <div>
+            <b>含める（記述1問 ＋ 選択問題）</b><br>
+            <small style="color:var(--muted)">回答シート上で半自動採点（関数）が行われます。</small>
+          </div>
+        </label>
+      </div>
+
+      <div id="notice-written-danger" class="notice alert-danger">
+        <b>📝 スプレッドシート半自動採点モード</b><br>
+        フォーム自体のクイズ機能はOFFになりますが、生成されるスプレッドシートの右側に「選択問題の自動採点列」「記述の採点入力枠（黄色）」「合計点」が自動で構築されます。<br>先生は記述の点数を入れるだけで集計が完了します（記述が未入力の間、合計点は「未採点」と表示されます）。誤入力を防ぐ機能も搭載しています。<br>
+        <small>※ このモードでは、選択肢に「選択肢1：」などのラベルを自動で付けます。数字や日付の回答も、文字列のまま照合して採点します。</small>
+      </div>
+      <div id="notice-written-ok" class="notice verify" style="margin-top:12px;">
+        <b>ℹ️ クイズフォーム自動採点モード</b><br>
+        選択問題のみで構成され、Googleフォームの標準機能で全問自動採点されます。
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>1</span>基礎情報</div>
+      <div class="choices three">
+        <label class="choice"><input type="radio" name="grade" value="高1" checked>高校1年</label>
+        <label class="choice"><input type="radio" name="grade" value="高2">高校2年</label>
+        <label class="choice"><input type="radio" name="grade" value="高3">高校3年</label>
+      </div>
+      <label class="note" for="subject">教科</label>
+      <select id="subject" required>
+        <option value="" disabled selected>教科を選択してください</option>
+        <option>国語</option><option>数学</option><option>英語</option><option>理科</option>
+        <option>地歴・公民</option><option>情報</option><option>総合的な探究の時間</option>
+      </select>
+      <label class="note" for="unit">単元・テーマ</label>
+      <input id="unit" type="text" required placeholder="例：二次関数 / 一次関数の利用">
+      <label class="note" for="teacher_intent">先生のねらい・気になること（任意）</label>
+      <input id="teacher_intent" type="text" placeholder="例：符号ミスが多い / 公式を使えるか確認したい">
+      <div class="hint">生徒のつまずきや「ここを見たい」を一言添える欄です。</div>
+      <label class="note" for="id_fields">フォームの本人確認欄</label>
+      <select id="id_fields">
+        <option value="NAME_ONLY" selected>氏名のみ</option>
+        <option value="CLASS_NAME">学年・組・番号 ＋ 氏名</option>
+      </select>
+      <div class="hint">同姓同名がいる場合は「学年・組・番号 ＋ 氏名」を選んでください。</div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>2</span>テストの方向性</div>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="purpose" value="① 授業内容の基礎的な定着を確認したい（平均75点〜）">まずは基本を確認</label>
+        <label class="choice"><input type="radio" name="purpose" value="② 基礎固めを中心としつつ、少しだけ差をつけたい（平均70点〜）">基礎中心＋少し差がつく</label>
+        <label class="choice"><input type="radio" name="purpose" value="③ 次の模試や実力テストにつながる標準的な問題にしたい（平均60〜65点）" checked>標準的なテスト</label>
+        <label class="choice"><input type="radio" name="purpose" value="④ 応用力を問う、難易度高めの構成にしたい（平均50点〜）">応用まで入れる</label>
+        <label class="choice"><input type="radio" name="purpose" value="⑤ 共通テストの形式（初見資料読み取りなど）を意識させたい（平均45〜55点）">共通テストを意識</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>3</span>出題範囲・深さ</div>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="source" value="A. 教科書の本文（太字レベル）だけで解けるようにして" checked>教科書本文中心</label>
+        <label class="choice"><input type="radio" name="source" value="B. 教科書の図表や脚注の内容も盛り込んで">図表・脚注まで</label>
+        <label class="choice"><input type="radio" name="source" value="C. 初見の資料や少し発展的な内容も入れて">初見資料・発展も含む</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>4</span>問題数・満点・時間（最大10問）</div>
+      <div class="hint" style="margin-bottom:8px">※「記述問題あり」の場合、記述1問を含んだ合計問題数となります。満点は問題数以上の整数にしてください（各問1点以上のため）。</div>
+      <div class="choices three">
+        <label class="choice"><input type="radio" name="q_count" value="3">3問</label>
+        <label class="choice"><input type="radio" name="q_count" value="5" checked>5問（推奨）</label>
+        <label class="choice"><input type="radio" name="q_count" value="10">10問（上限）</label>
+      </div>
+      <div class="choices" style="margin-top:10px">
+        <div id="score_container"><label class="note" for="score">目標満点</label><input id="score" type="number" value="50" min="1" max="1000" step="1" required></div>
+        <div><label class="note" for="time_range">想定時間</label>
+          <select id="time_range"><option value="10">10分</option><option value="15" selected>15分</option><option value="30">30分</option><option value="50">50分</option></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>5</span>作問上の追加指示（任意）</div>
+      <textarea id="additional_instruction" placeholder="例：計算問題を多めに / 1ページ前の復習を問1に"></textarea>
+    </section>
+
+    <button class="primary" type="submit">作成データを準備</button>
+    <div id="editStatus" class="status" role="status" aria-live="polite"></div>
+  </form>
+
+  <section id="result" class="result">
+    <div class="guide">
+      <h2>このあと4ステップです</h2>
+      <div class="flow">
+        <div class="flow-item"><div class="badge">1</div><div><b>作成データをコピー</b><br>下の青いボタンを押します。</div></div>
+        <div class="flow-item"><div class="badge">2</div><div><b>Geminiのチャットに貼り付けて送信</b><br>画面上に表示された問題・正答・解説を確認します。</div></div>
+        <div class="flow-item"><div class="badge">3</div><div><b>「承認」と入力</b><br>問題なければ <span class="command">承認</span> と入力します。</div></div>
+        <div class="flow-item"><div class="badge">4</div><div><b>GASコードをコピーして実行</b><br>表示されたGASコード（1つのコードブロック）をコピーし、Apps Scriptで実行します。<b>実行前に、上部の関数選択が <span class="command">createFormAndSheet</span> になっていることを確認してください。</b>完了後、実行ログに生徒配布用URLが表示されます。</div></div>
+      </div>
+    </div>
+    <button class="primary" id="copyBtn" type="button">作成データをコピー</button>
+    <div id="copyStatus" class="status" aria-live="polite"></div>
+    <button class="secondary" id="previewBtn" type="button">実行パッケージの内容を確認</button>
+    <pre id="preview" hidden></pre>
+  </section>
+
+  <details class="changelog" id="changelog">
+    <summary>更新履歴（<span class="js-ver">1.9</span>）</summary>
+    <div id="changelog-body"></div>
+  </details>
+
+  <div class="footer-note">NEPM™ / Nakata Educational Prompt Method Ver.<span class="js-ver">1.9</span> ｜ Copyright © N. Nakata All Rights Reserved.</div>
+</main>
+
+<script>
+// ============================================================
+// バージョン管理（唯一の正）。更新時はここと CHANGELOG.md を同時に更新する。
+// ============================================================
+const NEPM_VERSION = {
+  version: "1.9",
+  date: "2026-10-13",
+  history: [
+    {
+      v: "1.9", date: "2026-10-13",
+      changes: [
+        "入力変更時に作成済みパッケージを無効化し、古い条件のコピーを防止",
+        "記述ありモードの選択肢に識別ラベルを付け、数値・日付への変換による採点ずれを防止",
+        "先生用シートの問題文・選択肢・正答・解説をリッチテキストで保存し、数式化を防止",
+        "選択肢重複チェックをSetに変更し、constructorなどの誤判定を修正",
+        "再編集時の案内と、配布前の回答・採点テスト手順を追加"
+      ]
+    },
+    {
+      v: "1.8", date: "2026-10-13",
+      changes: [
+        "【修正・重大】GASの実行入口を明確化：createFormAndSheet をファイル先頭の関数にし、手順に関数選択の確認を追加",
+        "【修正】問題数の検証を追加（QUESTION_COUNT。AIが指定と違う問数を出したら実行前に停止）",
+        "【修正】選択肢の検証を強化（文字列・空文字・前後空白・大文字小文字違いの重複を拒否）",
+        "【修正】解説(explanation)の欠落を検出",
+        "【修正】半自動採点：数字・記号のみの選択肢を拒否（日付/数値変換による全員0点を防止）",
+        "【修正】合計点：記述が未入力の間は「未採点」と表示（途中点が最終点に見えない）",
+        "【修正】HTML側に「満点 ≧ 問題数」「満点は整数」の検査を追加",
+        "【修正】プロンプトの記述配点ルールを緩和（満点が小さくても配点が成立するように）",
+        "【修正】解説シートの選択肢に余計な ' が出る不具合を修正（セルを書式「テキスト」にして対処）",
+        "【追加】実行ログに生徒配布用URL・編集URL・回答シートURLを出力",
+        "【追加】本人確認欄の選択（氏名のみ／学年・組・番号＋氏名）",
+        "【改善】空の「シート1」を自動削除、戻る操作後の注意書き表示ずれを修正、表記ゆれ（© N. Nakata）を統一、過大な表現を修正",
+        "【追加】版数を単一定数で管理し、HTML・プロンプト・GASへ反映。更新履歴をページ内に表示"
+      ]
+    },
+    {
+      v: "1.7", date: "—",
+      changes: [
+        "基準版（Robust Scoring Engine）。1.6以前の履歴は未記録"
+      ]
+    }
+  ]
+};
+
+(function renderVersion() {
+  document.title = "NEPM 作問Web＋ 配信フォーム自動作成 Ver." + NEPM_VERSION.version;
+  document.querySelectorAll('.js-ver').forEach(function (el) { el.textContent = NEPM_VERSION.version; });
+  var body = document.getElementById('changelog-body');
+  NEPM_VERSION.history.forEach(function (h) {
+    var h3 = document.createElement('h3');
+    h3.textContent = "Ver." + h.v + "（" + h.date + "）";
+    var ul = document.createElement('ul');
+    h.changes.forEach(function (c) {
+      var li = document.createElement('li');
+      li.textContent = c;
+      ul.appendChild(li);
+    });
+    body.appendChild(h3);
+    body.appendChild(ul);
+  });
+})();
+
+function updateWrittenModeNotice(val) {
+  const dangerNotice = document.getElementById('notice-written-danger');
+  const okNotice = document.getElementById('notice-written-ok');
+  if (val === 'WITH_WRITTEN') {
+    dangerNotice.style.display = 'block';
+    okNotice.style.display = 'none';
+  } else {
+    dangerNotice.style.display = 'none';
+    okNotice.style.display = 'block';
+  }
+}
+// 戻る/進む操作などでラジオ状態が復元されても、注意書きを実際の選択に合わせる
+function syncWrittenNotice() {
+  const el = document.querySelector('input[name="written_mode"]:checked');
+  updateWrittenModeNotice(el ? el.value : 'CHOICE_ONLY');
+}
+window.addEventListener('pageshow', syncWrittenNotice);
+syncWrittenNotice();
+
+const ID_FIELD_PRESETS = {
+  NAME_ONLY: ["氏名"],
+  CLASS_NAME: ["学年・組・番号", "氏名"]
+};
+
+const getTemplateGAS = (titleStr, modeStr, score, qCount, idFields) => `# Nakata Educational Prompt Method™ (NEPM™)
+## Form Builder Integrated Specification (Ver. ${NEPM_VERSION.version} - Robust Scoring Engine)
+
+Role: 先生のための対話型作問・Googleフォーム作成アシスタントです。
+
+---
+
+### 【絶対順守の動作ルール】
+
+1. 下記のルール・テンプレート構造は、解釈の追加や変更をせず厳格に適用してください。
+2. **【JavaScript構文安全ルール】**:
+   - 選択問題の正答位置（\`answerIndex\`）は特定の位置（0など）に偏らせず、ランダム配置させてください。
+   - すべての設問に **\`explanation\`（解説テキスト）** を必ず作成してください（空文字は不可）。
+   - \`DESIGN\` オブジェクト内の文字列でダブルクォーテーションを使う場合は必ず \`\\"\` とエスケープしてください。改行は必ず \`\\n\` 表記で出力してください。
+   - **\`const DESIGN = {\` は1行コメント等と同一行に結合させず、必ず独立した行で開始してください。**
+3. **【DESIGN構造ルール】**:
+   - 氏名欄などの本人確認欄の追加やフォーム名の設定はテンプレート側の固定値で処理します。**\`DESIGN\` 内には \`title\` や \`mode\` を含めず、\`questions\` 配列のみを定義**してください。
+4. **【問題数ルール】**:
+   - \`questions\` 配列の要素数は、指定された \`Total Item Count\`（${qCount}問）とちょうど一致させてください（記述ありの場合は記述1問を含む）。一致しないとGAS実行時にエラーで停止します。
+5. **【配点設定ルール】**:
+   - モードにかかわらず、**必ずすべての設問（CHOICE, WRITTEN問わず）に \`point\` プロパティ（1以上の整数）を設定**し、全設問の \`point\` の合計が指定された \`Total Score\`（${score}点）と必ず一致するように適切に割り振ってください。**合計の一致が最優先です。**
+   - **【端数調整のルール】** 合計点が均等に割り切れず配点調整が必要な場合は、以下の優先順位に従ってください。
+     1. 記述問題（WRITTEN）がある場合、記述の配点は満点の2〜4割程度を目安に、キリの良い数字（5の倍数など）とし、端数調整の対象から外すこと。ただし満点が小さくこれが成立しない場合は、各設問1点以上の整数で合計を一致させることを優先すること。
+     2. 選択問題（CHOICE）の中で、最も難易度が高い・または思考力を問う問題の配点を高くして端数を吸収すること。
+6. **【選択肢の書式ルール】**:
+   - 各選択肢は、空文字でない文字列とし、前後に空白を付けないでください。大文字小文字だけが異なる選択肢（重複）も不可です。
+   - 選択肢に識別ラベルを手入力しないでください。WITH_WRITTENでは固定GASが「選択肢1：」などを自動付与します。数字・日付・数式風の文字列も使用できます。
+
+---
+
+### 【作問モードと動作条件】
+
+- **CHOICE_ONLY（選択問題のみ・全問自動採点）**
+  - すべての設問を単一選択（ラジオボタン）形式で作成します。フォームはクイズ形式になります。
+- **WITH_WRITTEN（記述あり・半自動採点モード）**
+  - 選択問題（複数）＋ 記述問題（短文回答形式・厳密に1問）で構成します。
+  - フォーム自体はクイズ形式にしませんが、生成されるスプレッドシート側に自動採点関数が埋め込まれます。
+
+---
+
+### 【対話フローと出力ステップ】
+
+#### ■ ステップ 1: 問題・正答・解説の一覧表示
+プロンプトを受け取ったら、まず最初に以下の構成で画面に出力してください。
+
+1. 先頭にモード明記:
+   - CHOICE_ONLYの場合 ➔ 「【作問モード】選択問題のみ（フォームクイズ自動採点）」
+   - WITH_WRITTENの場合 ➔ 「【作問モード】記述あり（スプレッドシート半自動採点）」
+2. **【問題・配点・正答・解説の一覧】**
+   - 設問ごとに「問題文」「配点」「選択肢（正答位置）」「正答」「解説」を分かりやすく表示します。
+   - 末尾に「問題数：○問／配点合計：○点（指定 ${score}点）」を検算結果として明記してください。
+   - 氏名欄については触れないでください。
+3. **確認と承認の案内ブロック**:
+   ## ⚠️ ここで一度確認してください
+   問題文・正答・配点・解説を確認してください。
+   - 📝 修正する ➔ 直したい内容をそのまま入力
+   - ✅ この内容で進む ➔ **「承認」** と入力
+
+#### ■ ステップ 2: 完成版GASコードと手順案内の出力（「承認」入力時）
+先生が「承認」と入力したら、**会話文や挨拶を一切含めず**、以下の2点のみを順番に出力してください。
+
+1. **完成版GASコード（javascriptのコードブロック1つ）**
+   - 下記の【固定テンプレートGAS】の \`const DESIGN = { ... };\` の中身を作問データで置換したコード全体を出力してください。
+   - \`DESIGN\` 以外のコード部分は一字一句変更してはいけません。
+
+2. **先生向け手順案内（直後に連続して表示）**
+   以下の案内文章を省略せず、そのまま出力してください。
+
+---
+📖 Googleフォーム作成・配信の手順
+
+1. **コードをコピーする**
+   上のコードブロックの右上にある「コピー」ボタンを押します。
+
+2. **Apps Scriptを開き、貼り付けて保存する**
+   新しいタブで https://script.google.com/ にアクセスし、「＋ 新しいプロジェクト」を押します。元からあるコードを消して貼り付け、「保存（フロッピーアイコン）」を押します。
+
+3. **実行する**
+   画面上部の関数選択が **「createFormAndSheet」** になっていることを確認し、「▷ 実行」ボタンを1回だけ押します。
+   ※初回のみ権限の確認が出ます。
+   「**権限を確認**」➔ ご自身のアカウントを選択 ➔ 「**このアプリは Google で確認されていません**」と出たら左下の「**詳細**」➔「**（プロジェクト名）（安全ではないページ）に移動**」➔「**すべて選択**」にチェックが入っていることを確認 ➔「**次へ**」（または「許可」）と進めてください。
+
+4. **実行完了を確認する**
+   画面下の「実行ログ」に「正常に完了しました」と表示されたら成功です。ログに出る「フォーム編集URL」で内容と公開・回答者設定を確認してください。「生徒配布用URL」を開いてテスト回答し、全問正解・一問不正解の得点を確認してから生徒へ配布してください。「回答シートURL」から回答と採点を確認できます。記述ありの場合は、未入力の合計が「未採点」となり、記述に0点または満点を入力すると合計が正しく変わることも確認してください。
+   エラーが出た場合は、作成途中のファイルは自動でゴミ箱へ移動されます。ログの内容を確認し、修正してもう一度実行してください。
+
+   ⚠️ **【注意】** 回答用スプレッドシートには、正答と解説のシートが入っています。**生徒や他の先生に共有しないでください。**
+---
+
+---
+
+### 【固定テンプレートGAS】
+
+\`\`\`javascript
+/*
+ * © N. Nakata  NEPM™ Form Builder Ver ${NEPM_VERSION.version}
+ * Auto-Scoring Engine Integrated (Robust)
+ */
+
+const NEPM_VER = ${JSON.stringify(NEPM_VERSION.version)};
+const FORM_TITLE = ${JSON.stringify(titleStr)};
+const FORM_MODE = ${JSON.stringify(modeStr)};
+const TARGET_SCORE = ${score};
+const QUESTION_COUNT = ${qCount};
+const ID_FIELDS = ${JSON.stringify(idFields)};
+
+const DESIGN = {
+  questions: [
+    {
+      type: "CHOICE",
+      text: "問題文",
+      choices: ["選択肢A", "選択肢B", "選択肢C", "選択肢D"],
+      answerIndex: 0,
+      point: 10,
+      explanation: "ここに解法・解説テキストが入ります。"
+    },
+    {
+      type: "WRITTEN",
+      text: "問題文",
+      point: 10,
+      explanation: "ここに模範解答・採点基準解説が入ります。"
+    }
+  ]
+};
+
+// ★実行入口：この関数を選択して「実行」を押す（ファイル先頭の関数）
+function createFormAndSheet() {
+  validateDesign(DESIGN);
+
+  var form = null;
+  var ss = null;
+
+  try {
+    form = FormApp.create(FORM_TITLE);
+    form.setIsQuiz(FORM_MODE === "CHOICE_ONLY");
+
+    // 本人確認欄の追加 (点数なし)
+    for (var f = 0; f < ID_FIELDS.length; f++) {
+      var textItem = form.addTextItem();
+      textItem.setTitle(ID_FIELDS[f]).setRequired(true);
+      textItem.setHelpText(ID_FIELDS[f] === "氏名" ? "例：山田 太郎" : "例：1年2組15番");
+    }
+
+    for (var i = 0; i < DESIGN.questions.length; i++) {
+      var qData = DESIGN.questions[i];
+      var qNum = i + 1;
+      var qTitle = "問" + qNum + ". " + qData.text;
+
+      if (qData.type === "CHOICE") {
+        var mcItem = form.addMultipleChoiceItem();
+        mcItem.setTitle(qTitle).setRequired(true);
+
+        var choicesObj = [];
+        for (var j = 0; j < qData.choices.length; j++) {
+          var isCorrect = (j === qData.answerIndex);
+          if (FORM_MODE === "CHOICE_ONLY") {
+            choicesObj.push(mcItem.createChoice(qData.choices[j], isCorrect));
+          } else {
+            choicesObj.push(mcItem.createChoice(getChoiceLabel(qData, j)));
+          }
+        }
+        mcItem.setChoices(choicesObj);
+
+        if (FORM_MODE === "CHOICE_ONLY") {
+          mcItem.setPoints(qData.point);
+        }
+
+      } else if (qData.type === "WRITTEN") {
+        var wrItem = form.addTextItem();
+        wrItem.setTitle(qTitle).setRequired(true);
+      }
+    }
+
+    // 回答用スプレッドシート作成と紐付け
+    ss = SpreadsheetApp.create(FORM_TITLE + " (回答)");
+    form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
+
+    // シート同期待ち (最大10秒)
+    var respSheet = null;
+    for (var wait = 0; wait < 5; wait++) {
+      SpreadsheetApp.flush();
+      Utilities.sleep(2000);
+      var sheets = ss.getSheets();
+      for (var s = 0; s < sheets.length; s++) {
+        var topCell = sheets[s].getRange(1, 1).getValue().toString().toLowerCase();
+        if (topCell === "タイムスタンプ" || topCell === "timestamp") {
+          respSheet = sheets[s];
+          break;
+        }
+      }
+      if (respSheet) break;
+    }
+
+    if (!respSheet) {
+      throw new Error("スプレッドシートの同期に時間がかかっています。しばらく待ってからシートを確認してください。");
+    }
+
+    // 空の初期シートを削除（失敗しても致命的ではない）
+    try {
+      var allSheets = ss.getSheets();
+      for (var d = 0; d < allSheets.length; d++) {
+        if (allSheets[d].getSheetId() !== respSheet.getSheetId() && allSheets[d].getDataRange().isBlank()) {
+          ss.deleteSheet(allSheets[d]);
+        }
+      }
+    } catch (delErr) {
+      console.warn("空シートの削除をスキップ: " + delErr.message);
+    }
+
+    // スプレッドシート半自動採点エンジン (WITH_WRITTEN の場合)
+    if (FORM_MODE === "WITH_WRITTEN") {
+      var headers = respSheet.getRange(1, 1, 1, respSheet.getLastColumn()).getValues()[0];
+      var qLen = DESIGN.questions.length;
+      var outStartCol = headers.length + 1;
+      var sumFormulaParts = [];
+      var writtenColLetters = [];
+
+      for (var m = 0; m < qLen; m++) {
+        var q = DESIGN.questions[m];
+        var searchTarget = "問" + (m + 1) + ".";
+        var ansColIdx = -1;
+
+        // 見出しから回答列を特定
+        for (var h = 0; h < headers.length; h++) {
+          if (headers[h].toString().indexOf(searchTarget) === 0) {
+            ansColIdx = h + 1;
+            break;
+          }
+        }
+
+        if (ansColIdx === -1) {
+          throw new Error("シート上に「" + searchTarget + "」の列が見つかりません。");
+        }
+
+        var ansColLetter = getColumnLetter(ansColIdx);
+        var outColIdx = outStartCol + m;
+        var outColLetter = getColumnLetter(outColIdx);
+
+        var cell = respSheet.getRange(1, outColIdx);
+        if (q.type === "CHOICE") {
+          var safeAns = getChoiceLabel(q, q.answerIndex).replace(/"/g, '""');
+          cell.setValue('={"問' + (m+1) + ' 自動採点"; ARRAYFORMULA(IF(LEN(A2:A), IF(' + ansColLetter + '2:' + ansColLetter + '&""="' + safeAns + '", ' + q.point + ', 0), ""))}');
+          cell.setBackground("#eef5ff");
+        } else {
+          cell.setValue("問" + (m+1) + " 記述手動採点\\n(MAX: " + q.point + "点)");
+          cell.setBackground("#fff8e7");
+          writtenColLetters.push(outColLetter);
+
+          // 先生の入力ミスを防ぐデータ入力規則（0 〜 配点上限 までの数値のみ許可）
+          var rule = SpreadsheetApp.newDataValidation()
+            .requireNumberBetween(0, q.point)
+            .setAllowInvalid(false)
+            .setHelpText("0から" + q.point + "までの数値を入力してください。")
+            .build();
+          respSheet.getRange(2, outColIdx, respSheet.getMaxRows() - 1, 1).setDataValidation(rule);
+        }
+        sumFormulaParts.push("IFERROR(" + outColLetter + "2:" + outColLetter + "*1, 0)");
+      }
+
+      // 合計点：記述が未入力の行は「未採点」と表示（途中点を最終点と誤認しない）
+      var sumExpr = sumFormulaParts.join(" + ");
+      var totalExpr = sumExpr;
+      if (writtenColLetters.length > 0) {
+        var blankConds = [];
+        for (var w = 0; w < writtenColLetters.length; w++) {
+          blankConds.push(writtenColLetters[w] + '2:' + writtenColLetters[w] + '=""');
+        }
+        totalExpr = 'IF(' + (blankConds.length === 1 ? blankConds[0] : 'OR(' + blankConds.join(", ") + ')') + ', "未採点", ' + sumExpr + ')';
+      }
+      var totalCell = respSheet.getRange(1, outStartCol + qLen);
+      totalCell.setValue('={"合計点"; ARRAYFORMULA(IF(LEN(A2:A), ' + totalExpr + ', ""))}');
+      totalCell.setBackground("#edf8f1").setFontWeight("bold");
+
+      respSheet.setFrozenRows(1);
+    }
+
+    // 先生用「問題・解答・解説」シートの自動追加
+    var expSheet = ss.insertSheet("問題・解答・解説");
+    var headerData = ["問", "種別", "問題文", "配点", "選択肢", "正答", "解説"];
+    expSheet.appendRow(headerData);
+    var headerRange = expSheet.getRange(1, 1, 1, 7);
+    headerRange.setFontWeight("bold").setBackground("#dce4ef");
+
+    var rows = [];
+    for (var k = 0; k < DESIGN.questions.length; k++) {
+      var qq = DESIGN.questions[k];
+      var choicesText = "";
+      var correctText = "";
+
+      if (qq.type === "CHOICE") {
+        var cList = [];
+        for (var cIdx = 0; cIdx < qq.choices.length; cIdx++) {
+          cList.push(FORM_MODE === "WITH_WRITTEN" ? getChoiceLabel(qq, cIdx) : (cIdx + 1) + ". " + qq.choices[cIdx]);
+        }
+        choicesText = cList.join("\\n");
+        correctText = FORM_MODE === "WITH_WRITTEN" ? getChoiceLabel(qq, qq.answerIndex) : (qq.answerIndex + 1) + ". " + qq.choices[qq.answerIndex];
+      } else {
+        choicesText = "-";
+        correctText = "（手動採点）";
+      }
+
+      rows.push([k + 1, qq.type === "CHOICE" ? "選択" : "記述", (qq.text || "").toString(), qq.point || "-", choicesText, correctText, (qq.explanation || "").toString()]);
+    }
+
+    if (rows.length > 0) {
+      // 数値列のみsetValuesで保存。文字列列は数式として解釈させず保存する。
+      var baseRows = rows.map(function (row) {
+        return [row[0], row[1], "", row[3], "", "", ""];
+      });
+      expSheet.getRange(2, 1, rows.length, 7).setValues(baseRows);
+      var questionRich = rows.map(function (row) {
+        return [SpreadsheetApp.newRichTextValue().setText(row[2]).build()];
+      });
+      var detailRich = rows.map(function (row) {
+        return [4, 5, 6].map(function (idx) {
+          return SpreadsheetApp.newRichTextValue().setText(row[idx]).build();
+        });
+      });
+      expSheet.getRange(2, 3, rows.length, 1).setRichTextValues(questionRich);
+      expSheet.getRange(2, 5, rows.length, 3).setRichTextValues(detailRich);
+      expSheet.getRange(1, 1, rows.length + 1, 7).setVerticalAlignment("top");
+      expSheet.getRange(2, 3, rows.length, 5).setWrap(true);
+      expSheet.setColumnWidth(1, 40);  // 問
+      expSheet.setColumnWidth(2, 60);  // 種別
+      expSheet.setColumnWidth(3, 240); // 問題文
+      expSheet.setColumnWidth(4, 50);  // 配点
+      expSheet.setColumnWidth(5, 200); // 選択肢
+      expSheet.setColumnWidth(6, 140); // 正答
+      expSheet.setColumnWidth(7, 260); // 解説
+    }
+
+    console.log(
+      "正常に完了しました。 (NEPM Form Builder v" + NEPM_VER + ")\\n" +
+      "【生徒配布用URL】" + form.getPublishedUrl() + "\\n" +
+      "【フォーム編集URL】" + form.getEditUrl() + "\\n" +
+      "【回答シートURL】" + ss.getUrl()
+    );
+
+  } catch (e) {
+    console.error("エラーが発生しました: " + e.message);
+
+    // 途中まで作成されたファイルがあればゴミ箱へ移動（ロールバック処理）
+    try {
+      if (form) DriveApp.getFileById(form.getId()).setTrashed(true);
+      if (ss) DriveApp.getFileById(ss.getId()).setTrashed(true);
+      console.error("作成途中だったファイルは安全のためゴミ箱へ移動しました。");
+    } catch (cleanupError) {
+      console.error("ファイルのクリーンアップ中にエラー: " + cleanupError.message);
+    }
+
+    throw e;
+  }
+}
+
+function getChoiceLabel(question, index) {
+  return FORM_MODE === "WITH_WRITTEN"
+    ? "選択肢" + (index + 1) + "：" + question.choices[index]
+    : question.choices[index];
+}
+
+function getColumnLetter(colIndex) {
+  var temp, letter = '';
+  while (colIndex > 0) {
+    temp = (colIndex - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    colIndex = (colIndex - temp - 1) / 26;
+  }
+  return letter;
+}
+
+function validateDesign(design) {
+  if (FORM_MODE !== "CHOICE_ONLY" && FORM_MODE !== "WITH_WRITTEN") throw new Error("検証エラー: FORM_MODEが不正です。");
+  if (!Number.isInteger(TARGET_SCORE) || TARGET_SCORE <= 0) throw new Error("検証エラー: TARGET_SCOREが不正です。");
+  if (!Number.isInteger(QUESTION_COUNT) || QUESTION_COUNT < 1 || QUESTION_COUNT > 10) throw new Error("検証エラー: QUESTION_COUNTが不正です。");
+  if (!design || typeof design !== "object") throw new Error("検証エラー: DESIGNデータが不適切です。");
+  if (!Array.isArray(design.questions) || design.questions.length === 0) throw new Error("検証エラー: 設問がありません。");
+  if (design.questions.length > 10) throw new Error("検証エラー: 設問数は10問以内にしてください。");
+  if (design.questions.length !== QUESTION_COUNT) {
+    throw new Error("設問数(" + design.questions.length + "問)が、指定された問題数(" + QUESTION_COUNT + "問)と一致しません。AIの出力ミスです。");
+  }
+
+  var writtenCount = 0;
+  var totalPoints = 0;
+
+  for (var i = 0; i < design.questions.length; i++) {
+    var q = design.questions[i];
+    var qNo = i + 1;
+    if (!q) throw new Error("問" + qNo + " のデータが不正です。");
+    if (typeof q.text !== "string" || q.text.trim() === "") throw new Error("問" + qNo + " の問題文が空です。");
+    if (typeof q.explanation !== "string" || q.explanation.trim() === "") throw new Error("問" + qNo + " の解説(explanation)が空です。");
+
+    // 配点の集計と型・整数検証
+    if (typeof q.point !== "number" || q.point <= 0 || !Number.isInteger(q.point)) {
+      throw new Error("問" + qNo + " に正当な整数の配点(point)が設定されていません。");
+    }
+    totalPoints += q.point;
+
+    if (q.type === "WRITTEN") {
+      writtenCount++;
+    } else if (q.type === "CHOICE") {
+      if (!Array.isArray(q.choices) || q.choices.length < 2 || q.choices.length > 5) throw new Error("問" + qNo + " の選択肢は2〜5個にしてください。");
+
+      // 選択肢は「前後空白のない、空でない文字列」のみ
+      var seen = new Set();
+      for (var c = 0; c < q.choices.length; c++) {
+        var ch = q.choices[c];
+        if (typeof ch !== "string" || ch.trim() === "") throw new Error("問" + qNo + " の選択肢" + (c + 1) + "が空、または文字列ではありません。");
+        if (ch !== ch.trim()) throw new Error("問" + qNo + " の選択肢" + (c + 1) + "の前後に空白があります。");
+        var key = ch.toLowerCase();
+        if (seen.has(key)) throw new Error("問" + qNo + " の選択肢に重複があります（大文字小文字違いを含む）。");
+        seen.add(key);
+
+      }
+
+      // answerIndexが整数であるかの厳密なチェック
+      if (!Number.isInteger(q.answerIndex) || q.answerIndex < 0 || q.answerIndex >= q.choices.length) {
+        throw new Error("問" + qNo + " の正答位置(answerIndex)が不正です。");
+      }
+
+    } else {
+      throw new Error("問" + qNo + " の設問種別が不正です。");
+    }
+  }
+
+  // 合計点と目標満点の一致チェック
+  if (totalPoints !== TARGET_SCORE) {
+    throw new Error("配点の合計(" + totalPoints + "点)が、指定された満点(" + TARGET_SCORE + "点)と一致しません。AIの出力ミスです。");
+  }
+
+  if (FORM_MODE === "CHOICE_ONLY" && writtenCount > 0) throw new Error("モードが'CHOICE_ONLY'ですが、記述問題が含まれています。");
+  if (FORM_MODE === "WITH_WRITTEN" && writtenCount !== 1) throw new Error("モードが'WITH_WRITTEN'の場合、記述問題は1問必要です。");
+}
+\`\`\`
+`;
+
+const form = document.getElementById('maker');
+const result = document.getElementById('result');
+const preview = document.getElementById('preview');
+const copyBtn = document.getElementById('copyBtn');
+const previewBtn = document.getElementById('previewBtn');
+const copyStatus = document.getElementById('copyStatus');
+let payload = '';
+const editStatus = document.getElementById('editStatus');
+
+function invalidatePackage() {
+  if (!payload) return;
+  payload = '';
+  preview.textContent = '';
+  preview.hidden = true;
+  previewBtn.textContent = '実行パッケージの内容を確認';
+  copyStatus.textContent = '';
+  result.style.display = 'none';
+  editStatus.textContent = '条件を変更しました。「作成データを準備」をもう一度押してください。';
+}
+form.addEventListener('input', invalidatePackage);
+form.addEventListener('change', invalidatePackage);
+
+function checkedValue(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  invalidatePackage();
+
+  const writtenMode = checkedValue('written_mode');
+  const grade = checkedValue('grade');
+  const subject = document.getElementById('subject').value;
+  const unit = document.getElementById('unit').value.trim();
+  const purpose = checkedValue('purpose');
+  const source = checkedValue('source');
+  const qCount = checkedValue('q_count');
+  const scoreInput = document.getElementById('score');
+  const scoreText = scoreInput.value.trim();
+  const score = Number(scoreText);
+  const time = document.getElementById('time_range').value;
+  const teacherIntent = document.getElementById('teacher_intent').value.trim();
+  const additionalInstruction = document.getElementById('additional_instruction').value.trim();
+  const idFields = ID_FIELD_PRESETS[document.getElementById('id_fields').value] || ID_FIELD_PRESETS.NAME_ONLY;
+
+  if (!grade) return alert('学年を選択してください。');
+  if (!subject) return alert('教科を選択してください。');
+  if (!unit) { document.getElementById('unit').focus(); return alert('単元・テーマを入力してください。'); }
+  if (!purpose) return alert('テストの方向性を選択してください。');
+  if (!source) return alert('出題範囲・深さを選択してください。');
+  if (!qCount) return alert('問題数を選択してください。');
+
+  if (!scoreText || !Number.isFinite(score) || score <= 0 || !scoreInput.checkValidity()) {
+    scoreInput.focus(); return alert('満点は1以上1000以下の数値で入力してください。');
+  }
+  if (!Number.isInteger(score)) {
+    scoreInput.focus(); return alert('満点は整数で入力してください。');
+  }
+  if (score < Number(qCount)) {
+    scoreInput.focus(); return alert('満点（' + score + '点）が問題数（' + qCount + '問）より少ないため、各問1点以上の配点が成立しません。満点を ' + qCount + ' 以上にしてください。');
+  }
+
+  // --- 本日の日付(YYYYMMDD)を取得 ---
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const dateStr = `${yyyy}${mm}${dd}`;
+
+  const generatedTitle = `${dateStr} ${subject} ${unit} テスト`;
+  const intentLine = teacherIntent ? `Teacher Intent: ${teacherIntent}\n` : '';
+  const instructionLine = additionalInstruction ? `Additional Instruction: ${additionalInstruction}\n` : '';
+
+  payload = `# NEPM 作問Web＋ 配信フォーム自動作成 パッケージ
+Web UI Version: ${NEPM_VERSION.version}
+Build Date: ${NEPM_VERSION.date}
+Date: ${dateStr}
+Written Mode: ${writtenMode}
+Grade: ${grade}
+Subject: ${subject}
+Unit: ${unit}
+Total Score: ${score}
+Time Range: ${time} minutes
+Total Item Count: ${qCount}
+Exam Purpose: ${purpose}
+Source Depth: ${source}
+${intentLine}${instructionLine}
+---
+
+${getTemplateGAS(generatedTitle, writtenMode, score, Number(qCount), idFields)}
+
+---
+## 実行開始指示
+
+上記パラメータを入力値として使用し、仕様に従って連続した作問フローを開始してください。
+追加の確認は不要です。まず【問題・配点・正答・解説の一覧】を出力してください。`;
+
+  preview.textContent = payload;
+  result.style.display = 'block';
+  copyStatus.textContent = '';
+  editStatus.textContent = '';
+  result.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+async function copyPayload() {
+  if (!payload) return;
+  let copied = false;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(payload);
+      copied = true;
+    }
+  } catch (_) {}
+
+  if (!copied) {
+    const ta = document.createElement('textarea');
+    ta.value = payload;
+    ta.setAttribute('readonly','');
+    ta.style.position='fixed'; ta.style.opacity='0'; ta.style.left='-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { copied = Boolean(document.execCommand('copy')); } catch (_) { copied = false; }
+    document.body.removeChild(ta);
+  }
+
+  if (copied) {
+    copyStatus.textContent = '✓ 作成データをコピーしました。Geminiのチャット欄へ貼り付けて送信してください。';
+  } else {
+    copyStatus.textContent = 'コピーできませんでした。下の「実行パッケージの内容を確認」を開き、手動でコピーしてください。';
+    preview.hidden = false;
+    previewBtn.textContent = '実行パッケージを閉じる';
+  }
+}
+
+copyBtn.addEventListener('click', copyPayload);
+previewBtn.addEventListener('click', () => {
+  preview.hidden = !preview.hidden;
+  previewBtn.textContent = preview.hidden ? '実行パッケージの内容を確認' : '実行パッケージを閉じる';
+});
+</script>
+</body>
+</html>
