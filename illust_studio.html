@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEPM™ イラスト作成Web Ver.9.10.0</title>
+<style>
+:root{--bg:#f3f5f9;--card:#fff;--ink:#172033;--muted:#64748b;--line:#d9e0eb;--accent:#3158c9;--soft:#edf2ff;--warn:#fff6e8;--warnline:#fb923c;--radius:16px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Noto Sans JP",sans-serif}main{max-width:980px;margin:auto;padding:22px 15px 50px}
+.hero{background:linear-gradient(130deg,#111a31,#263f7c 72%,#6076bd);color:#fff;padding:25px;border-radius:22px}.hero h1{margin:0;font-size:clamp(1.45rem,4vw,2.2rem);line-height:1.25}.hero p{margin:10px 0 0;color:#e2e9ff}.tag{display:inline-block;margin-top:14px;border:1px solid #aab8ef;border-radius:99px;padding:3px 10px;font-size:.8rem}
+.notice,.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:14px}.notice{background:#f9fbff}
+.warning{border:2px solid var(--warnline);background:var(--warn);border-radius:14px;padding:12px 16px;margin-top:14px;color:#9a3412}.warning strong{font-size:1rem;color:#7c2d12}
+.step{font-weight:800;font-size:1.08rem;margin:0 0 5px}.hint,.muted{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+.what{color:#35466b;font-size:.9rem;margin:2px 0 8px}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:9px}
+.choice{display:flex;align-items:flex-start;gap:9px;padding:11px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;min-height:48px}.choice:has(input:checked){border-color:var(--accent);background:var(--soft)}
+input[type=radio],input[type=checkbox]{accent-color:var(--accent);margin-top:5px;flex-shrink:0}
+label.field{display:block;font-weight:700;margin:16px 0 4px}
+input[type=text],input[type=password],textarea,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid #cbd3e1;border-radius:10px;padding:11px 12px}
+textarea{min-height:90px;resize:vertical}.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.layer{border:1px solid var(--line);border-radius:13px;padding:13px;margin-top:10px}.layer h3{margin:0 0 3px;font-size:1rem}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+button{border:0;border-radius:11px;padding:11px 15px;font:inherit;font-weight:750;cursor:pointer;transition:background .15s,color .15s,opacity .15s}.primary{background:var(--accent);color:#fff}.secondary{background:#e8edf5;color:#172033}button:disabled{background:#e5e7eb!important;color:#9ca3af!important;cursor:not-allowed;box-shadow:none;opacity:1}
+#preview{white-space:pre-wrap;overflow-wrap:anywhere;background:#101827;color:#edf3ff;border-radius:12px;padding:15px;min-height:190px;font-size:.91rem}
+.status{font-size:.9rem;color:var(--muted);margin-top:9px}.small{font-size:.82rem;color:var(--muted)}.hidden{display:none!important}
+.mode-note{background:#f7f8fc;border:1px dashed #c7d0e0;border-radius:12px;padding:12px;margin-top:10px}
+.optHelp{background:var(--soft);border-radius:10px;padding:8px 12px;font-size:.88rem;color:#2a3c75;margin:7px 0 0}.optHelp:empty{display:none}
+details.guide{margin-top:10px}details.guide summary{cursor:pointer;font-weight:800}details.guide dl{margin:10px 0 0}details.guide dt{font-weight:700;margin-top:8px}details.guide dd{margin:0;color:#35466b;font-size:.93rem}
+details.guide ol{margin:8px 0 0;padding-left:1.3em;color:#35466b;font-size:.93rem}
+.modeSwitch{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}.modeTab{flex:1;min-width:220px;text-align:left;padding:15px 17px;border:2px solid transparent;background:#e8edf5;color:#172033;border-radius:14px}.modeTab.active{background:#fff;border-color:var(--accent);box-shadow:0 3px 12px #17203312}.modeTab strong{display:block;font-size:1.08rem}.modeTab span{display:block;font-size:.88rem;font-weight:500;margin-top:3px}.simpleGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.styleCard{border:2px solid var(--line);border-radius:14px;padding:12px;background:white;cursor:pointer;display:block}.styleCard:has(input:checked){border-color:var(--accent);background:var(--soft)}.styleCard input{margin-right:6px}.styleSample{height:92px;border-radius:9px;margin-bottom:9px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;font-weight:800;overflow:hidden}.sampleComic{background:linear-gradient(135deg,#f9e9dc,#fff 48%,#d7e7ff);color:#23345e;border:2px solid #27334c;clip-path:polygon(0 0,100% 8%,95% 100%,4% 92%)}.sampleStudy{background:linear-gradient(130deg,#d8c9ad,#f8f0df 48%,#9f8b6b);color:#453a2c;border:1px solid #c8b99e}.sampleNature{background:linear-gradient(135deg,#dce9d5,#f5f3e7 55%,#a9c5a0);color:#35533b;border:1px solid #c4d4bd}.sampleGrid{background-color:#f7f6f1;background-image:linear-gradient(#d8d9d5 1px,transparent 1px),linear-gradient(90deg,#d8d9d5 1px,transparent 1px);background-size:18px 18px;color:#525e6c;border:1px solid #d5d7d8}.simpleHelp{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;color:#475569;font-size:.92rem}.posterBox{background:#fffaf0;border:2px solid #f3c98b;border-radius:14px;padding:14px;margin-top:14px}.regen{background:#f59e0b;color:#fff}.flowChips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.chip{padding:4px 11px;border-radius:99px;background:#eef1f6;color:#64748b;font-size:.82rem;font-weight:600}.chip.now{background:var(--accent);color:#fff;font-weight:800}.chip.done{background:#dcfce7;color:#166534}.nowBox{background:#eef4ff;border:2px solid var(--accent);border-radius:12px;padding:12px 14px;margin-top:10px}.nowBox .msg{font-weight:700;margin:0}.nowBox .sub{font-size:.88rem;color:#35466b;margin:6px 0 0}.nowBox .row{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.footer{text-align:center;color:var(--muted);font-size:.82rem;padding:20px 0 0}
+@media(max-width:500px){main{padding:12px 10px 35px}.hero,.panel,.notice{padding:15px}.choices{grid-template-columns:1fr}}
+.navLink{display:inline-block;color:#fff;text-decoration:none;border:1px solid #aab8ef;border-radius:10px;padding:9px 14px;background:#ffffff12}.navLink:hover{background:#ffffff28}.creative{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#f8fafc}.creative summary{cursor:pointer;font-weight:700}
+</style>
+</head>
+<body><main>
+<header class="hero"><h1>NEPM™ イラスト作成Web</h1><p>イラスト・サムネイル・ポスター・図解を作る。ジャンルを選ぶ。制作モードを選ぶ。表現は自由に組み合わせる。</p><span class="tag">Ver.9.10.0 · かんたんモード＋ヘルモード</span><nav class="actions" aria-label="関連ページ"><a class="navLink" href="index.html">← ホームに戻る</a><a class="navLink" href="https://note.com/nepm_prompt_ai" target="_blank" rel="noopener noreferrer">noteの記事一覧 ↗</a></nav></header>
+<div class="modeSwitch" role="tablist" aria-label="作画モード">
+<button type="button" id="simpleTab" class="modeTab active" role="tab" aria-selected="true"><strong>✨ かんたんモード</strong><span>画風を選んで、文字を書く。あとは全部おまかせ。</span></button>
+<button type="button" id="hardTab" class="modeTab" role="tab" aria-selected="false"><strong>🔥 ヘルモード（詳細設定）</strong><span>構図・視点・光・色・質感まで、細部を追い込む。</span></button>
+</div>
+<section id="simplePanel" class="panel">
+<h2 class="step">かんたん作画</h2><p class="what">4つの画風から選び、タイトルを書くだけ。A4ポスターなら、文章を貼るだけで紙面の配置までAIにおまかせ。</p>
+<div class="simpleGrid" id="simpleStyles">
+<label class="styleCard"><div class="styleSample sampleComic">物語が動き出す</div><input type="radio" name="simpleStyle" value="comic" checked><strong>漫画風</strong><div class="small">物語性・躍動感</div></label>
+<label class="styleCard"><div class="styleSample sampleStudy">静かな知の空間</div><input type="radio" name="simpleStyle" value="study"><strong>書斎風・知的</strong><div class="small">落ち着き・知性</div></label>
+<label class="styleCard"><div class="styleSample sampleNature">自然とともに</div><input type="radio" name="simpleStyle" value="nature"><strong>自然テーマ</strong><div class="small">自然・やわらかさ</div></label>
+<label class="styleCard"><div class="styleSample sampleGrid">整然と、端正に</div><input type="radio" name="simpleStyle" value="grid"><strong>グリッド・タイル型</strong><div class="small">幾何学模様・余白・読みやすさ</div></label>
+</div>
+<label class="field">画像サイズ・縦横比</label>
+<p class="what">用途に合わせて選んでください。標準は16:9です。</p>
+<div class="choices" id="simpleRatioChoices">
+<label class="choice"><input type="radio" name="simpleRatio" value="16:9" checked><span><strong>16:9（標準）</strong><br><span class="small">PC・スライド向け</span></span></label>
+<label class="choice"><input type="radio" name="simpleRatio" value="4:3"><span><strong>4:3</strong><br><span class="small">標準的な画面・資料向け</span></span></label>
+<label class="choice"><input type="radio" name="simpleRatio" value="9:16"><span><strong>スマホ向け（9:16）</strong><br><span class="small">縦長の画面向け</span></span></label>
+<label class="choice"><input type="radio" name="simpleRatio" value="note"><span><strong>noteタイトルサムネ</strong><br><span class="small">1280 × 670 px</span></span></label>
+<label class="choice"><input type="radio" name="simpleRatio" value="A4P"><span><strong>📄 A4たて ポスター</strong><br><span class="small">掲示・案内・チラシ（A3拡大もOK）</span></span></label>
+<label class="choice"><input type="radio" name="simpleRatio" value="A4L"><span><strong>📄 A4よこ ポスター</strong><br><span class="small">横長の掲示・説明資料</span></span></label>
+</div>
+<label class="field" for="simpleTitle">タイトル（任意）</label><input id="simpleTitle" type="text" placeholder="例：AIと考える、これからの学び">
+<label class="field" for="simpleSubtitle">サブタイトル（任意）</label><input id="simpleSubtitle" type="text" placeholder="例：人間とAIが協働する教室">
+<label class="field" for="simpleSubject" id="subjectLabel">描きたい内容（自由入力）</label><textarea id="simpleSubject" placeholder="例：未来の教室で、生徒とAIが一緒にアイデアを考えている"></textarea>
+<div id="subjectWarn" class="warning hidden"><strong>⚠ 長い文章が「絵のテーマ」欄に入っています</strong><br>この欄は絵にしたい題材を書く欄です。このままだと、文章はポスターに載りません。ポスターに載せたい文章なら、下のボタンで移してください。<div class="actions" style="margin-top:8px"><button type="button" class="primary" id="moveSubjectBtn">この文章を「ポスターに載せる文章」欄へ移す</button></div></div>
+<div id="posterWrap" class="hidden posterBox">
+<label class="field" style="margin-top:0">🖨 ポスターの作り方</label>
+<div class="choices" id="posterOutputChoices">
+<label class="choice"><input type="radio" name="posterOutput" value="html" checked><span><strong>印刷用HTMLで作る（おすすめ）</strong><br><span class="small">文字が正確。保存してそのまま印刷。画像生成に対応していないAIでもOK</span></span></label>
+<label class="choice"><input type="radio" name="posterOutput" value="image"><span><strong>画像で作る</strong><br><span class="small">絵の雰囲気重視。画像生成AI向け。文字は崩れることがあります</span></span></label>
+</div>
+<label class="field" style="margin-top:16px">🎨 絵の量</label>
+<div class="choices" id="posterArtChoices">
+<label class="choice"><input type="radio" name="posterArt" value="text"><span><strong>文字中心</strong><br><span class="small">絵は小さな飾り。読みやすさ優先</span></span></label>
+<label class="choice"><input type="radio" name="posterArt" value="normal" checked><span><strong>ふつう</strong><br><span class="small">絵と文字のバランス</span></span></label>
+<label class="choice"><input type="radio" name="posterArt" value="big"><span><strong>絵を大きく</strong><br><span class="small">大きな主役の絵を中心に</span></span></label>
+</div>
+<label class="field" for="posterBody" style="margin-top:16px">📝 ポスターに載せる文章（長くても大丈夫）</label>
+<p class="what">日時・場所・対象・持ち物・注意事項・手順など、載せたい文章をそのまま貼り付け・入力してください。枠の数・大きさ・配置・見出しの大小は、文字量に合わせてAIが設計します。</p>
+<textarea id="posterBody" rows="14" style="min-height:300px" placeholder="例：&#10;日時：12月22日（日）10:00〜12:00&#10;場所：本校 体育館&#10;対象：中学生・保護者&#10;持ち物：上履き、筆記用具&#10;注意事項：駐車場はありません。公共交通機関をご利用ください。&#10;&#10;※箇条書き・長文・改行、そのままでOKです"></textarea>
+<div class="small" id="posterCount" style="text-align:right">0 文字</div>
+<p class="simpleHelp">A4ポスターは簡単な案内・掲示物向けのおまけ機能です。凝ったデザインは画像を作ってCanvaなどで編集してください。ポスターにはFact Checkを適用しません。日時・場所・連絡先・文字の欠落・印刷範囲は完成後に確認してください。</p><div id="posterHtmlNote" class="simpleHelp" style="margin-top:8px">🖨 文字はHTMLの文字として組むので、誤字や欠落が起きにくい方式です。AIの生成が完了したことを確認してからHTMLコードをコピーし、<code>poster.html</code> として保存し、ブラウザで開いて印刷してください（A4・倍率100%・余白なし・背景のグラフィックON）。</div>
+<div id="posterImgWarn" class="simpleHelp hidden" style="margin-top:8px">⚠ 画像生成AIは、長い文章を一字一句正確に描けないことがあります。文字量が多いときは、要点に絞ると仕上がりが安定します。誤字は最後に手直ししてください。</div>
+</div>
+<div class="simpleHelp">🎰 一発で決まるかもしれない。気に入らなかったら、ガチャです。もう一回！<br>生成するたびに構図や色彩などに変化をつけるよう指示しますが、毎回必ず別の画像になるとは限りません。画像AIは文字を正確に描けないこともあります。</div>
+<div class="flowChips" id="flowChips"></div>
+<div class="nowBox"><p class="msg" id="flowMsg"></p><p class="sub" id="flowSub"></p><div class="row"><button type="button" class="primary hidden" id="flowNextBtn"></button><button type="button" class="secondary hidden" id="flowBackBtn">← ひとつ戻る</button></div></div>
+<div class="actions"><button type="button" class="primary" id="simpleBuildBtn">プロンプトを作成</button><button type="button" class="secondary" id="simpleCopyBtn">プロンプトをコピー</button><button type="button" class="regen" id="simpleRegenBtn" title="構図・配色・レイアウトを変えて、作り直してコピーまで一発">🎲 作り直し（一発コピー）</button></div>
+<p class="small" style="margin:8px 0 0">🎲 作り直し：同じ内容のまま、構図・配色・レイアウトの方向性を変えた新しいプロンプトを作り、そのままコピーします。</p>
+<label class="field" for="simplePreview">生成用プロンプト</label><div id="simplePreview" class="" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#101827;color:#edf3ff;border-radius:12px;padding:15px;min-height:160px"></div><p class="status" id="simpleStatus">プロンプトを作成し、画像生成に対応したAIのチャット欄へ貼り付けて送信してください。</p>
+</section>
+
+<div class="notice"><strong>この版について</strong>
+<p class="muted" style="margin:5px 0 0">選んだ内容から画像生成AI向けのプロンプトを組み立てます。絵だけの自由な発想ではFact CheckはOFFのままです。化学式・数式を含むときは「式の扱い」で、雰囲気重視か正確さ重視かを選べます（初期値は雰囲気重視）。画像内の文字についても守らせたい場合は、任意のチェックを入れてください。</p>
+</div>
+
+<div id="app" class="hidden">
+
+<div id="factCheckNotice" class="warning hidden">
+ <strong id="factCheckTitle">⚠ Fact Check ON</strong><br>
+ <span id="factCheckBody"></span>
+</div>
+
+<section class="panel"><h2 class="step">0. Gemini Boost（強調スイッチ）</h2>
+<p class="what">Geminiで絵が灰色っぽい・殺風景・質感や衣装が弱いと感じるときに、「盛る」指示をプロンプトの冒頭に追加します。ChatGPTなど他のAIで使うときはOFFのままで構いません。</p>
+<select id="geminiBoost"></select>
+<div id="boostItems" class="choices hidden" style="margin-top:10px">
+<label class="choice"><input type="checkbox" id="boostColor" checked><span><strong>色彩を豊かに</strong><br><span class="small">灰色っぽさをなくし、彩度と色数を上げる。</span></span></label>
+<label class="choice"><input type="checkbox" id="boostProps" checked><span><strong>小物・情報量を増やす</strong><br><span class="small">殺風景をなくし、小物を2〜3倍に。</span></span></label>
+<label class="choice"><input type="checkbox" id="boostTexture" checked><span><strong>壁・柱・素材の質感</strong><br><span class="small">ひび・摩耗・彫刻・継ぎ目まで描き込む。</span></span></label>
+<label class="choice"><input type="checkbox" id="boostCostume" checked><span><strong>衣装を豪華に</strong><br><span class="small">人物がいる場合のみ。重ね着・刺繍・装飾。</span></span></label>
+</div>
+<div id="boostStyleWrap" class="hidden"><label class="field" for="chatgptStyle">ChatGPT寄せ（画調プリセット）</label>
+<select id="chatgptStyle"></select>
+<p class="small" id="cgApplied" style="margin:6px 0 0"></p>
+<label class="field" for="chatgptColor">配色（ChatGPT寄せ用）</label>
+<select id="chatgptColor"></select></div></section>
+
+<section class="panel"><h2 class="step">1. ジャンル</h2>
+<p class="what">絵の「世界観・題材の方向」を決めます。</p>
+<div class="choices" id="genreChoices"></div><details class="creative" id="creativeDetails"><summary>創作向けプリセット</summary><p class="hint">二人の関係性・視線・距離感から、物語のある一枚を作ります。</p><label class="choice"><input type="checkbox" id="fuEnabled"><span><strong>腐女子モード</strong><br>成人男性二人の関係性を描く設定を使う</span></label><div class="actions"><button type="button" class="secondary" id="fuPreset">「腐」プリセットを一括設定</button></div><p class="small">この欄の設定をまとめて変更します。ほかのジャンル・画風・主題は変更しません。</p><div id="fuFields" class="two hidden"><div><label class="field" for="fuRelation">関係性</label><select id="fuRelation"><option>相棒</option><option>ライバル</option><option>幼なじみ</option><option>主従</option><option>初対面</option></select></div><div><label class="field" for="fuScene">場面</label><select id="fuScene"><option>秘密の会話</option><option>日常</option><option>共闘</option><option>再会</option><option>別れ際</option></select></div><div><label class="field" for="fuEmotion">感情</label><select id="fuEmotion"><option>信頼と秘めた恋心</option><option>憧れ</option><option>対抗心</option><option>嫉妬</option><option>切なさ</option></select></div><div><label class="field" for="fuHair">髪</label><select id="fuHair"><option>黒髪 × 銀髪</option><option>黒髪 × 黒髪</option><option>銀髪 × 金髪</option><option>AIに任せる</option></select></div><div><label class="field" for="fuClothes">衣装</label><select id="fuClothes"><option>上半身裸・下半身は着衣</option><option>二人とも着衣</option><option>片方のみ上半身裸・下半身は着衣</option></select></div><div><label class="field" for="fuDistance">距離感</label><select id="fuDistance"><option>顔や肩が触れそうな近さ</option><option>離れて互いを意識</option><option>隣に並ぶ</option><option>肩が触れる</option><option>抱擁</option></select></div><div><label class="field" for="fuGaze">視線</label><select id="fuGaze"><option>一方が強く見つめ、もう一方は目をそらしつつ意識</option><option>見つめ合う</option><option>片方だけ見つめる</option><option>互いに目をそらす</option></select></div><div><label class="field" for="fuFace">表情</label><select id="fuFace"><option>余裕のある微笑 × 平静を装う表情</option><option>穏やかな微笑</option><option>真剣な表情</option><option>照れを隠す表情</option></select></div><div><label class="field" for="fuIntensity">表現の濃さ</label><select id="fuIntensity"><option>見る人の想像に委ねる</option><option>さりげない</option><option>恋愛を明確に</option></select></div><div><label class="field" for="fuFreedom">おまかせ範囲</label><select id="fuFreedom"><option>指定を優先</option><option>細部はAIに任せる</option><option>関係性・場面・感情はAIが提案する</option></select></div></div></details><div id="educationNotice" class="warning hidden">教材用途では、Geminiでの生成はおすすめしません（制作者の使用経験に基づく案内です）。特に化学式・数式・分子構造などは、ChatGPTでの生成をご検討ください。貼り付け先は自由に選べますが、どのAIでも誤りが生じるため、教材として使う前に内容を確認してください。</div>
+<label class="field" for="subject">主題・場面</label>
+<p class="what">描きたい内容を書きます（例：グルコースのC6H12O6分子の概念図、二次方程式の解の公式など）。</p>
+<textarea id="subject" placeholder="例：巨大な古代遺跡を見上げる冒険者。またはグルコース（C6H12O6）の構造イメージ。"></textarea></section>
+
+<section class="panel"><h2 class="step">2. 制作モード</h2>
+<div class="choices" id="modeChoices"></div>
+<div id="thumbnailFields" class="mode-note hidden"><strong>noteタイトルサムネ専用設定</strong>
+<div class="two"><div><label class="field" for="mainTitle">メインタイトル（文言固定）</label><input id="mainTitle" type="text" placeholder="タイトルを入力"></div><div><label class="field" for="subTitle">サブタイトル（任意）</label><input id="subTitle" type="text" placeholder="補足の文言を入力"></div></div>
+<div class="two"><div><label class="field" for="impact">インパクト</label><select id="impact"></select></div><div><label class="field" for="textLayout">文字の見せ方</label><select id="textLayout"></select></div></div>
+<label class="field" for="titlePlacement">文字配置</label><select id="titlePlacement"></select>
+<label class="field" for="subtitleWeight">サブタイトルの強さ</label><select id="subtitleWeight"></select>
+</div></section>
+
+<section class="panel"><h2 class="step">3. 表現原理</h2>
+<div class="choices" id="expressionChoices"></div>
+<label class="field">追加の視覚メカニズム（複数選択）</label>
+<div class="choices" id="mechanismChoices"></div></section>
+
+<section class="panel"><h2 class="step">4. 共通作画エンジン：構図・距離感</h2>
+<label class="field" for="distance">画面全体の距離感</label><select id="distance"></select>
+<label class="field" for="composition">全体構図</label><select id="composition"></select>
+<div class="layer"><h3>近景（視点に近い層）</h3><div class="choices" id="nearChoices"></div></div>
+<div class="layer"><h3>中景（主題・動作の層）</h3><div class="choices" id="midChoices"></div></div>
+<div class="layer"><h3>遠景（奥に広がる層）</h3><div class="choices" id="farChoices"></div></div>
+<div class="two"><div><label class="field" for="density">描き込み量</label><select id="density"></select></div><div><label class="field" for="palette">色彩</label><select id="palette"></select></div></div>
+<div class="two"><div><label class="field" for="light">光</label><select id="light"></select></div><div><label class="field" for="surface">質感</label><select id="surface"></select></div></div>
+<label class="field" for="ratio">出力比率</label><select id="ratio"></select>
+<div id="customRatioWrap" class="hidden"><label class="field" for="ratioCustom">自由指定サイズ</label><input id="ratioCustom" type="text" placeholder="例：1600×900"></div></section>
+
+<section class="panel"><h2 class="step">5. 追加指示 & ガードレール設定</h2>
+<label class="field" for="avoid">避けたい要素（任意）</label><input id="avoid" type="text" placeholder="例：ロゴ、過剰な装飾、文字など">
+<label class="field" for="extra">最後のひと押し（任意）</label><textarea id="extra" placeholder="選択肢にない希望だけを追加してください。"></textarea>
+<div id="textBlock"><label class="field" for="textPolicy">画像内の文字</label><select id="textPolicy"></select>
+<div id="imageTextWrap" class="hidden"><label class="field" for="imageText">入れる文字</label><input id="imageText" type="text" placeholder="画像内に入れる文字"></div></div>
+
+<label class="field" for="factCheck">Fact Check（式・文字の捏造防止）</label>
+<select id="factCheck"></select>
+<label class="field" for="formulaMode">式・数式の扱い（化学式・数式を検知したとき）</label>
+<select id="formulaMode"></select>
+<label class="choice" style="margin-top:9px">
+ <input type="checkbox" id="factCheckText">
+ <span><strong>画像内に文字を入れる場合も Fact Check する（任意）</strong><br><span class="small">文字がデザインの一部なら OFF のまま。タイトルなど表記を厳守したいときだけ ON にします。「常にON」のときは無関係に適用されます。</span></span>
+</label>
+
+<label class="choice" style="margin-top:9px">
+ <input type="checkbox" id="chatMode" checked>
+ <span><strong>チャット型AI向けの実行指示・応答制御を付ける</strong><br><span class="small">貼り付け時に即時実行させ、余計な解説を出さない指示を追加します。</span></span>
+</label>
+</section>
+
+<section class="panel"><h2 class="step">6. 生成用プロンプト</h2><div id="preview" aria-live="polite"></div><div class="actions">
+<button class="primary" id="copyBtn" type="button">プロンプトをコピー</button>
+<button class="secondary" id="refreshBtn" type="button">更新</button>
+<button class="secondary" id="downloadBtn" type="button">設定をJSON保存</button>
+<button class="secondary" id="loadBtn" type="button">設定JSON読込</button>
+<input type="file" id="fileInput" accept=".json" class="hidden">
+<button class="secondary" id="resetBtn" type="button">初期化</button>
+</div><p class="status" id="status" aria-live="polite">選択内容は自動で反映されます。</p></section>
+<p class="footer">NEPM™ Illustration Web · N.Nakata · Ver.9.10.0</p>
+</div></main>
+<script>
+const GENRES=[
+ {id:'fantasy',label:'ファンタジー',desc:'魔法、冒険、古代遺跡、神話の世界など。'},
+ {id:'scifi',label:'SF・未来',desc:'宇宙、ロボット、未来の都市や技術など。'},
+ {id:'everyday',label:'現代・日常',desc:'街、暮らし、人物など、身近な場面。'},
+ {id:'abstract',label:'抽象・シュール',desc:'形や色が主役。現実にはない不思議な絵。'},
+ {id:'education',label:'教育・解説',desc:'学習や説明のための、わかりやすい絵。'}
+];
+const MODES=[
+ {id:'illustration',label:'通常イラスト',desc:'1枚で完結する、ふつうの絵。'},
+ {id:'noteThumbnail',label:'noteタイトルサムネ',desc:'記事の見出し画像。タイトル文字と絵を一緒に設計します。'},
+ {id:'presentation',label:'プレゼン・表紙',desc:'発表資料や説明資料の表紙。文字を置く余白も考えます。'},
+ {id:'concept',label:'概念・比喩表現',desc:'「自由」「時間」など、目に見えないものを絵にします。'}
+];
+const EXPRESSIONS=[
+ {id:'写実的',label:'写実的',desc:'写真のように、本物らしく描く。'},
+ {id:'様式化・デフォルメ',label:'様式化・デフォルメ',desc:'特徴を強めて、単純化して描く。'},
+ {id:'抽象化',label:'抽象化',desc:'物の形をぼかし、形や色そのものを主役にする。'},
+ {id:'シュール・非現実',label:'シュール・非現実',desc:'現実にはありえない組み合わせ。'},
+ {id:'複数視点・幾何学的再構成',label:'複数視点・幾何学的再構成',desc:'面で分け、多角的に構成。'},
+ {id:'実験的・混合表現',label:'実験的・混合表現',desc:'手法を組み合わせる。'}
+];
+const MECHANISMS=[
+ {id:'形状の単純化',label:'形状の単純化',desc:'細かい形を省き単純化。'},
+ {id:'形状の分解と再配置',label:'形状の分解と再配置',desc:'パーツを再構成。'},
+ {id:'複数視点の同時表示',label:'複数視点の同時表示',desc:'異視点を一画面に。'},
+ {id:'遠近法の誇張・反転',label:'遠近法の誇張・反転',desc:'空間を強調または逆転。'},
+ {id:'極端なスケール差',label:'極端なスケール差',desc:'大小の落差で魅せる。'},
+ {id:'輪郭の重複・ずれ',label:'輪郭の重複・ずれ',desc:'線を二重にしブレ表現。'},
+ {id:'反復・残像・時間の重ね合わせ',label:'反復・残像・時間の重ね合わせ',desc:'時間経過を一画面に。'},
+ {id:'物体と背景の境界を曖昧にする',label:'境界の曖昧化',desc:'背景と一体化させる。'},
+ {id:'色彩面の衝突',label:'色彩面の衝突',desc:'強烈な色の面構成。'},
+ {id:'意図的な不均衡',label:'意図的な不均衡',desc:'あえてバランスを崩す。'}
+];
+const NEAR=[
+ {id:'自然なフレーム（枝・柱・岩・窓など）',label:'自然なフレーム',desc:'手前で画面を囲む。'},
+ {id:'ぼけ・影・光の粒子',label:'ぼけ・影・光の粒子',desc:'前ぼけや光で空気感。'},
+ {id:'手前に大きく迫る物体や道具',label:'手前に迫る物体',desc:'迫力を出す。'},
+ {id:'近景なし。手前に物体を追加しない',label:'近景なし',desc:'すっきり見せる。'}
+];
+const MID=[
+ {id:'主役を明確に見せる',label:'主役を明確に見せる',desc:'分かりやすさ重視。'},
+ {id:'動きのあるアクション',label:'動きのあるアクション',desc:'動的な場面。'},
+ {id:'巨大な背景とのスケール対比',label:'スケール対比',desc:'壮大さを表現。'},
+ {id:'形状の分解・変形',label:'形状の分解・変形',desc:'ゆがみ・変形要素。'},
+ {id:'主題を小さく置き、空間を強調',label:'空間の強調',desc:'広い空間が主役。'}
+];
+const FAR=[
+ {id:'auto',label:'おまかせ',desc:'AIに任せる。'},
+ {id:'霧・霞・大気遠近法',label:'霧・霞・大気遠近法',desc:'奥行きのある空気感。'},
+ {id:'遠方の城塞・都市・巨大建造物',label:'建造物・都市',desc:'遠景に構造物。'},
+ {id:'山並み・地平線・広大な自然',label:'自然・地平線',desc:'自然の広がり。'},
+ {id:'抽象空間・色彩面・歪んだ遠近法',label:'抽象空間',desc:'非現実的な奥行き。'},
+ {id:'遠景を簡素にし、背景を省略',label:'背景省略',desc:'背景を描かない。'}
+];
+const SELECTS={
+ impact:[['強','目立つ印象。'],['格調重視','品のある印象。'],['知的・技術的','理知的。'],['挑発的','攻めた印象。'],['ミニマル','簡潔。']],
+ textLayout:[['巨大文字','文字を最大化。'],['帯・ラベル','帯付きで可読性UP。'],['上品な文字組み','細身で上品。'],['立体・変形文字','立体感。'],['絵と文字の一体化','絵に溶け込ませる。']],
+ titlePlacement:[['左寄せ','左に配置。'],['中央集中','中央に配置。'],['右寄せ','右に配置。'],['上部に配置','上部に配置。'],['非対称・自由配置','自由な配置。'],['絵と文字を融合','絵の流れに合わせる。']],
+ subtitleWeight:[['控えめ','小さく。'],['中程度','標準。'],['メインと同程度','同等に目立たせる。']],
+ distance:[['映画的な奥行き','奥行き重視。'],['遠景重視','広大さ重視。'],['没入型','包まれる感じ。'],['主題に接近','アップ。'],['平面構成・奥行きを抑える','平面的。']],
+ composition:[['自由構成','AIにおまかせ。'],['中央・対称','どっしり落ち着く。'],['三分割','安定した構成。'],['斜めの流れ','勢い。'],['非対称','緊張感。'],['大きな余白','静けさ。'],['フレーム内フレーム','枠内構成。'],['分割・断片化','切り分け。'],['複数の焦点','見どころ多数。'],['意図的な重心の偏り','偏り。'],['衝突・密集・混乱','カオス。']],
+ density:[['標準','標準。'],['高密度','描き込み多。'],['大胆に簡略化','シンプル。'],['主題のみ詳細、他は簡素','メリハリ。'],['極端に情報量を絞る','最小限。']],
+ palette:[['題材に合わせて自由','自由。'],['鮮やかで高コントラスト','はっきり。'],['落ち着いた低彩度','静か。'],['寒色中心','クール。'],['暖色中心','ウォーム。'],['色彩面の衝突','面構成。'],['モノクローム','白黒。'],['補色の強い対比','対比。']],
+ light:[['題材に合わせて自由','自由。'],['柔らかな拡散光','やわらか。'],['強い逆光','ドラマチック。'],['硬い指向性の光','くっきり。'],['劇的な明暗差','コントラスト。'],['平面的・均一な光','均一。'],['非現実的な複数光源','複数光。']],
+ surface:[['題材に合わせて自由','自由。'],['マット・落ち着いた表面','マット。'],['紙・鉛筆・手描きの質感','アナログ感。'],['水彩・にじみ','水彩風。'],['金属・硬質素材','硬質。'],['粗い筆致・ざらつき','粗め。'],['滑らかなデジタル表現','滑らか。'],['素材感を混在させる','混合。']],
+ ratio:[['16:9','スライド向け'],['1280×670（noteサムネイル）','note向け'],['1:1','正方形'],['3:2','写真比率'],['4:5','縦長'],['自由指定','自由サイズ']],
+ factCheck:[['自動（式・文字があるときだけON）','絵だけの自由発想ではOFF。化学式・数式を含む、または画像内に文字を入れる指定があるときだけON。'],['常にON','式・文字の両方のガードレールを常に付けます。'],['OFF','Fact Checkを付けません。']],
+ chatgptStyle:[['OFF','Geminiの既定の画調のまま。'],['ON：荘厳・ドラマチック','低い視点、主役を大きく、暖色×寒色の対比、光の筋とリムライト、四隅を暗く、濡れた床の反射。※「色彩を豊かに」「小物・情報量」は自動でOFF（色を絞る方針のため）。'],['ON：明るく華やか','主役を大きく、澄んだ高彩度の色、光が満ちる明るい画面、やわらかな光の筋とグロー。※「色彩を豊かに」「小物・情報量」は自動でOFF。']],
+ chatgptColor:[['おまかせ（色彩の設定に従う）','色は下の「色彩」の設定とプリセットの標準方針に従います。'],['紫×金（ステンドグラスの色光）','紫の寒色の空間に、奥の巨大な色ガラスの窓から色光が差し、主役に金・橙の光が当たる。'],['青×橙','深い青〜青緑の寒色の空間に、橙〜琥珀の暖色の光。']],
+ geminiBoost:[['OFF','追加しません。ChatGPTなど他のAI向け。'],['ON（強め）','はっきり盛る。盛りすぎが気になるときはこちら。'],['ON（最大・大げさ）','かなり大げさに盛る。Geminiの地味さが気になるときに。']],
+ formulaMode:[['雰囲気として描く（デザイン優先）','式は装飾として扱い、多少崩れてもOK。見た目の美しさ優先。'],['入力した式だけを使う（正確さ重視）','式の創作・補完をさせず、描けない構造図は抽象的に。講演・授業向け。'],['式は描かない','式や数字は描かず、光の線や幾何学模様など読めない装飾で雰囲気だけ出す。']],
+ textPolicy:[['文字なし','文字なし'],['指定した文字だけを入れる','文字指定'],['文字の有無をAIに任せる','AIに任せる']]
+};
+const $=id=>document.getElementById(id);const val=id=>($(id)?.value||'').trim();const checked=name=>document.querySelector(`input[name="${name}"]:checked`)?.value||'';
+function setMainMode(mode){const simple=mode==='simple';$('simplePanel').classList.toggle('hidden',!simple);$('app').classList.toggle('hidden',simple);$('simpleTab').classList.toggle('active',simple);$('hardTab').classList.toggle('active',!simple);$('simpleTab').setAttribute('aria-selected',String(simple));$('hardTab').setAttribute('aria-selected',String(!simple));}
+$('simpleTab').addEventListener('click',()=>setMainMode('simple'));$('hardTab').addEventListener('click',()=>setMainMode('hard'));
+function buildSimplePrompt(){const style=checked('simpleStyle');const styles={comic:'漫画風。読みやすいコマ割りを感じさせる構図、明快な輪郭、表情豊かな描写、リズムのある視線誘導。過剰な効果線は題材に合う場合のみ。',study:'静かな書斎・知的な編集イラスト風。落ち着いた構成、柔らかな自然光、書物や木・紙の質感、控えめな色彩、知的で端正な雰囲気。',nature:'自然をテーマにした柔らかなイラスト。植物や自然素材、穏やかな光、緑・土・空の調和した色彩、余白を活かした心地よい構図。',grid:'落ち着いたグリッド・タイル型のデザイン。アイボリー、白、薄いグレーを基調に、細い罫線と控えめな幾何学模様、十分な余白、整ったレイアウト。派手なネオンや強すぎるコントラストを避け、文字を読みやすく配置する。'};const title=val('simpleTitle'),sub=val('simpleSubtitle'),subject=val('simpleSubject'),ratio=checked('simpleRatio')||'16:9';const isPoster=ratio==='A4P'||ratio==='A4L';const body=($('posterBody')?.value||'').trim();const variation=nextVariation(isPoster);const ratioText=isPoster?(ratio==='A4P'?'A4たて（縦長・縦横比 約1:1.414・210×297mm）のポスター。':'A4よこ（横長・縦横比 約1.414:1・297×210mm）のポスター。')+'印刷物として、四辺に十分な余白（安全領域）を確保し、端に文字を寄せない。A3に拡大印刷しても読める構成にする。':ratio==='note'?'noteタイトルサムネイル。目標サイズ1280×670 px（約1.91:1）。タイトルと重要な要素を中央の安全領域に配置し、端で文字や主題が切れないようにする。':'画像比率 '+ratio+'。画面全体をこの比率に合わせて構成する。';if(isPoster&&checked('posterOutput')!=='image'){const land=ratio==='A4L';const W=land?'297mm':'210mm',H=land?'210mm':'297mm',O=land?'landscape':'portrait';const hp=['あなたはHTML/CSSに詳しいWebデザイナーです。次の条件で、印刷用ポスターの「HTMLコード」を、単一のHTMLファイルとして書いてください。','【用紙】'+(land?'A4よこ（297mm × 210mm）':'A4たて（210mm × 297mm）')+'。次の骨格を必ず使う：@page{size:A4 '+O+';margin:0} / html,body{margin:0;padding:0} / .poster-page{width:'+W+';height:'+H+';overflow:hidden;box-sizing:border-box}（*,*::before,*::after は box-sizing:inherit）。ポスター本体は .poster-page 1枚で固定し、内容がページ外にはみ出さないこと。【画面表示の決まり】body に background:#e5e7eb と padding:20px 0 を付け、.poster-page は margin:0 auto で左右中央に置く。html,body に height:100% や 100vh を指定しない。body に display:flex や align-items:center を使わない（画面が用紙より低いとき、上の部分が切れて見えなくなるため）。【印刷時の決まり】@media print では body の背景と padding を消し、.poster-page の margin と box-shadow も消す。page-break-after は使わない（空白ページ防止）。背景色が印刷されるよう -webkit-print-color-adjust:exact;print-color-adjust:exact を指定する。【余計な文字対策】保存時に余計な文字が混ざっても紙面に出ないよう、body に font-size:0 を指定し、.poster-page に font-size:16px と line-height:1.5 を指定する。','【技術条件】外部CSS・外部JavaScript・外部フォント・外部画像URL・@import は使用しない。JavaScriptは使わない。CSSは <style> 内に完結させる。装飾・枠・図形・イラストはCSSまたはインラインSVGで表現する。フォントは日本語のシステムフォント指定（例：\"Hiragino Sans\",\"Yu Gothic\",\"Meiryo\",sans-serif / 明朝系なら \"Hiragino Mincho ProN\",\"Yu Mincho\",serif）とする。','【デザインの方向性】'+styles[style]+' 配色・フォント・装飾はこの方向性に合わせる。カラー印刷を前提とし、本文の読みやすさとタイトルの視認性を最優先する。','【絵のテーマ（絵で表したい題材）】'+(subject||title||'本文の内容に合うテーマの挿絵。')+' ※これは絵の題材であり、本文ではない。テーマは、物・人・場面などの具体的なモチーフとして、インラインSVGで描く。','【絵の量】'+({text:'挿絵は小さな添え物にとどめ、文字の読みやすさを最優先する。',normal:'紙面の約2〜3割に、テーマに合う挿絵（インラインSVG）を入れる。隅の小さな飾りだけで終わらせず、はっきり見える大きさの絵を最低1点、見出しの近くまたは主要な枠のまわりに置く。',big:'紙面の約4〜5割を占める大きな主役の挿絵（インラインSVG）を中心に置き、文字はその周囲や余白に配置する。絵は複数の図形・色・陰影を重ねて描き込みを増やし、単純なベタ塗りの図形だけで終わらせない。'}[checked('posterArt')||'normal']),'【タイトル】'+(title?'「'+title+'」を大きく正確に表示する。表記を変更・省略しない。':'指定なし。本文から最適なタイトルを判断してよいが、本文自体は変更しない。'),'【サブタイトル】'+(sub?'「'+sub+'」を正確に表示する。表記を変更・省略しない。':'指定なし。'),'【ポスター本文（原文）】\n'+(body?body:'（本文の指定なし。タイトルとサブタイトル中心の掲示物として構成する）')+'\n※上の本文は、省略・要約・言い換えをせず、すべて載せる。誤字・脱字らしき箇所があっても勝手に直さず、そのまま載せたうえで、コードブロックの外で一言指摘する。','【紙面レイアウト設計（AIにおまかせ）】本文を項目ごとに整理し、情報の重要度と文字量を見積もったうえで、紙面そのものを設計する。①タイトルは遠くからでも読める大きさにする。②見出し・本文・補足・注意書きの文字サイズに明確な差をつける。③文字量に応じて、囲み枠（四角・角丸・帯・吹き出し）の数・形・大きさを決める。文字が多いほど枠を分けて段組み（CSS Grid / columns）にし、少ないほど余白と装飾を活かす。④手順は番号付きの枠、比較は左右の枠、流れは矢印でつなぐ。日時・場所など最重要情報は目立つ枠にまとめる。⑤文字と背景のコントラストを十分に確保し、文字の上に複雑な絵柄を重ねない。⑥四辺に十分な余白を確保し、端に文字を寄せない。⑦文字が多くて収まらない場合は、枠の分割・段組み・文字サイズの調整で収める。ただし本文の文字サイズは、A4印刷で無理なく読める大きさ（目安：本文10pt以上）を下回らせない。それでも収まらない場合は、収めるための提案を本文の外で一言添える。','【今回のレイアウト方向性（参考案）】'+variation+' ※これは参考案。本文の性質に合わない場合（例：順序のない文章に番号付きの手順枠を使う、など）は、無理に採用せず、内容に合う形に調整してよい。番号付きの枠は、本文が手順・順序のある内容のときだけ使う。','【文字の追加禁止】画面に載る文字は、タイトル・サブタイトル・ポスター本文だけにする。英語の飾り文字、バッジ、スローガン、フッター、キャッチコピー、注釈など、指定のない文字を勝手に追加しない。','【出力前の自己検査】次を内部で確認してから出力する：用紙サイズ（.poster-page）／はみ出しなし／本文の欠落・改変なし／指定外の文字を追加していない／タイトルが十分に大きい／絵の量が指定どおり／外部依存なし／装飾が本文を邪魔していない。問題があれば自動修正する。','【出力形式】HTMLコードは、説明文と混在させず、単独のHTMLコードブロック1つで出力する（<!DOCTYPE html> から始める）。前後の説明は最小限にし、最後に「poster.html として保存し、ブラウザで開いて印刷（A4・倍率100%・余白なし・背景のグラフィックON）」とだけ案内する。'].join('\n\n');$('simplePreview').textContent=hp;return hp;}
+const p=['【今回の構図の参考案】'+(isPoster?variation:nextImageVariation()),...(isPoster?['【絵の量】'+({text:'小さな挿絵にとどめ、文字を中心にする。',normal:'紙面の約2〜3割を挿絵にする。',big:'紙面の約4〜5割に大きな挿絵を置く。'}[checked('posterArt')||'normal'])]:[]),'指定に基づき、画像を1枚生成してください。説明文や複数案一覧ではなく、完成した1枚の画像を作成します。','【画像サイズ・縦横比】'+ratioText+' 生成AIが厳密なピクセル寸法に対応しない場合は、比率と構図を優先する。','【選択された画風】'+styles[style],'【描きたい内容】'+(subject||title||(isPoster?'本文の内容に合うテーマのイラスト・装飾。':'選択した画風を活かした、魅力的でまとまりのあるイラスト。')),...(isPoster?['【ポスター本文（原文）】\n'+(body?body:'（本文の指定なし。タイトルとサブタイトル中心の掲示物として構成する）')+'\n※上の本文は、省略・要約・言い換え・誤字をせず、すべてポスター内に載せる。','【紙面レイアウト設計（AIにおまかせ）】本文を項目ごとに整理し、情報の重要度と文字量を見積もったうえで、紙面そのものを設計する。①タイトルは遠くからでも読める大きさで最上部など目立つ位置に置く。②見出し・本文・補足・注意書きの文字サイズに明確な差をつける。③文字量に応じて、囲み枠（四角・角丸の枠、帯、吹き出し等）の数・形・大きさをAIが決める。文字が多いほど枠を分け、少ないほど余白と図解を活かす。④手順は番号付きの枠、比較は左右の枠、流れは矢印でつなぐ。日時・場所など最重要情報は目立つ枠にまとめる。⑤文字と背景のコントラストを十分に確保し、文字の上に複雑な絵柄を重ねない。⑥視線が上から下へ自然に流れる構成にし、余白・色・小さなイラストや図解で整える。文字が読めることを装飾より優先する。','【今回のレイアウト方向性（作り直し用）】'+variation]:[]),'【タイトル】'+(title?'「'+title+'」を正確に表示する。表記を変更・省略しない。':'タイトル文字は指定なし。'),'【サブタイトル】'+(sub?'「'+sub+'」を正確に表示する。表記を変更・省略しない。':'指定なし。'),'【構図・仕上げ】題材に合った構図、視点、配色、光、質感、情報量を自動で設計する。主題を明確にし、見やすく完成度の高い画像にする。','【変化と創造性】生成のたびに、構図・視点・色の組み合わせ・背景の細部などを柔軟に変化させる。同じテンプレートの単純な繰り返しにせず、題材に合う新鮮な表現を試みる。ただし、変化をつけるために主題や指定文字を変えてはならない。',(isPoster?'【文字について】指定したタイトル・サブタイトル・ポスター本文以外の文字、ロゴ、透かし、意味のない文字列は追加しない。本文は原文どおりに正確に描く。画像モデルによる文字描画には限界があるため、表記の完全一致を保証しない。':'【文字について】指定したタイトルとサブタイトル以外の文字、ロゴ、透かし、意味のない文字列は追加しない。画像モデルによる文字描画には限界があるため、表記の完全一致を保証しない。'),'【優先事項】ユーザーの題材と画風を尊重する。奇妙さや大胆な表現が題材に合う場合、無難な方向に勝手に修正しない。','【実行指示】この内容を画像生成用の指示として扱い、可能であればそのまま画像生成を開始する。'].join('\n\n');$('simplePreview').textContent=p;return p;}
+const VAR_POSTER=['上部に大きなタイトル帯、中段に角丸の枠を2〜3列で並べる整理型レイアウト。','左側に縦長の大きな見出し枠、右側に項目別の小さな枠を積む構成。','中央にメインビジュアルとタイトル、周囲を囲むように情報枠を配置する構成。','上から下へ番号付きの枠を並べ、矢印で流れを示すステップ型レイアウト。','最重要情報（日時・場所）を大きな枠で目立たせ、補足と注意書きを下部に小さくまとめる構成。','帯状の区切り線で3〜4ブロックに分割し、各ブロックに小さなアイコンを添える構成。'];
+const VAR_COLOR=['落ち着いた寒色系（青・グレー）を基調に差し色を1色。','あたたかい暖色系（オレンジ・クリーム）を基調に、文字は濃色で。','やわらかなパステルカラーを基調に、見出しだけ濃い色で締める。','白地に濃紺と1色のアクセントで、端正で読みやすく。','自然な緑・ベージュを基調に、穏やかで見やすく。'];
+const VAR_ILLUST=['背景は薄く控えめにし、小さなイラストを要所に添える。','上部または隅に主題のイラストを大きめに1点置き、本文域は広く確保する。','枠のまわりに薄い模様・フレーム装飾をあしらう。','アイコン風のシンプルな図解を枠ごとに添える。'];
+let lastVar=-1,varSeed=0;
+function nextVariation(isPoster){const pick=a=>a[Math.floor(Math.random()*a.length)];if(varSeed===0){varSeed=1;lastVar=-1;return isPoster?'標準：本文の量と重要度に合わせて、最も読みやすい配置をAIが自由に決める。':''}let i;do{i=Math.floor(Math.random()*VAR_POSTER.length)}while(i===lastVar&&VAR_POSTER.length>1);lastVar=i;return VAR_POSTER[i]+' '+pick(VAR_COLOR)+' '+pick(VAR_ILLUST)+'（案'+(++varSeed)+'）'}
+function togglePoster(){const r=checked('simpleRatio');const on=r==='A4P'||r==='A4L';const subj=($('simpleSubject').value||'').trim();$('subjectWarn').classList.toggle('hidden',!(on&&subj.length>40&&!($('posterBody').value||'').trim()));$('subjectLabel').textContent=on?'🎨 絵のテーマ（絵で描きたい題材。文章は下の「ポスターに載せる文章」へ）':'描きたい内容（自由入力）';$('simpleSubject').placeholder=on?'例：給料日の財布と、こぼれるコイン':'例：未来の教室で、生徒とAIが一緒にアイデアを考えている';$('posterWrap').classList.toggle('hidden',!on);const html=checked('posterOutput')!=='image';$('posterHtmlNote').classList.toggle('hidden',!html);$('posterImgWarn').classList.toggle('hidden',html);}
+let flowStep=1;
+function flowDef(){const r=checked('simpleRatio');const poster=r==='A4P'||r==='A4L';const html=poster&&checked('posterOutput')!=='image';const o=r==='A4L'?'よこ':'たて';
+ if(html)return{names:['プロンプトを作成','コピー','AIに貼って送信','HTMLを保存して開く','印刷して掲示'],msgs:[
+  ['👉 入力できたら、青い「プロンプトを作成」を押してください。','タイトルや文章を変えたときも、もう一度ここからです。'],
+  ['👉 次は、青い「プロンプトをコピー」を押してください。','コピーできたら、このページはそのまま開いておいてください。'],
+  ['👉 AI（Gemini・ChatGPT・Claude）のチャット欄に貼り付けて、送信してください。','画像生成に対応していないAIでも大丈夫です。AIがHTMLコードを返します。もし「対応できません」などと返ってきたら、新しいチャットを開いて貼り直すか、別のAI（ChatGPT・Claudeなど）で試してください。'],
+  ['👉 AIが返したHTMLコードを保存して、ブラウザで開いてください。','コードブロックの「コピー」を押し、メモ帳などに貼り付けて、poster.html という名前で保存 → ダブルクリックで開きます。コピーするのは「<!DOCTYPE html>」から「</html>」までです。その外の文字（「```」や案内文）が混ざると、紙面の下に表示されてしまいます。AIの画面にプレビューが出る場合は、そこから印刷してもOKです。文字がはみ出していないか、見た目を確認してください。気に入らなければ、下の🎲作り直しをどうぞ。'],
+  ['👉 ブラウザの印刷（Ctrl+P）で、A4・'+o+'・倍率100%・余白なし・背景のグラフィックONにして印刷してください。','最初に1枚だけ試し刷りをして、確認してから枚数を刷るのがおすすめです。']],
+  btn:[null,null,'送信した → 次へ','保存して開いた → 次へ','印刷した → 完了'],done:['🎉 完成です。廊下に貼ってください。','直したいときは、文章を変更するか、🎲作り直しを押してください。']};
+ return{names:['プロンプトを作成','コピー','AIに貼って送信','画像を保存して確認'],msgs:[
+  ['👉 入力できたら、青い「プロンプトを作成」を押してください。','タイトルや内容を変えたときも、もう一度ここからです。'],
+  ['👉 次は、青い「プロンプトをコピー」を押してください。','コピーできたら、このページはそのまま開いておいてください。'],
+  ['👉 画像生成に対応したAIのチャット欄に貼り付けて、送信してください。','AIが画像を作ります。気に入らなければ、同じものをもう一度送るか、🎲作り直しを使います。'],
+  ['👉 できた画像を保存して、文字や絵に問題がないか確認してください。','画像AIは文字を間違えることがあります。誤字がないか、必ず目で確認してください。']],
+  btn:[null,null,'送信した → 次へ','確認した → 完了'],done:['🎉 完成です。','別の案が欲しいときは、🎲作り直し（ガチャ）をどうぞ。']};}
+function renderFlow(){const d=flowDef();const n=d.names.length;if(flowStep>n+1)flowStep=n+1;
+ $('flowChips').innerHTML=d.names.map((t,i)=>{const k=i+1;const c=k<flowStep?'done':k===flowStep?'now':'';return '<span class="chip '+c+'">'+(k<flowStep?'✓ ':k+'. ')+t+'</span>'}).join('');
+ const fin=flowStep>n;const mm=fin?d.done:d.msgs[flowStep-1];$('flowMsg').textContent=mm[0];$('flowSub').textContent=mm[1];
+ const nb=$('flowNextBtn');const showNext=!fin&&flowStep>=3;nb.classList.toggle('hidden',!showNext);if(showNext)nb.textContent=d.btn[flowStep-1];
+ $('flowBackBtn').classList.toggle('hidden',flowStep<4);
+ const ready=flowStep>=2;const b=$('simpleBuildBtn'),c=$('simpleCopyBtn');
+ b.disabled=ready;b.classList.toggle('primary',!ready);b.classList.toggle('secondary',ready);
+ c.disabled=!ready;c.classList.toggle('primary',flowStep===2);c.classList.toggle('secondary',flowStep!==2);}
+function setSimpleActionState(ready){flowStep=ready?2:1;renderFlow();}
+setSimpleActionState(false);
+$('simpleBuildBtn').addEventListener('click',()=>{buildSimplePrompt();setSimpleActionState(true);$('simpleStatus').textContent='①プロンプトを作成しました。次に、青い「プロンプトをコピー」を押してください。';});
+$('simpleCopyBtn').addEventListener('click',async()=>{const p=$('simplePreview').textContent;try{await navigator.clipboard.writeText(p);$('simpleStatus').textContent='コピーしました。';if(flowStep<3)flowStep=3;renderFlow();}catch(e){if(flowStep<3)flowStep=3;renderFlow();$('simpleStatus').textContent='自動コピーできませんでした。生成用プロンプト欄を選択してコピーしてください。'}});
+function simpleInputsChanged(){varSeed=0;togglePoster();buildSimplePrompt();setSimpleActionState(false);$('simpleStatus').textContent='内容を変更しました。青い「プロンプトを作成」を押してください。';}
+['simpleTitle','simpleSubtitle','simpleSubject','posterBody'].forEach(id=>$(id).addEventListener('input',simpleInputsChanged));document.querySelectorAll('input[name="simpleStyle"],input[name="simpleRatio"],input[name="posterOutput"],input[name="posterArt"]').forEach(el=>el.addEventListener('change',simpleInputsChanged));
+
+function renderChoices(container,items,name,type,defIdx){$(container).innerHTML=items.map((item,i)=>`<label class="choice"><input type="${type}" name="${name}" value="${item.id}" ${type==='radio'&&i===defIdx?'checked':''}><span><strong>${item.label}</strong>${item.desc?`<br><span class="small">${item.desc}</span>`:''}</span></label>`).join('')}
+function fillSelects(){for(const id in SELECTS){const sel=$(id);sel.innerHTML=SELECTS[id].map(([v])=>`<option value="${v}">${v}</option>`).join('');if(!$('help_'+id))sel.insertAdjacentHTML('afterend',`<p class="optHelp" id="help_${id}"></p>`)}}
+function updateHelps(){for(const id in SELECTS){const sel=$(id);const hit=SELECTS[id].find(([v])=>v===sel.value);$('help_'+id).textContent=hit?hit[1]:''}}
+function renderAll(){renderChoices('genreChoices',GENRES,'genre','radio',0);renderChoices('modeChoices',MODES,'mode','radio',0);renderChoices('expressionChoices',EXPRESSIONS,'expression','radio',0);renderChoices('mechanismChoices',MECHANISMS,'mechanism','checkbox',-1);renderChoices('nearChoices',NEAR,'near','radio',3);renderChoices('midChoices',MID,'mid','radio',0);renderChoices('farChoices',FAR,'far','radio',0)}
+fillSelects();renderAll();
+function selectedLabel(name,items){const id=checked(name);const item=items.find(x=>x.id===id);return item?item.label:''}
+
+// 化学式・数式の検知（誤爆を減らすため、元素記号で検証）
+const ELEMENTS=new Set('H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm Md No Lr'.split(' '));
+function hasChemFormula(t){
+ const cands=t.match(/(?:[A-Z][a-z]?\d*|\([A-Za-z0-9]+\)\d*){2,}/g)||[];
+ return cands.some(c=>{
+  if(!/\d/.test(c)&&!/^(NaCl|NaOH|HCl|KCl|KOH|NaF|HF|HBr)$/.test(c))return false;
+  const tokens=[...c.replace(/[()]/g,'').matchAll(/([A-Z][a-z]?)(\d*)/g)].map(m=>m[1]);
+  return tokens.length>=2&&tokens.every(x=>ELEMENTS.has(x));
+ });
+}
+function detectScienceKeywords(raw){
+ const norm=raw.normalize('NFKC');
+ const words=/(化学式|構造式|分子式|化学反応式|数式|計算式|方程式|解の公式|分子|原子|元素|官能基|グリコシド|ヒドロキシ|ベンゼン|アルカン|アミノ酸|たんぱく質|核酸|\bDNA\b|\bRNA\b|微分|積分|三角関数|因数分解|ピタゴラス|三平方|formula|equation|molecule|\\frac|\\sqrt)/i;
+ const symbols=/[A-Za-z0-9)\]]\s*[=＝≠≒≦≧÷^²³√∫∑∏π]\s*[A-Za-z0-9(\[]|\d\s*[+＋]\s*\d|[∫∑∏√]/;
+ return words.test(raw)||symbols.test(raw)||hasChemFormula(norm);
+}
+// Fact Check 状態：0=自動 1=常にON 2=OFF／式の扱い：0=雰囲気 1=厳密 2=描かない
+function factCheckState(){
+ const isThumb=checked('mode')==='noteThumbnail';
+ const texts=[val('subject'),val('extra')];
+ let text=false;
+ if(isThumb){texts.push(val('mainTitle'),val('subTitle'));text=!!(val('mainTitle')||val('subTitle'))}
+ else if(val('textPolicy')==='指定した文字だけを入れる'&&val('imageText')){texts.push(val('imageText'));text=true}
+ if(!$('factCheckText').checked)text=false;
+ const detected=detectScienceKeywords(texts.join(' '));
+ const sel=$('factCheck').selectedIndex,fm=$('formulaMode').selectedIndex;
+ if(sel===2)return{on:false};
+ if(sel===1)return{on:true,forced:true,text:true,formula:fm===1,ban:fm===2,decor:fm===0};
+ const formula=detected&&fm===1,ban=detected&&fm===2,decor=detected&&fm===0;
+ return{on:text||formula||ban,forced:false,text,formula,ban,decor};
+}
+
+function buildPrompt(){
+ const genre=selectedLabel('genre',GENRES)||'ファンタジー';
+ const mode=selectedLabel('mode',MODES)||'通常イラスト';
+ const expr=selectedLabel('expression',EXPRESSIONS)||'様式化・デフォルメ';
+ const mechanisms=[...document.querySelectorAll('input[name="mechanism"]:checked')].map(x=>x.value);
+ const parts=[];
+ parts.push('指定条件をもとに、独立したイラストを1枚生成してください。複数コマ、ストーリーボード、複数候補を1枚に並べる形式は要求されていない限り使用しません。');
+ // Gemini Boost（冒頭に追加）
+ const gb=$('geminiBoost').selectedIndex;
+ if(gb>0){
+  const max=gb===2,cg=$('chatgptStyle').selectedIndex,L=[];
+  if(!cg&&$('boostColor').checked)L.push('- 色彩の豊かさ：灰色がかった・くすんだ・退色した印象を禁止。彩度と色数を'+(max?'大きく':'しっかり')+'上げ、補色や差し色（鮮やかな赤・金・ターコイズ・深緑・紫など）を画面の複数箇所に散らす。肌・空・影にも色味を含ませ、モノトーンに寄せない。');
+  if(!cg&&$('boostProps').checked)L.push('- 小物・情報量：殺風景を禁止。中景・遠景に、場面に合う小物・道具・植物・布・食器・書物・装飾品・生活感のある痕跡を、通常の'+(max?'2〜3倍':'約1.5倍')+'の量で配置する。大きさ・種類・配置に変化をつける。');
+  if($('boostTexture').checked)L.push('- 壁・柱・素材の質感：壁・床・柱・天井・地面・金属・木・石・布を、凹凸・ひび・摩耗・汚れ・苔・彫刻・装飾・継ぎ目まで描き込み、のっぺりした面を作らない。素材ごとに異なる光沢と陰影を出す。');
+  if($('boostCostume').checked)L.push('- 衣装デザイン（人物が登場する場合のみ）：貧相・無地・簡素な服を禁止。重ね着、刺繍、縁取り、金属装飾、帯・ベルト・装身具、布の厚み・皺・光沢の違いを盛り込み、世界観に合った'+(max?'豪華で凝った':'手の込んだ')+'衣装にする。人物がいない場合は人物を追加しない。');
+  if(L.length){
+   L.push('- 注意：強調は小物・看板・書物・布などに文字や記号を描くことを意味しない（文字は指定がある場合のみ）。主役と指定文字の視認性を損なわない。ユーザーが選んだ色彩（例：モノクローム）・描き込み量・近景/遠景/背景省略の指定、避けたい要素と矛盾する場合は、ユーザー指定を優先する。');
+   parts.push('【Gemini Boost（強調プリセット）強度：'+(max?'最大':'強め')+'】以下の強調をこの仕様全体に適用してください。'+(max?'控えめにせず、意図的に大げさなくらい盛ってください。':'はっきりと分かる程度に盛ってください。')+'\n'+L.join('\n'));
+  }
+  if(cg){
+   const dark=cg===1,C=[];
+   C.push('- 主役の迫力：カメラを低い位置に置き、主役を見上げるローアングル気味に描く。主役（複数なら群像全体）は画面高さの約'+(dark?(max?'7':'6'):(max?'6':'5'))+'割以上を占め、床や空の余白は画面の2割以内にとどめる。主役が複数の場合は中央に密集させる。天井・アーチ・窓の上部は画面の上端で切って（見切れさせて）、空間全体を引きで見せず、主役が画面を大きく占める構図にする。');
+   C.push(dark
+    ?'- 色彩設計：色数を増やさず、主色1〜2色＋補色の差し色1色に絞る（例：紫の寒色背景に、金・橙の暖色光）。色の量ではなく、色温度（暖色×寒色）と明暗の対比で華やかさを出す。'
+    :'- 色彩設計：彩度が高く澄んだ色で、灰色・くすみを避ける。ただし色数は主色2〜3色＋補色の差し色に整理し、散らかさない。色温度（暖色×寒色）の対比で華やかさを出す。');
+   C.push(dark
+    ?'- 光の演出：背景側の大きな光源から、太く明るい光の筋（ボリュームライト）を差し込ませ、霞・塵を空中に描く。主役には暖色の強いキーライトを当て、輪郭に白〜金のリムライトを入れて背景から浮かび上がらせる。光源の周囲にはやわらかいグロー（にじみ）を入れる。台座と床の足元にも暖色の光を落とし、像の影を床へ長く伸ばす。'
+    :'- 光の演出：画面全体を明るくし、光が空間に満ちる印象にする。やわらかな光の筋とグロー（にじみ）を入れ、影は浅く、明部の階調を豊かにする。主役には暖かい光を当て、輪郭にリムライトを入れる。');
+   C.push(dark
+    ?'- 周辺減光：画面の四隅を暗く落とし、中央の主役に視線を集める。'
+    :'- 周辺減光：四隅を暗く落とさない。ごく軽く落とす程度にとどめる。');
+   const col=$('chatgptColor').selectedIndex;
+   if(col>0){const i=C.findIndex(x=>x.startsWith('- 色彩設計'));C[i]='- 色彩設計：'+(col===1
+    ?'空間全体は紫〜青紫の寒色にする。題材にない窓や建造物は追加せず、紫系の光と色彩で表現する。主役には金・橙の暖色光を当て、紫との補色対比で背景から浮かび上がらせる。色数は増やさない。'
+    :'空間全体は深い青〜青緑の寒色にし、主役と光源は橙〜琥珀の暖色にする。青と橙の補色対比で見せ、色数は増やさない。')}
+   C.push('- 反射：床・水面・磨かれた金属がある場合は、'+(dark?'濡れたような':'明るい')+'光沢を出し、光源と色を鏡面反射させる。');
+   C.push('- 静けさ：指定にない人物・群衆・賑わいを足さない。小物は主役を引き立てるものに限り、主役より目立たせない。');
+   if(val('composition')==='自由構成')C.push('- 構図：左右対称寄りにし、柱・アーチ・縦の線など垂直線を強調して、高さと荘厳さを出す。');
+   C.push('- 注意：上記は画調の既定。ユーザーが選んだ構図・距離感・色彩・光・描き込み量・近景/遠景の指定、避けたい要素と矛盾する場合は、ユーザー指定を優先する。文字や記号は、指定がある場合のみ描く。');
+   parts.push('【ChatGPT寄せ（画調プリセット：'+(dark?'荘厳・ドラマチック':'明るく華やか')+'）】Geminiの既定の画調より、次の方向へ明確に寄せてください。\n'+C.join('\n'));
+  }
+ }
+ if($('fuEnabled').checked){const free=val('fuFreedom')==='関係性・場面・感情はAIが提案する';parts.push('【腐女子モード】登場人物は明確に成人の男性二人。親密さ・感情・物語を描き、露骨な性行為や性器は描かない。');for(const [id,label] of Object.entries(FU_LABELS)){if(free&&['fuRelation','fuScene','fuEmotion'].includes(id))continue;parts.push('【'+label+'】'+val(id));}parts.push('この欄で明示した人物設定は一般的な衣装強調より優先する。おまかせにした部分で意外性を出し、それ以外の指定や避けたい要素を守る。');}
+ parts.push('【ジャンル】'+genre+'。世界観を補助するものであり共通設定を上書きしません。');
+ parts.push('【制作モード】'+mode+'。用途を定め、ジャンルとは独立して適用されます。');
+ if(val('subject'))parts.push('【主題・場面】'+val('subject'));
+ parts.push('【表現原理】'+expr);
+ if(mechanisms.length)parts.push('【視覚メカニズム】'+mechanisms.join('、'));
+ parts.push('【画面全体の距離感】'+val('distance'));
+ parts.push('【全体構図】'+val('composition'));
+ parts.push('【近景】'+checked('near'));
+ parts.push('【中景】'+checked('mid'));
+ const far=checked('far');if(far&&far!=='auto')parts.push('【遠景】'+far);
+ parts.push('【描き込み量】'+val('density')+'。');
+ parts.push('【色彩】'+val('palette'));
+ parts.push('【光】'+val('light'));
+ parts.push('【質感】'+val('surface'));
+ let ratio=val('ratio');if(ratio==='自由指定')ratio=val('ratioCustom')||'題材に合う縦横比をAIが選ぶ';
+ parts.push('【出力比率・サイズ】'+ratio);
+
+ const m=checked('mode');
+ if(m==='noteThumbnail'){
+  parts.push('【noteタイトルサムネ制作モード】記事タイトルと絵を一体設計。');
+  if(val('mainTitle'))parts.push('【メインタイトル・表記固定】「'+val('mainTitle')+'」。文字を勝手に言い換えない。');else parts.push('【メインタイトル】指定なし。タイトル文字を追加しない。');
+  if(val('subTitle'))parts.push('【サブタイトル・表記固定】「'+val('subTitle')+'」。');
+  parts.push('【インパクト】'+val('impact'));
+  parts.push('【文字表現】'+val('textLayout'));
+  parts.push('【文字配置】'+val('titlePlacement'));
+  parts.push('【サブタイトルの強さ】'+val('subtitleWeight'));
+ }else{
+  if(m==='presentation')parts.push('【プレゼン・表紙モード】余白と視線誘導を設計。');
+  else if(m==='concept')parts.push('【概念・比喩表現モード】抽象的な概念を象徴化。');
+  const tp=val('textPolicy');parts.push('【画像内の文字】'+tp+(tp==='指定した文字だけを入れる'?'。指定文字：「'+(val('imageText')||'')+'」。それ以外は不可。':''));
+ }
+ if(val('avoid'))parts.push('【避けたい要素】'+val('avoid'));
+ if(val('extra'))parts.push('【追加指示】'+val('extra'));
+ parts.push('【ユーザー意図の優先】選択内容を尊重する。奇妙・非対称・不均衡を理由に無難に直さない。「近景なし」「背景省略」等の指定を守り勝手に足さない。');
+
+ // Fact Check ガードレール／式の扱い
+ const fc=factCheckState();
+ $('factCheckNotice').classList.toggle('hidden',!fc.on);
+ if(fc.on){
+  const why=[];if(fc.text)why.push('画像内に入れる文字');if(fc.formula)why.push('化学式・数式（正確さ重視）');if(fc.ban)why.push('式は描かない指定');
+  $('factCheckBody').textContent=(fc.forced?'「常にON」のため':'検出：'+why.join('・')+'。')+'ガードレールをプロンプトに追加しています。';
+  const g=['【Fact Check Guardrail】Evidence Boundary原則：自己申告は証拠にならない。「正しく描けた」と宣言せず、実際の画像で確認する。'];
+  if(fc.text)g.push('【文字の厳守】\n- 画像内の文字は、指定された表記のみを一字一句そのまま使う。言い換え・省略・追加・翻訳をしない。\n- 指定外の文字・ロゴ・透かし・意味のないダミー文字を入れない。\n- 生成後に指定表記と照合し、誤字・欠け・化け字があれば描き直してから提示する。');
+  if(fc.formula)g.push('【式・化学式の厳守】\n- 式・化学式・構造式は、ユーザーが入力した表記のみを使い、AIが式の補完・変形・計算・創作をしない。\n- 正確に描けない構造式・分子モデル（原子の結合・官能基・配位数）や図表は、精密な図解として描かず、抽象的・概念的なイメージにとどめる。\n- 式の文字を画像内に入れるのは、画像内の文字として指定された場合のみ。');
+  if(fc.ban)g.push('【式は描かない】\n- 数式・化学式・数字付きの図表や記号を画像内に描かない。\n- 科学・数学の雰囲気は、光の線・幾何学模様・抽象的な図形など、読めない装飾でのみ表現する。');
+  parts.push(g.join('\n'));
+ }
+ if(fc.decor)parts.push('【式の扱い：デザイン優先】式・記号は視覚的な装飾要素として扱う。指定された式はできるだけ入力どおりに描くが、細部の厳密な正確さより、見た目の美しさと雰囲気を優先する。');
+
+ if($('chatMode').checked){
+  parts.push('---\n## 実行開始指示\n上記は要約・校正・確認用の文章ではなく、この会話で使用する画像生成仕様です。\n内容を読み込んだら、解説や質問を返さず、そのまま画像生成処理を開始してください。\n自動開始しない場合は「スタート」と入力されたものとして即時実行してください。');
+ }
+ return parts.join('\n\n')
+}
+
+const CG_PRESET={1:{distance:'主題に接近',palette:'補色の強い対比',light:'劇的な明暗差'},2:{distance:'主題に接近',palette:'鮮やかで高コントラスト',light:'柔らかな拡散光'}};
+const CG_LABEL={distance:'距離感',palette:'色彩',light:'光'};
+let cgApplied=null,cgSnapshot=null,cgIdx=0;
+function cgEffective(){return $('geminiBoost').selectedIndex>0?$('chatgptStyle').selectedIndex:0}
+function syncCgPreset(){
+ const idx=cgEffective();if(idx===cgIdx)return;
+ if(cgApplied){for(const k in cgApplied){if($(k).value===cgApplied[k])$(k).value=cgSnapshot[k]}cgApplied=null;cgSnapshot=null}
+ const note=$('cgApplied');
+ if(idx>0){const p=CG_PRESET[idx];cgSnapshot={};for(const k in p){cgSnapshot[k]=$(k).value;$(k).value=p[k]}cgApplied={...p};note.textContent='プリセットが次を設定しました：'+Object.keys(p).map(k=>CG_LABEL[k]+'＝'+p[k]).join('、')+'（手動で変更できます。OFFに戻すと元の値に戻ります）'}
+ else note.textContent='';
+ cgIdx=idx;
+}
+function resetCgState(){cgApplied=null;cgSnapshot=null;cgIdx=cgEffective();$('cgApplied').textContent=''}
+function update(){$('fuFields').classList.toggle('hidden',!$('fuEnabled').checked);$('educationNotice').classList.toggle('hidden',checked('genre')!=='education');if($('boostItems')){const off=$('geminiBoost').selectedIndex===0;$('boostItems').classList.toggle('hidden',off);$('boostStyleWrap').classList.toggle('hidden',off);const cg=$('chatgptStyle').selectedIndex>0;['boostColor','boostProps'].forEach(i=>{$(i).disabled=cg;$(i).closest('label').style.opacity=cg?'.45':'1'})}if($('preview'))$('preview').textContent=buildPrompt();updateHelps()}
+function toggleMode(){const isThumb=checked('mode')==='noteThumbnail';$('thumbnailFields').classList.toggle('hidden',!isThumb);$('textBlock').classList.toggle('hidden',isThumb);toggleText();update()}
+function toggleText(){$('imageTextWrap').classList.toggle('hidden',val('textPolicy')!=='指定した文字だけを入れる')}
+function toggleRatio(){$('customRatioWrap').classList.toggle('hidden',val('ratio')!=='自由指定')}
+
+function allState(){return{creative:{enabled:$('fuEnabled').checked,values:Object.fromEntries(Object.keys(FU_LABELS).map(k=>[k,val(k)]))},simple:{style:checked('simpleStyle'),ratio:checked('simpleRatio'),output:checked('posterOutput'),art:checked('posterArt'),title:val('simpleTitle'),subtitle:val('simpleSubtitle'),subject:val('simpleSubject'),body:val('posterBody')},presetSnapshot:cgSnapshot,presetApplied:cgApplied,genre:checked('genre'),mode:checked('mode'),subject:val('subject'),expression:checked('expression'),mechanisms:[...document.querySelectorAll('input[name="mechanism"]:checked')].map(x=>x.value),distance:val('distance'),composition:val('composition'),near:checked('near'),mid:checked('mid'),far:checked('far'),density:val('density'),palette:val('palette'),light:val('light'),surface:val('surface'),ratio:val('ratio'),ratioCustom:val('ratioCustom'),mainTitle:val('mainTitle'),subTitle:val('subTitle'),impact:val('impact'),textLayout:val('textLayout'),titlePlacement:val('titlePlacement'),subtitleWeight:val('subtitleWeight'),textPolicy:val('textPolicy'),imageText:val('imageText'),avoid:val('avoid'),extra:val('extra'),factCheck:val('factCheck'),factCheckText:$('factCheckText').checked,formulaMode:val('formulaMode'),geminiBoost:val('geminiBoost'),chatgptStyle:val('chatgptStyle'),chatgptColor:val('chatgptColor'),boostItems:['boostColor','boostProps','boostTexture','boostCostume'].map(i=>$(i).checked),chatMode:$('chatMode').checked}}
+
+function restoreState(s){
+ if(!s)return;
+ const setRadio=(name,v)=>{const el=document.querySelector(`input[name="${name}"][value="${v}"]`);if(el)el.checked=true;};
+ setRadio('genre',s.genre);setRadio('mode',s.mode);setRadio('expression',s.expression);setRadio('near',s.near);setRadio('mid',s.mid);setRadio('far',s.far);
+ if(Array.isArray(s.mechanisms)){
+  document.querySelectorAll('input[name="mechanism"]').forEach(cb=>cb.checked=s.mechanisms.includes(cb.value));
+ }
+ const setVal=(id,v)=>{if($(id)&&v!==undefined)$(id).value=v;};
+ setVal('subject',s.subject);setVal('distance',s.distance);setVal('composition',s.composition);setVal('density',s.density);setVal('palette',s.palette);setVal('light',s.light);setVal('surface',s.surface);setVal('ratio',s.ratio);setVal('ratioCustom',s.ratioCustom);setVal('mainTitle',s.mainTitle);setVal('subTitle',s.subTitle);setVal('impact',s.impact);setVal('textLayout',s.textLayout);setVal('titlePlacement',s.titlePlacement);setVal('subtitleWeight',s.subtitleWeight);setVal('textPolicy',s.textPolicy);setVal('imageText',s.imageText);setVal('avoid',s.avoid);setVal('extra',s.extra);
+ if(s.geminiBoost!==undefined)setVal('geminiBoost',s.geminiBoost);
+ if(s.chatgptStyle!==undefined)setVal('chatgptStyle',s.chatgptStyle);
+ if(s.chatgptColor!==undefined)setVal('chatgptColor',s.chatgptColor);
+ if(Array.isArray(s.boostItems))['boostColor','boostProps','boostTexture','boostCostume'].forEach((i,k)=>$(i).checked=!!s.boostItems[k]);
+ if(s.formulaMode!==undefined)setVal('formulaMode',s.formulaMode);
+ if(s.factCheckText!==undefined)$('factCheckText').checked=s.factCheckText;
+ if(s.factCheck!==undefined)setVal('factCheck',s.factCheck);else if(s.factCheckForce)$('factCheck').selectedIndex=1;
+ if($('chatMode')&&s.chatMode!==undefined)$('chatMode').checked=s.chatMode;
+ resetCgState();if(s.presetSnapshot&&s.presetApplied){cgSnapshot=s.presetSnapshot;cgApplied=s.presetApplied;}if(s.creative){$('fuEnabled').checked=!!s.creative.enabled;for(const k of Object.keys(FU_LABELS))setVal(k,s.creative.values?.[k]);$('creativeDetails').open=!!s.creative.enabled;}else $('fuEnabled').checked=false;if(s.simple){setRadio('simpleStyle',s.simple.style);setRadio('simpleRatio',s.simple.ratio);setRadio('posterOutput',s.simple.output);setRadio('posterArt',s.simple.art);for(const [k,v] of Object.entries({simpleTitle:s.simple.title,simpleSubtitle:s.simple.subtitle,simpleSubject:s.simple.subject,posterBody:s.simple.body}))setVal(k,v);$('posterCount').textContent=val('posterBody').length+' 文字';varSeed=0;buildSimplePrompt();setSimpleActionState(false);togglePoster();}toggleMode();toggleRatio();update();
+}
+
+
+const FU_LABELS={'fuRelation': '関係性', 'fuScene': '場面', 'fuEmotion': '感情', 'fuHair': '髪', 'fuClothes': '衣装', 'fuDistance': '距離感', 'fuGaze': '視線', 'fuFace': '表情', 'fuIntensity': '表現の濃さ', 'fuFreedom': 'おまかせ範囲'};
+function nextImageVariation(){const a=["余白を活かした三分割の構図","奥行きと斜めの視線誘導を活かす構図","主題に接近し、背景を簡潔にする構図","光の方向と色の対比を活かす構図"];return a[(Math.max(1,varSeed)-1)%a.length]+"（案"+varSeed+"）。参考案より主題・指定文字・画風を優先する。";}
+$('fuPreset').addEventListener('click',()=>{$('fuEnabled').checked=true;Object.keys(FU_LABELS).forEach(k=>$(k).selectedIndex=0);update();$('status').textContent='「腐」プリセットを設定しました。各項目は変更できます。';});
+
+const onAny=e=>{
+ if(e.target.name==='mode')toggleMode();
+ else if(e.target.id==='textPolicy')toggleText();
+ else if(e.target.id==='ratio')toggleRatio();
+ else if(e.target.id==='geminiBoost'||e.target.id==='chatgptStyle')syncCgPreset();
+ update();
+};
+document.addEventListener('input',onAny);document.addEventListener('change',onAny);
+
+$('copyBtn').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('preview').textContent);$('status').textContent='プロンプトをコピーしました。'}catch(e){$('status').textContent='手動でコピーしてください。'}});
+$('refreshBtn').addEventListener('click',()=>{update();$('status').textContent='更新しました。'});
+$('downloadBtn').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({app:'NEPM Illustration Web',version:'9.10.0',settings:allState()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='NEPM_イラスト設定.json';a.click();URL.revokeObjectURL(a.href);$('status').textContent='設定JSONを保存しました。'});
+
+$('loadBtn').addEventListener('click',()=>$('fileInput').click());$('fileInput').addEventListener('change',e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=evt=>{
+  try{
+   const data=JSON.parse(evt.target.result);
+   if(data.settings){restoreState(data.settings);$('status').textContent='設定JSONを読み込みました。';}
+   else $('status').textContent='無効な設定ファイルです。';
+  }catch(err){$('status').textContent='JSON解析エラーが発生しました。';}
+ };
+ reader.readAsText(file);
+});
+
+$('resetBtn').addEventListener('click',()=>{$('fuEnabled').checked=false;$('creativeDetails').open=false;Object.keys(FU_LABELS).forEach(k=>$(k).selectedIndex=0);renderAll();['subject','mainTitle','subTitle','ratioCustom','avoid','extra','imageText'].forEach(id=>$(id).value='');for(const id in SELECTS)$(id).selectedIndex=0;$('chatMode').checked=true;$('factCheckText').checked=false;['boostColor','boostProps','boostTexture','boostCostume'].forEach(i=>$(i).checked=true);resetCgState();toggleMode();toggleRatio();$('status').textContent='ヘルモードの設定を初期化しました（かんたんモードは保持）。'});
+$('posterBody').addEventListener('input',()=>{$('posterCount').textContent=$('posterBody').value.length.toLocaleString()+' 文字'});
+$('simpleRegenBtn').addEventListener('click',async()=>{if(varSeed===0)varSeed=1;const p=buildSimplePrompt();setSimpleActionState(true);try{await navigator.clipboard.writeText(p);flowStep=3;renderFlow();$('simpleStatus').textContent='🎲 作り直してコピーしました（案'+varSeed+'）。AIのチャット欄に貼り付けて送信してください。気に入らなければ、もう一度押すと別の案になります。'}catch(e){flowStep=3;renderFlow();$('simpleStatus').textContent='🎲 作り直しました。自動コピーできないので、生成用プロンプト欄を選択してコピーしてください。'}});
+$('moveSubjectBtn').addEventListener('click',()=>{$('posterBody').value=$('simpleSubject').value.trim();$('simpleSubject').value='';$('posterBody').dispatchEvent(new Event('input',{bubbles:true}));$('simpleStatus').textContent='文章を「ポスターに載せる文章」欄へ移しました。絵のテーマ欄には、絵にしたい題材を短く書いてください（空でも大丈夫です）。';});
+$('flowNextBtn').addEventListener('click',()=>{flowStep++;renderFlow()});$('flowBackBtn').addEventListener('click',()=>{if(flowStep>3){flowStep--;renderFlow()}});
+togglePoster();toggleMode();toggleRatio();buildSimplePrompt();setMainMode('simple');
+</script></body></html>
