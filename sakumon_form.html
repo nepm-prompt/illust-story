@@ -16,7 +16,7 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NEPM 作問Web＋ 配信フォーム自動作成 Ver.1.9</title>
+<title>NEPM 作問Web＋ 配信フォーム自動作成 Ver.1.11</title>
 <style>
 :root {
   --bg:#f4f7fb; --card:#fff; --text:#172033; --muted:#5f6b7a;
@@ -88,7 +88,7 @@ details.changelog ul{margin:4px 0 0;padding-left:1.2em}
     <h1>NEPM 作問Web＋ 配信フォーム自動作成</h1>
     <p class="subtitle">問題・解説の作成から、Googleフォーム作成用GASコードの一括出力までサポート</p>
     <div class="meta">
-      <span class="meta-tag">✨ Ver. <span class="js-ver">1.9</span></span>
+      <span class="meta-tag">✨ Ver. <span class="js-ver">1.11</span></span>
       <span>Auto-Scoring & Robust Engine</span>
       <span>｜</span>
       <span>© N. Nakata  NEPM™ All Rights Reserved.</span>
@@ -99,7 +99,7 @@ details.changelog ul{margin:4px 0 0;padding-left:1.2em}
 <main>
   <div class="assurances">
     <div class="assurance"><b>✓ 構成・配点の機械チェック</b><small>満点合計・問題数・選択肢の形式を、GAS実行時に検査します。</small></div>
-    <div class="assurance"><b>✓ 半自動採点エンジン搭載</b><small>スプレッドシートに採点関数を自動構築します。</small></div>
+    <div class="assurance"><b>✓ 半自動採点エンジン搭載</b><small>スプレッドシートに独立した「採点」シートを自動構築します。</small></div>
     <div class="assurance"><b>✓ 整理しやすい自動命名</b><small>作成日の日付がタイトルに自動で付与されます。</small></div>
   </div>
 
@@ -127,7 +127,7 @@ details.changelog ul{margin:4px 0 0;padding-left:1.2em}
 
       <div id="notice-written-danger" class="notice alert-danger">
         <b>📝 スプレッドシート半自動採点モード</b><br>
-        フォーム自体のクイズ機能はOFFになりますが、生成されるスプレッドシートの右側に「選択問題の自動採点列」「記述の採点入力枠（黄色）」「合計点」が自動で構築されます。<br>先生は記述の点数を入れるだけで集計が完了します（記述が未入力の間、合計点は「未採点」と表示されます）。誤入力を防ぐ機能も搭載しています。<br>
+        フォーム自体のクイズ機能はOFFになりますが、生成されるスプレッドシートに独立した「採点」シートが作成され、そこに「氏名」「選択問題の自動採点」「記述の採点入力枠（黄色）」「合計点」が自動で構築されます。<br>先生は採点シートで記述の点数を入れるだけで集計が完了します（記述が未入力の間、合計点は「未採点」と表示されます）。誤入力を防ぐ機能も搭載しています。<br>
         <small>※ このモードでは、選択肢に「選択肢1：」などのラベルを自動で付けます。数字や日付の回答も、文字列のまま照合して採点します。</small>
       </div>
       <div id="notice-written-ok" class="notice verify" style="margin-top:12px;">
@@ -224,11 +224,11 @@ details.changelog ul{margin:4px 0 0;padding-left:1.2em}
   </section>
 
   <details class="changelog" id="changelog">
-    <summary>更新履歴（<span class="js-ver">1.9</span>）</summary>
+    <summary>更新履歴（<span class="js-ver">1.11</span>）</summary>
     <div id="changelog-body"></div>
   </details>
 
-  <div class="footer-note">NEPM™ / Nakata Educational Prompt Method Ver.<span class="js-ver">1.9</span> ｜ Copyright © N. Nakata All Rights Reserved.</div>
+  <div class="footer-note">NEPM™ / Nakata Educational Prompt Method Ver.<span class="js-ver">1.11</span> ｜ Copyright © N. Nakata All Rights Reserved.</div>
 </main>
 
 <script>
@@ -236,9 +236,22 @@ details.changelog ul{margin:4px 0 0;padding-left:1.2em}
 // バージョン管理（唯一の正）。更新時はここと CHANGELOG.md を同時に更新する。
 // ============================================================
 const NEPM_VERSION = {
-  version: "1.9",
-  date: "2026-10-13",
+  version: "1.11",
+  date: "2026-10-16",
   history: [
+    {
+      v: "1.11", date: "2026-10-16",
+      changes: [
+        "【不具合修正】「採点」シートの数式で回答シートを参照する際、フォームの回答挿入で参照がずれないようINDIRECT関数を使用する形式に変更",
+        "【改善】氏名列の検索処理で最初に見つかった列を採用するよう改善"
+      ]
+    },
+    {
+      v: "1.10", date: "2026-10-16",
+      changes: [
+        "【不具合修正】回答シートに見出しが上書きされて数式が消える問題を修正。回答シートには触れず、独立した「採点」シートを生成して自動・手動採点を行えるように変更"
+      ]
+    },
     {
       v: "1.9", date: "2026-10-13",
       changes: [
@@ -401,7 +414,7 @@ Role: 先生のための対話型作問・Googleフォーム作成アシスタ�
    「**権限を確認**」➔ ご自身のアカウントを選択 ➔ 「**このアプリは Google で確認されていません**」と出たら左下の「**詳細**」➔「**（プロジェクト名）（安全ではないページ）に移動**」➔「**すべて選択**」にチェックが入っていることを確認 ➔「**次へ**」（または「許可」）と進めてください。
 
 4. **実行完了を確認する**
-   画面下の「実行ログ」に「正常に完了しました」と表示されたら成功です。ログに出る「フォーム編集URL」で内容と公開・回答者設定を確認してください。「生徒配布用URL」を開いてテスト回答し、全問正解・一問不正解の得点を確認してから生徒へ配布してください。「回答シートURL」から回答と採点を確認できます。記述ありの場合は、未入力の合計が「未採点」となり、記述に0点または満点を入力すると合計が正しく変わることも確認してください。
+   画面下の「実行ログ」に「正常に完了しました」と表示されたら成功です。ログに出る「フォーム編集URL」で内容と公開・回答者設定を確認してください。「生徒配布用URL」を開いてテスト回答し、全問正解・一問不正解の得点を確認してから生徒へ配布してください。「回答シートURL」を開き、新しく作成された「採点」シートで回答と採点を確認できます。記述ありの場合は、未入力の合計が「未採点」となり、記述に0点または満点を入力すると合計が正しく変わることも確認してください。
    エラーが出た場合は、作成途中のファイルは自動でゴミ箱へ移動されます。ログの内容を確認し、修正してもう一度実行してください。
 
    ⚠️ **【注意】** 回答用スプレッドシートには、正答と解説のシートが入っています。**生徒や他の先生に共有しないでください。**
@@ -531,7 +544,32 @@ function createFormAndSheet() {
     if (FORM_MODE === "WITH_WRITTEN") {
       var headers = respSheet.getRange(1, 1, 1, respSheet.getLastColumn()).getValues()[0];
       var qLen = DESIGN.questions.length;
-      var outStartCol = headers.length + 1;
+      
+      // 独立した「採点」シートを作成
+      var scoreSheet = ss.insertSheet("採点");
+      var safeRespSheetName = respSheet.getName().replace(/'/g, "''").replace(/"/g, '""');
+      var ind = function (col) {
+        return 'INDIRECT("' + "'" + safeRespSheetName + "'!" + col + "2:" + col + '")';
+      };
+      
+      var outStartCol = 1;
+
+      // 回答シートから「氏名」列を探す
+      var nameColIdx = -1;
+      for (var h = 0; h < headers.length; h++) {
+        if (headers[h].toString().indexOf("氏名") !== -1) {
+          nameColIdx = h + 1;
+          break;
+        }
+      }
+      var nameColLetter = nameColIdx !== -1 ? getColumnLetter(nameColIdx) : "B"; 
+
+      // 1列目：氏名（ARRAYFORMULAで回答シートから参照）
+      var nameCell = scoreSheet.getRange(1, outStartCol);
+      nameCell.setValue('={"氏名"; ARRAYFORMULA(IF(LEN(' + ind("A") + '), ' + ind(nameColLetter) + ', ""))}');
+      nameCell.setBackground("#f4f7fb").setFontWeight("bold");
+      outStartCol++;
+
       var sumFormulaParts = [];
       var writtenColLetters = [];
 
@@ -549,17 +587,17 @@ function createFormAndSheet() {
         }
 
         if (ansColIdx === -1) {
-          throw new Error("シート上に「" + searchTarget + "」の列が見つかりません。");
+          throw new Error("回答シート上に「" + searchTarget + "」の列が見つかりません。");
         }
 
         var ansColLetter = getColumnLetter(ansColIdx);
         var outColIdx = outStartCol + m;
         var outColLetter = getColumnLetter(outColIdx);
 
-        var cell = respSheet.getRange(1, outColIdx);
+        var cell = scoreSheet.getRange(1, outColIdx);
         if (q.type === "CHOICE") {
           var safeAns = getChoiceLabel(q, q.answerIndex).replace(/"/g, '""');
-          cell.setValue('={"問' + (m+1) + ' 自動採点"; ARRAYFORMULA(IF(LEN(A2:A), IF(' + ansColLetter + '2:' + ansColLetter + '&""="' + safeAns + '", ' + q.point + ', 0), ""))}');
+          cell.setValue('={"問' + (m+1) + ' 自動採点"; ARRAYFORMULA(IF(LEN(' + ind("A") + '), IF(' + ind(ansColLetter) + '&""="' + safeAns + '", ' + q.point + ', 0), ""))}');
           cell.setBackground("#eef5ff");
         } else {
           cell.setValue("問" + (m+1) + " 記述手動採点\\n(MAX: " + q.point + "点)");
@@ -572,7 +610,7 @@ function createFormAndSheet() {
             .setAllowInvalid(false)
             .setHelpText("0から" + q.point + "までの数値を入力してください。")
             .build();
-          respSheet.getRange(2, outColIdx, respSheet.getMaxRows() - 1, 1).setDataValidation(rule);
+          scoreSheet.getRange(2, outColIdx, scoreSheet.getMaxRows() - 1, 1).setDataValidation(rule);
         }
         sumFormulaParts.push("IFERROR(" + outColLetter + "2:" + outColLetter + "*1, 0)");
       }
@@ -587,11 +625,11 @@ function createFormAndSheet() {
         }
         totalExpr = 'IF(' + (blankConds.length === 1 ? blankConds[0] : 'OR(' + blankConds.join(", ") + ')') + ', "未採点", ' + sumExpr + ')';
       }
-      var totalCell = respSheet.getRange(1, outStartCol + qLen);
-      totalCell.setValue('={"合計点"; ARRAYFORMULA(IF(LEN(A2:A), ' + totalExpr + ', ""))}');
+      var totalCell = scoreSheet.getRange(1, outStartCol + qLen);
+      totalCell.setValue('={"合計点"; ARRAYFORMULA(IF(LEN(' + ind("A") + '), ' + totalExpr + ', ""))}');
       totalCell.setBackground("#edf8f1").setFontWeight("bold");
 
-      respSheet.setFrozenRows(1);
+      scoreSheet.setFrozenRows(1);
     }
 
     // 先生用「問題・解答・解説」シートの自動追加
