@@ -1,0 +1,1968 @@
+<!doctype html>
+<!--
+  NEPM 作問Web＋ 配信フォーム自動作成
+  Ver.1.30 - API処理ステータス可視化・利用手順書内蔵
+  © N. Nakata NEPM™ All Rights Reserved.
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEPM 作問Web＋ 配信フォーム自動作成 Ver.1.30</title>
+
+<script>
+// SheetJS ローダー（自動リンク化破損防止＆公式CDN 0.20.3 → jsDelivr 0.18.5 自動フォールバック＋状態記録）
+window.__NEPM_XLSX_SOURCE = '';
+(function loadSheetJS() {
+  var urls = [
+    { url: 'https:' + '//cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js', label: '0.20.3' },
+    { url: 'https:' + '//cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js', label: '0.18.5-fallback' }
+  ];
+  function tryLoad(idx) {
+    if (idx >= urls.length) return;
+    var s = document.createElement('script');
+    s.src = urls[idx].url;
+    s.onload = function() { window.__NEPM_XLSX_SOURCE = urls[idx].label; };
+    s.onerror = function() { tryLoad(idx + 1); };
+    document.head.appendChild(s);
+  }
+  tryLoad(0);
+})();
+</script>
+
+<style>
+:root {
+  --bg:#f4f7fb; --card:#fff; --text:#172033; --muted:#5f6b7a;
+  --line:#dce4ef; --brand:#2157a6; --brand2:#143f7d;
+  --ok:#edf8f1; --warn:#fff8e7; --info:#eef5ff; --danger:#fff0f0;
+  --shadow:0 10px 28px rgba(26,52,92,.09);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;line-height:1.6}
+header{background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;padding:30px 18px 26px}
+.header-inner{max-width:920px;margin:auto}
+.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.08em;opacity:.88}
+h1{font-size:clamp(1.8rem,5vw,2.5rem);margin:4px 0 2px;line-height:1.2}
+.subtitle{margin:4px 0 0;opacity:.94}
+.meta{margin-top:10px;font-size:.86rem;opacity:.85;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.meta-tag{padding:2px 8px;border-radius:6px;font-weight:700;font-size:.78rem;color:var(--text);background:#eef5ff;border:1px solid #cbdcf6}
+main{max-width:920px;margin:0 auto;padding:20px 14px 50px}
+.assurances{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:-2px 0 18px}
+.assurance{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+.assurance b{display:block;margin-bottom:3px}
+.assurance small{color:var(--muted)}
+.notice{border-radius:14px;padding:16px 18px;margin:12px 0;border:1px solid var(--line);background:var(--card)}
+.notice.security-box{background:#f0f7ff;border:2px solid #2157a6;color:#0f2942}
+.notice.verify{background:var(--info);border-color:#cbdcf6}
+.notice.privacy{background:var(--warn);border-color:#eedba7}
+.notice.alert-danger{background:#fff8e7;border-color:#eedba7;color:#926c05;display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0;box-shadow:var(--shadow)}
+.step{font-weight:850;font-size:1.06rem;margin-bottom:12px}
+.step span{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;margin-right:7px;font-size:.88rem}
+label.note{display:block;font-weight:700;margin:10px 0 5px}
+.hint{font-size:.84rem;color:var(--muted);margin-top:4px}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;padding:12px 13px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:var(--text);font:inherit}
+textarea{min-height:85px;resize:vertical}
+.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.choices.three{grid-template-columns:repeat(3,1fr)}
+.choice{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:11px;background:#fbfcfe;cursor:pointer}
+.choice:has(input:checked){border-color:#7fa6dc;background:#f0f6ff}
+button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:14px 18px;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.primary{width:100%;background:var(--brand);color:#fff;box-shadow:0 6px 16px rgba(33,87,166,.18)}
+.primary:hover:not(:disabled){background:var(--brand2)}
+.secondary{width:100%;background:#eef2f7;color:#243247;margin-top:9px}
+.inline-row{display:flex;gap:8px;align-items:center}
+.inline-row input{flex:1}
+.inline-btn{flex:0 0 auto;background:#eef2f7;color:#243247;padding:12px 14px;border-radius:10px;font-size:.86rem;font-weight:700}
+.inline-btn:hover:not(:disabled){background:#dce4ef}
+.result{display:none;margin-top:18px}
+.guide{background:#fff;border:2px solid #9db9df;border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.guide h2{font-size:1.15rem;margin:0 0 10px}
+.flow{display:grid;gap:9px}
+.flow-item{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;background:#f7f9fc}
+.badge{flex:0 0 auto;min-width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--brand);color:#fff;font-weight:900}
+.command{font-weight:900;color:#b42318;background:#fff0f0;border-radius:6px;padding:1px 6px}
+.status{margin:10px 0 0;font-weight:750}
+pre{white-space:pre-wrap;word-break:break-word;background:#111827;color:#e5e7eb;padding:15px;border-radius:12px;max-height:430px;overflow:auto;font-size:.78rem}
+.footer-note{font-size:.82rem;color:var(--muted);text-align:center;margin-top:24px}
+details.changelog{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:.86rem}
+details.changelog summary{cursor:pointer;font-weight:800}
+details.changelog h3{font-size:.95rem;margin:14px 0 4px}
+details.changelog ul{margin:4px 0 0;padding-left:1.2em}
+
+/* ドロップゾーン */
+.drop-zone{border:2px dashed #93c5fd;background:#f8fafc;border-radius:14px;padding:22px 16px;text-align:center;cursor:pointer;transition:all .2s;margin-top:8px}
+.drop-zone:hover,.drop-zone.dragover{background:#eff6ff!important;border-color:#2157a6!important}
+
+@media(max-width:680px){
+  .assurances,.choices,.choices.three{grid-template-columns:1fr}
+  .inline-row{flex-direction:column;align-items:stretch}
+  header{padding-top:24px}
+  .card{padding:16px}
+}
+.header-nav{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}.home-link{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border:1px solid rgba(255,255,255,.6);border-radius:9px;background:rgba(255,255,255,.12);color:#fff;font-size:.88rem;font-weight:700;text-decoration:none}.home-link:hover{background:rgba(255,255,255,.23)}
+
+/* NEPM公開サイトと調和するネイビー/ブルーの進行表示 */
+.header-nav .guide-download{font:inherit;line-height:1.5;cursor:pointer}
+.api-progress{margin:14px 0;padding:17px 18px;border:1px solid #bbd1ee;border-radius:15px;background:linear-gradient(180deg,#f4f8ff 0%,#fff 100%);box-shadow:0 6px 22px rgba(26,52,92,.07)}
+.api-progress[hidden]{display:none}
+.api-progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--brand2);font-weight:850;margin-bottom:9px}
+.api-clock{font-weight:700;color:var(--muted);font-size:.83rem;white-space:nowrap}
+.api-progress-track{height:11px;border-radius:99px;overflow:hidden;background:#dce8f8;position:relative}
+.api-progress-fill{position:absolute;height:100%;width:38%;background:linear-gradient(90deg,#2157a6,#70b3fa,#2157a6);border-radius:99px;animation:nepm-progress 1.65s ease-in-out infinite alternate}
+.api-progress.is-done .api-progress-fill{animation:none;width:100%;background:#16846b}
+.api-progress.is-error .api-progress-fill{animation:none;width:100%;background:#bd6a16}
+@keyframes nepm-progress{from{transform:translateX(-105%)}to{transform:translateX(265%)}}
+.api-progress-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;list-style:none;padding:0;margin:14px 0 8px}
+.api-progress-steps li{border-radius:9px;text-align:center;padding:7px 5px;font-size:.76rem;font-weight:700;background:#edf2fa;color:#5b6b82;border:1px solid #e1e9f5}
+.api-progress-steps li.is-current{color:#fff;background:var(--brand);border-color:var(--brand)}
+.api-progress-steps li.is-passed{color:#146551;background:#e8f7f1;border-color:#b8decf}
+.api-progress-detail{font-size:.88rem;font-weight:750;color:#1f456e;min-height:1.4em}
+@media(max-width:680px){.api-progress-steps{grid-template-columns:repeat(2,minmax(0,1fr))}.api-progress{padding:14px}.api-progress-head{align-items:flex-start;flex-direction:column;gap:2px}}
+@media(prefers-reduced-motion:reduce){.api-progress-fill{animation:none;width:100%;opacity:.7}}
+
+/* GAS貼り付け手順：画像はHTMLに埋め込み、別ファイル不要 */
+.gas-howto{margin-top:18px;padding:16px;border:1px solid #bad0ec;border-radius:14px;background:#fff;color:var(--text)}
+.gas-howto h3{margin:0 0 8px;color:var(--brand2);font-size:1.06rem}
+.gas-howto ol{margin:8px 0 14px;padding-left:1.4em}
+.gas-howto li{padding:3px 0}
+.gas-howto figure{margin:12px 0 0}
+.gas-howto img{display:block;max-width:100%;height:auto;border:1px solid #dce4ef;border-radius:9px;background:#fff}
+.gas-howto figcaption{font-size:.8rem;color:var(--muted);margin-top:5px}
+.gas-howto .gas-image-narrow{max-width:680px}
+.gas-howto .open-sheet-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 17px;background:#147d4b;border-radius:10px;color:#fff;text-decoration:none;font-weight:800;margin:2px 0 4px;max-width:100%}
+.gas-howto .open-sheet-link:hover,.gas-howto .open-sheet-link:focus-visible{background:#0d633a;text-decoration:underline}
+.gas-howto .open-sheet-hint{font-size:.83rem;color:var(--muted);margin:3px 0 11px}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <nav class="header-nav" aria-label="ヘッダーナビゲーション">
+      <a class="home-link" href="./index.html"><span aria-hidden="true">←</span>ホームに戻る</a>
+      <button class="home-link guide-download" id="downloadUserGuide" type="button" title="利用手順書PDFをダウンロード">📄 利用手順書（PDF）</button>
+    </nav>
+    <div class="eyebrow">NEPM™ / Nakata Educational Prompt Method</div>
+    <h1>NEPM 作問Web＋ 配信フォーム自動作成</h1>
+    <p class="subtitle">「回答者・採点者・管理者を事前登録し、Googleフォームと採点シートのアクセス権限を安全に分離」</p>
+    <div class="meta">
+      <span class="meta-tag">✨ Ver. <span class="js-ver">1.30</span></span>
+      <span>One-time Roster Import &amp; Local Processing</span>
+      <span>｜</span>
+      <span>© N. Nakata NEPM™ All Rights Reserved.</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="assurances">
+    <div class="assurance"><b>✓ 名簿は作成のたびに読み込み</b><small>テンプレートを使い、作成後は画面をリセット。名簿の保存・再利用機能は設けません。</small></div>
+    <div class="assurance"><b>✓ 役割を名簿で指定</b><small>回答者・採点者・管理者・共有教員を名簿で区別します。</small></div>
+    <div class="assurance"><b>✓ 権限設定はGAS側で検証</b><small>本番フォーム・採点シートは採点者と管理者に限定し、共有教員には回答を含まない受付停止状態のテンプレート用コピーを分離作成します。</small></div>
+  </div>
+
+  <div class="notice security-box">
+    <b style="font-size:1.12rem; color:var(--brand2); display:flex; align-items:center; gap:6px;">🔒【名簿の使い捨て運用と個人情報の取り扱い】</b>
+    <ul style="margin:8px 0 0; padding-left:1.3em; font-size:0.92rem; line-height:1.65;">
+      <li><b>【作成のたびに読み込む】</b>下のテンプレートをダウンロードし、既存の名簿から必要な情報をコピーして使います。</li>
+      <li><b>【使い捨て】</b>読み込んだ名簿データはこの画面で一時的に使用します。GAS出力後に「リセット」を押すと、画面上の名簿・入力内容・生成結果を消去します。</li>
+      <li><b>【保存しない】</b>名簿をJSON等で保存・再読み込みする機能は設けません。ブラウザの保存領域への永続保存もしません。</li>
+      <li><b>【慎重な取り扱い】</b>名簿ファイルは個人情報です。学校のルールに従って厳重に保管し、第三者に渡したり公開場所へ置いたりしないでください。</li>
+      <li><b>【権限の分離と確認】</b>採点者・管理者のみが本番フォームと採点シートにアクセスできます。共有教員には生徒の回答が見えない「配布用テンプレートのコピー（回答受付停止済）」が自動作成されます。</li>
+      <li><b>【コードの取り扱い】</b>出力されたGASコードには名簿情報が含まれます（名簿ありモードの場合）。完成コードをAIサービスへ再送信しないでください。</li>
+      <li><b>【名簿なしモード】</b>名簿を使わない簡易モードを選ぶと、個人情報（氏名・メールアドレス）は一切読み込みません。</li>
+    </ul>
+  </div>
+
+  <form id="maker">
+    <!-- STEP 0: 名簿取り込み -->
+    <section class="card">
+      <div class="step"><span>0</span>名簿の使用有無と読み込み（作成のたびに使い捨て）</div>
+      <div class="choices" id="roster_mode_choices">
+        <label class="choice">
+          <input type="radio" name="roster_mode" value="WITH_ROSTER" checked>
+          <div>
+            <b>名簿を使う（推奨）</b><br>
+            <small style="color:var(--muted)">名簿ファイル（Excel）を読み込みます。</small>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="roster_mode" value="NO_ROSTER">
+          <div>
+            <b>名簿なし（簡易モード）</b><br>
+            <small style="color:var(--muted)">名簿を読み込まず、すぐに作問できます。</small>
+          </div>
+        </label>
+      </div>
+      <div id="roster_benefit" class="notice verify" style="margin-top:12px; font-size:0.9rem; line-height:1.65;">
+        <b>名簿があるメリット</b>
+        <ul style="margin:6px 0 0; padding-left:1.3em;">
+          <li><b>本人の自動特定：</b>メールアドレスで氏名を自動表示し、名簿にないアカウントの回答は「無効」と判定します。</li>
+          <li><b>入力ミス・なりすましの防止：</b>生徒は出席番号を選ぶだけ（氏名の誤字なし）。選んだ番号とメールが合わなければ「⚠️番号不一致」を表示します。</li>
+          <li><b>権限の自動設定：</b>採点者・管理者への共有や、共有教員向けの配布用コピーを、名簿の役割欄から自動で設定します。</li>
+        </ul>
+        <div style="margin-top:6px;"><b>名簿なしの場合：</b>生徒が氏名を自由入力するため、誤字やなりすましは検知できません。採点者・管理者・共有教員への自動共有もなく、作成した教員のみがアクセスできます。少人数や試用に向いています。</div>
+      </div>
+      <div id="no_roster_notice" class="notice privacy" style="display:none; margin-top:12px;"><b>名簿なしモード</b><br>名簿の読み込みと対象クラスの選択は不要です。次のSTEP 1へ進んでください。</div>
+      <div id="roster_panel" style="margin-top:12px;">
+      <div class="hint">テンプレートをダウンロードし、既存の名簿から必要な情報をコピーして入力してください。完成した名簿ファイルをここに読み込ませます。</div>
+      <button class="secondary" id="downloadRosterTemplate" type="button">名簿テンプレートをダウンロード（Excel）</button>
+      <div class="notice privacy" style="margin-top:12px"><b>個人情報の取り扱いについて</b><br>このファイルには個人情報が含まれます。厳重に保管し、第三者に渡したり、公開場所へ保存したりしないでください。学校のルールに従い、慎重に取り扱ってください。作問・配信環境の作成後は、画面の「リセット」を押してください。</div>
+      <div id="drop_zone" class="drop-zone">
+        <div style="font-weight:800; color:#1e40af; font-size:1.05rem;">📁 ここに名簿テンプレート（Excel）をドロップ</div>
+        <div style="font-size:0.85rem; color:var(--muted); margin-top:4px;">またはクリックしてファイルを選択</div>
+        <input type="file" id="roster_file" accept=".xlsx" style="display:none;">
+      </div>
+      <label class="note" for="class_select">対象クラス</label>
+      <select id="class_select" disabled><option value="">先に名簿を読み込んでください</option></select>
+      <div class="hint">対象クラスを選ぶと、そのクラスの回答者を使います。採点者・管理者・共有教員は名簿の役割欄で指定します。</div>
+      <div id="roster_status" class="notice verify" style="display:none; margin-top:12px;">
+        <b>名簿の読み込み結果</b>
+        <div id="roster_summary" style="font-size:0.88rem; margin-top:4px;"></div>
+        <div id="roster_warnings" style="font-size:0.85rem; color:#b45309; margin-top:4px; font-weight:700;"></div>
+      </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>1</span>記述問題の有無</div>
+      <div class="choices">
+        <label class="choice">
+          <input type="radio" name="written_mode" value="CHOICE_ONLY" checked onchange="updateWrittenModeNotice(this.value)">
+          <div>
+            <b>含めない（選択問題のみ）</b><br>
+            <small style="color:var(--muted)">フォーム標準機能で全問自動採点され、解説もフォーム上に自動表示されます。</small>
+          </div>
+        </label>
+        <label class="choice">
+          <input type="radio" name="written_mode" value="WITH_WRITTEN" onchange="updateWrittenModeNotice(this.value)">
+          <div>
+            <b>含める（記述1問 ＋ 選択問題）</b><br>
+            <small style="color:var(--muted)">回答シート上で半自動採点（関数）が行われます。</small>
+          </div>
+        </label>
+      </div>
+
+      <div id="notice-written-danger" class="notice alert-danger">
+        <b>📝 スプレッドシート半自動採点モード</b><br>
+        選択問題（複数問）＋ 記述問題（短文形式 1問）で構成されます。スプレッドシートに独立した「採点」シートが作成され、名簿照合・出席番号クロス照合・自動計算・手動採点枠が自動構築されます。
+      </div>
+      <div id="notice-written-ok" class="notice verify" style="margin-top:12px;">
+        <b>ℹ️ クイズフォーム自動採点モード</b><br>
+        選択問題のみで構成され、Googleフォームの標準機能で全問自動採点されます。正答時の解説フィードバックも自動セットされます。
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>2</span>基礎情報</div>
+      <div class="choices three">
+        <label class="choice"><input type="radio" name="grade" value="高1" checked>高校1年</label>
+        <label class="choice"><input type="radio" name="grade" value="高2">高校2年</label>
+        <label class="choice"><input type="radio" name="grade" value="高3">高校3年</label>
+      </div>
+      <label class="note" for="subject">教科</label>
+      <select id="subject" required>
+        <option value="" disabled selected>教科を選択してください</option>
+        <option>国語</option><option>数学</option><option>英語</option><option>理科</option>
+        <option>地歴・公民</option><option>情報</option><option>総合的な探究の時間</option>
+      </select>
+      <label class="note" for="unit">単元・テーマ</label>
+      <input id="unit" type="text" required placeholder="例：二次関数 / 一次関数の利用">
+      <label class="note" for="teacher_intent">先生のねらい・気になること（任意）</label>
+      <input id="teacher_intent" type="text" placeholder="例：符号ミスが多い / 公式を使えるか確認したい">
+    </section>
+
+    <section class="card">
+      <div class="step"><span>3</span>テストの方向性</div>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="purpose" value="① 授業内容の基礎的な定着を確認したい（平均75点〜）">まずは基本を確認</label>
+        <label class="choice"><input type="radio" name="purpose" value="② 基礎固めを中心としつつ、少しだけ差をつけたい（平均70点〜）">基礎中心＋少し差がつく</label>
+        <label class="choice"><input type="radio" name="purpose" value="③ 次の模試や実力テストにつながる標準的な問題にしたい（平均60〜65点）" checked>標準的なテスト</label>
+        <label class="choice"><input type="radio" name="purpose" value="④ 応用力を問う、難易度高めの構成にしたい（平均50点〜）">応用まで入れる</label>
+        <label class="choice"><input type="radio" name="purpose" value="⑤ 共通テストの形式（初見資料読み取りなど）を意識させたい（平均45〜55点）">共通テストを意識</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>4</span>出題範囲・深さ</div>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="source" value="A. 教科書の本文（太字レベル）だけで解けるようにして" checked>教科書本文中心</label>
+        <label class="choice"><input type="radio" name="source" value="B. 教科書の図表や脚注の内容も盛り込んで">図表・脚注まで</label>
+        <label class="choice"><input type="radio" name="source" value="C. 初見の資料や少し発展的な内容も入れて">初見資料・発展も含む</label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>5</span>問題数・満点・時間（最大10問）</div>
+      <div class="choices three">
+        <label class="choice"><input type="radio" name="q_count" value="3">3問</label>
+        <label class="choice"><input type="radio" name="q_count" value="5" checked>5問（推奨）</label>
+        <label class="choice"><input type="radio" name="q_count" value="10">10問（上限）</label>
+      </div>
+      <div class="choices" style="margin-top:10px">
+        <div><label class="note" for="score">目標満点</label><input id="score" type="number" value="50" min="1" max="1000" step="1" required></div>
+        <div><label class="note" for="time_range">想定時間</label>
+          <select id="time_range"><option value="10">10分</option><option value="15" selected>15分</option><option value="30">30分</option><option value="50">50分</option></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="step"><span>6</span>作問上の追加指示（任意）</div>
+      <textarea id="additional_instruction" placeholder="例：計算問題を多めに / 1ページ前の復習を問1に"></textarea>
+    </section>
+
+    <section class="card" id="api_card">
+      <div class="step"><span>API</span>API自動作問（任意・ご自身の有料APIキーを使う場合）</div>
+      <label class="note" for="api_key">Gemini APIキー</label>
+      <input id="api_key" type="password" autocomplete="off" placeholder="ご自身のAPIキー（保存されません。リセットまたは画面を閉じると消えます）">
+      <label class="note" for="api_model">モデル名（一覧から選択または直接入力）</label>
+      <div class="inline-row">
+        <input id="api_model" type="text" list="gemini_models" value="gemini-3.8-flash" autocomplete="off">
+        <button class="inline-btn" id="fetchModelsBtn" type="button">🔄 利用可能モデルを取得</button>
+      </div>
+      <datalist id="gemini_models">
+        <option value="gemini-3.8-flash">
+        <option value="gemini-4-argon">
+        <option value="gemini-3.5-flash-lite">
+        <option value="gemini-3.1-flash-lite">
+      </datalist>
+      <div id="model_fetch_status" class="hint" style="color:var(--brand2); font-weight:700;"></div>
+      <div class="hint">キーは作問条件をGoogle（generativelanguage.googleapis.com）へ送るときにだけ使います。名簿・氏名・メールアドレスはAPIへ送信しません。費用はキーの持ち主に請求されます。モデルは頻繁に入れ替わります。「🔄 利用可能モデルを取得」を押すとそのAPIキーで現在使えるモデル一覧を取得できます。</div>
+    </section>
+    <button class="primary" id="apiBtn" type="button" style="background:var(--brand)">🤖 APIで自動作問する（全自動）</button>
+    <button class="secondary" type="submit">手動：作成データを準備してGeminiチャットに貼る（名簿は100%除外）</button>
+    <div id="editStatus" class="status" role="status" aria-live="polite"></div>
+  </form>
+
+  <section id="apiResult" class="result">
+    <div class="guide">
+      <h2>🤖 API自動作問</h2>
+      <div id="api_progress" class="api-progress" role="region" aria-label="Gemini作問の処理状況" hidden>
+        <div class="api-progress-head"><span id="api_progress_title">作問を準備しています</span><span id="api_progress_clock" class="api-clock">経過 0秒</span></div>
+        <div class="api-progress-track" role="progressbar" aria-label="Gemini作問中（進捗率非表示）" aria-valuetext="処理中"><div id="api_progress_fill" class="api-progress-fill"></div></div>
+        <ol id="api_progress_steps" class="api-progress-steps" aria-label="処理段階">
+          <li data-stage="prepare">入力条件の確認</li><li data-stage="request">Geminiへ送信・応答待ち</li><li data-stage="parse">JSON解析</li><li data-stage="validate">設問・配点の検査</li><li data-stage="review">教員の内容確認</li>
+        </ol>
+        <div id="api_progress_detail" class="api-progress-detail" role="status" aria-live="polite"></div>
+        <div class="hint">※ このバーは処理中の目印です。Geminiから完了率は取得できないため、正確な残り時間は表示しません。</div>
+      </div>
+      <div id="api_status" class="status" aria-live="polite"></div>
+      <div id="api_review"></div>
+      <label class="note" for="api_revise">修正したい点（任意）</label>
+      <textarea id="api_revise" placeholder="例：問3をもう少し易しく／計算問題を増やす"></textarea>
+      <button class="secondary" id="api_regen" type="button">この内容で作り直す</button>
+      <button class="primary" id="api_approve" type="button" style="margin-top:9px">✅ 内容を承認して完成版GASコードを作る</button>
+      <div class="hint">※ 正答の正しさはシステムでは検証できません。承認前に必ず先生が確認してください。</div>
+    </div>
+  </section>
+
+  <section id="result" class="result">
+    <div class="guide">
+      <h2>このあと3ステップです</h2>
+      <div class="flow">
+        <div class="flow-item"><div class="badge">1</div><div><b>作成データをコピーしてGeminiへ送信</b><br>下の青いボタンを押してコピーし、Geminiで送信します。（※名簿データは一切含まれません）</div></div>
+        <div class="flow-item"><div class="badge">2</div><div><b>「承認」と入力してGASコードを取得</b><br>Geminiが提示した問題を確認し、「承認」と入力してGASコードを取得します。</div></div>
+        <div class="flow-item"><div class="badge">3</div><div><b>取得したGASコードに手元の名簿を合体（ローカル合体機能）</b><br>下枠にGeminiのGASコードを貼ると、設問データ（DESIGN）を検査したうえで、安全な正規テンプレートと名簿・共有設定を合体した最終GASコードが出力されます。</div></div>
+      </div>
+    </div>
+    <button class="primary" id="copyBtn" type="button">作成データをコピー</button>
+    <div id="copyStatus" class="status" aria-live="polite"></div>
+    <button class="secondary" id="previewBtn" type="button">実行パッケージ（AI送信文）の内容を確認</button>
+    <pre id="preview" hidden></pre>
+
+    <!-- 名簿・共有設定 ローカル合体エリア -->
+    <div class="card" style="margin-top:24px; border:2px solid #2157a6; background:#f0f7ff;">
+      <h3 style="margin:0 0 8px; color:var(--brand2);">🧩 手元の名簿・共有設定をGASコードへ安全合体（ローカル処理）</h3>
+      <div id="mergeHint" class="hint" style="color:#1e3a8a; margin-bottom:12px;">Geminiから出力されたGASコードを下の枠に貼り付けると、問題データを厳密検証したうえで、手元の名簿データ・権限分離設定が合体された完全版GASコードが生成されます。</div>
+      <textarea id="gemini_gas_input" style="min-height:120px;" placeholder="Geminiが出力したGASコード（function createFormAndSheet() ...）をここに貼り付けてください"></textarea>
+      <button class="primary" id="mergeBtn" type="button" style="margin-top:10px; background:#1e40af;">名簿・共有設定を合体したGASコードを出力</button>
+      
+      <div id="merged_result_box" style="display:none; margin-top:16px;">
+        <label class="note">✅ 完成版GASコード（Apps Script貼り付け用）</label>
+        <button class="primary" id="copyMergedBtn" type="button" style="background:#059669; margin-bottom:8px;">完成版GASコードをコピー</button>
+        <div id="copyMergedStatus" class="status" aria-live="polite"></div>
+        <pre id="merged_gas_output"></pre>
+        <div class="gas-howto" aria-label="完成版GASコードの貼り付け手順">
+          <h3>📋 完成版GASコードをGoogle Apps Scriptに貼り付ける方法</h3>
+          <a class="open-sheet-link" href="https://docs.google.com/spreadsheets/create" target="_blank" rel="noopener noreferrer" aria-label="新しいGoogleスプレッドシートを別タブで開く">📊 Googleスプレッドシートを開く（新規作成） ↗</a>
+          <p class="open-sheet-hint">Chrome・Edge共通。別タブで空のスプレッドシートを作成します。Googleへのログインが必要な場合があります。学校の利用ルールをご確認ください。</p>
+          <ol>
+            <li>上の緑色の<strong>「完成版GASコードをコピー」</strong>をクリックします。</li>
+            <li>Googleスプレッドシートを開き、メニューの<strong>「拡張機能」→「Apps Script」</strong>を選びます。</li>
+            <li>Apps Scriptエディタで<strong>「コード.gs」</strong>を開き、最初から記載されているサンプルコードを<strong>すべて削除</strong>します。</li>
+            <li>コピーした完成版GASコードを貼り付け、<strong>保存</strong>します。その後、コード内の作成関数を選んで実行します。初回はGoogleの権限確認が表示される場合があります。</li>
+          </ol>
+          
+          <figure class="gas-image-narrow"><img src="data:image/webp;base64,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" alt="Googleスプレッドシートの拡張機能メニューにある Apps Script の項目" loading="lazy"><figcaption>② スプレッドシートの「拡張機能」から「Apps Script」を開く</figcaption></figure>
+          <p class="hint">※ 既存のスクリプトがあるプロジェクトでは上書きせず、新しいスプレッドシートまたは新しいApps Scriptプロジェクトを使用してください。実行後は作成されたフォーム・シートと共有権限を確認してください。</p>
+        </div>
+      </div>
+      <button class="secondary" id="resetAllBtn" type="button">リセット（名簿・入力・生成結果を消去）</button>
+      <div class="hint">リセットすると、この画面上の一時データを消去します。出力済みコードを必要な場所へコピーしたことを確認してから実行してください。</div>
+    </div>
+  </section>
+
+  <details class="changelog" id="changelog">
+    <summary>更新履歴（<span class="js-ver">1.30</span>）</summary>
+    <div id="changelog-body"></div>
+  </details>
+
+  <div class="footer-note">NEPM™ / Nakata Educational Prompt Method Ver.<span class="js-ver">1.30</span> ｜ Copyright © N. Nakata All Rights Reserved.</div>
+</main>
+
+<script>
+const NEPM_VERSION = {
+  version: "1.30",
+  date: "2026-11-07",
+  history: [
+    { v: "1.30", date: "2026-11-07", changes: [
+      "【表示改善】API自動作問の送信・応答待ち・JSON解析・条件検査・再作問・教員確認の段階と試行回数・経過時間を表示（完了率を偽装しないインジケーター）",
+      "【資料】画面ヘッダーからVer.1.30利用手順書（PDF）を直接ダウンロード可能（HTML内蔵）",
+      "【意匠】NEPM公開ページの青系配色とナビゲーションを踏襲し、進行表示・ボタンを統一"
+    ]},
+    { v: "1.29", date: "2026-11-07", changes: [
+      "【追加】STEP 0の最初に「名簿を使う／名簿なし（簡易モード）」の選択を追加。名簿を使うメリットの簡単な説明を表示",
+      "名簿なしモードでは名簿の読み込み・対象クラス選択を省略し、生徒が氏名を入力するフォームと採点シートを作成（名簿照合・番号クロス照合・採点者/管理者/共有教員の自動共有は行わない）",
+      "名簿なしモードの採点シートでは、C列の見出しを「氏名（生徒入力・未照合）」にして、名簿照合済みでないことを明示",
+      "モードを切り替えると、読み込み済みの名簿データは画面上から消去される"
+    ]},
+    { v: "1.28.2", date: "2026-11-07", changes: [
+      "【重大修正】1.28.1で、Geminiの出力経路により約20か所のエスケープ（\\n・\\\\・\\t・\\b等）が展開されて壊れ、ページのJavaScriptが構文エラーで起動できなかった問題を修復（relaxedParse・名簿読込アラート・正規表現・生成GASテンプレート内の改行等を1.27の正しい記述へ復元）",
+      "1.28/1.28.1で追加された機能（共有教員コピーの順序変更と受付停止・空欄出席番号の仮採番・SheetJS警告・モデル一覧取得・学年不整合確認・再生成失敗後の承認確認・同期待ち列数）は変更なし"
+    ]},
+    { v: "1.28", date: "2026-11-07", changes: [
+      "【権限・安全強化】共有教員用テンプレートコピーを本番回答シート紐付け前（setDestination前）に作成し、回答受付停止（setAcceptingResponses(false)）を追加",
+      "【同期堅牢化】シート同期待ちループで基準列数（タイムスタンプ・メール・番号＋設問数＝DESIGN.questions.length + 3）が揃うまで待機する条件を追加",
+      "【採番改善】名簿で出席番号が空欄の回答者がいる場合、既存番号と衝突しない最小の未使用番号を自動付与し、画面上に明示警告を表示",
+      "【セキュリティ通知】SheetJSが公式CDN(0.20.3)から読み込めず互換版(0.18.5)へフォールバックした際に画面上で警告を表示",
+      "【API改善】入力されたAPIキーで現在利用可能なGeminiモデル一覧をAPIから動的取得するボタンを追加",
+      "【整合性保護】手動合体時の学年ラジオ変更チェック、API再生成失敗直後の誤承認防止確認、およびVer.1.11〜1.24の全更新履歴を完全復元"
+    ]},
+    { v: "1.27", date: "2026-11-07", changes: [
+      "【重大修正】手動モードでGeminiが出力した「キーを引用符で囲まないDESIGN」（テンプレート形式）や単引用符・末尾カンマを読み取れず、設問データを検出できない問題を修正（コードを実行せずに読み取る安全な変換パーサーを追加）",
+      "テンプレートのDESIGN例とAIへのルールを、キーも二重引用符で囲む厳密JSON形式に変更",
+      "【更新】既定のGeminiモデル名を現行モデル（gemini-3.8-flash）に変更し、廃止済みの2.5系・2.0系を候補から削除"
+    ]},
+    { v: "1.26", date: "2026-11-07", changes: [
+      "【重大修正】SheetJSの読込先を公式CDN(0.20.3)＋jsDelivr(0.18.5)の自動フォールバック方式に変更し、チャットやエディタ貼り付け時のURL自動リンク化破損を防止",
+      "【重大修正】問題文に「メール」「氏名」「出席番号」が含まれる場合に回答シートのメール列・番号列が設問列で上書きされるバグを修正（設問列除外＆最初の一致で確定）",
+      "【重大修正】学年の正規化(normGrade)でNFKC正規化と厳密な正規表現を導入（「高校１年」等の全角に対応し、「中1」「11」等の誤変換を防止）",
+      "【権限分離改善】共有教員に本番フォームの編集権限を付与すると生徒の回答・メールが閲覧可能になる問題を解消（共有教員には回答を含まない配布用テンプレートコピーを自動作成して共有）",
+      "【採点強化】出席番号とメールアドレスのクロス照合を導入（生徒が他人の出席番号を選択した場合に「⚠️番号不一致」を自動表示）",
+      "【堅牢化】ARRAYFORMULA内で別シート参照(INDIRECT)と自シート参照を混在させない設計に統一し、回答1000行超え時の#VALUE!エラーを防止",
+      "【安全性向上】手動モード合体時にもAI出力からDESIGNオブジェクトのみを抽出・検査して正規GASテンプレートへ再構築する方式に統一"
+    ]},
+    { v: "1.25", date: "2026-11-07", changes: [
+      "【重大バグ修正】GAS採点シートのVLOOKUP参照範囲（_名簿データ!C:B）で全員が未登録・無効回答になる問題を修正（_名簿データをA列:メール・B列:氏名・C列:出席番号に整理しLOWER照合化）",
+      "【不具合修正】出席番号の未入力・重複時にGoogleフォームのListItem.setChoiceValuesがクラッシュする問題および氏名が選択肢に露出する問題を修正",
+      "【不具合修正】Gemini 2.5系の思考パート（thought）混入によるJSONパース失敗を防止し、リセット時の通信中断（AbortController）を追加",
+      "【不具合修正】API承認時のローカル合体失敗でも成功メッセージが出てしまう問題、および手動貼り付け時のMarkdownコードブロック記号混入による構文エラーを修正",
+      "【堅牢化】Google Workspace環境外でのsetRequireLogin例外保護、ファイルオーナー自身へのaddEditor重複呼び出し回避、シート同期時のopenById再取得を追加",
+      "【管理】HTML内の固定バージョン表記とNEPM_VERSIONの不整合を解消"
+    ]},
+    { v: "1.24", date: "2026-11-05", changes: [
+      "【追加】API自動作問：自分のGemini APIキーで作問→検査→確認→承認→GAS生成までをこの画面で実行（従来のコピー＆貼り付け手順も残す）",
+      "AIにはDESIGN(JSON)だけを出させ、固定テンプレートへはブラウザ側で埋め込み（AIによるテンプレート改変事故を防止）",
+      "問題数・配点合計・選択肢・解説の事前検査と自動やり直し（最大3回）",
+      "名簿・氏名・メールアドレスはAPIへ送信しない。APIキーは保存せず、リセットで消去",
+      "【不具合修正】ローカル合体の権限定数チェックの正規表現が常に不一致になる問題を修正",
+      "【不具合修正】GASテンプレート内の改行 \n が実改行になりGASが構文エラーになる問題を修正"
+    ]},
+    { v: "1.23", date: "2026-10-19", changes: [
+      "名簿テンプレートのWeb画面からのダウンロード機能を追加",
+      "名簿の都度読み込み・対象クラス選択に対応する入力欄を追加",
+      "選択クラスの回答者だけをGASへ合成し、教員の役割メールを分離",
+      "フォーム編集権限と採点シート権限を分離し、権限設定失敗時は処理を中止",
+      "重複したpayload宣言を修正し、JavaScriptの起動エラーを解消",
+      "役割（回答者・採点者・管理者・共有教員）を名簿テンプレートから読み込む設計へ変更",
+      "名簿を保存・再読み込みする機能を設けず、リセットで画面上の一時データと生成結果を消去",
+      "個人情報の取り扱い注意を明記し、Google Analyticsのタグを削除",
+      "アクセス制限を保証するかのような断定表現を修正"
+    ]},
+    { v: "1.22", date: "2026-10-19", changes: ["AI送信用プロンプトとローカル合体エリアを追加"]},
+    { v: "1.21", date: "2026-10-19", changes: ["氏名隠蔽型出席番号選択欄、メールアドレス照合等を導入"]},
+    { v: "1.11", date: "2026-10-16", changes: ["採点シートのINDIRECT参照化、氏名列自動検索の改善"]}
+  ]
+};
+
+(function renderVersion() {
+  document.title = "NEPM 作問Web＋ 配信フォーム自動作成 Ver." + NEPM_VERSION.version;
+  document.querySelectorAll('.js-ver').forEach(function (el) { el.textContent = NEPM_VERSION.version; });
+  var body = document.getElementById('changelog-body');
+  body.innerHTML = '';
+  NEPM_VERSION.history.forEach(function (h) {
+    var h3 = document.createElement('h3');
+    h3.textContent = "Ver." + h.v + "（" + h.date + "）";
+    var ul = document.createElement('ul');
+    h.changes.forEach(function (c) {
+      var li = document.createElement('li');
+      li.textContent = c;
+      ul.appendChild(li);
+    });
+    body.appendChild(h3);
+    body.appendChild(ul);
+  });
+})();
+
+function updateWrittenModeNotice(val) {
+  const dangerNotice = document.getElementById('notice-written-danger');
+  const okNotice = document.getElementById('notice-written-ok');
+  if (val === 'WITH_WRITTEN') {
+    dangerNotice.style.display = 'block';
+    okNotice.style.display = 'none';
+  } else {
+    dangerNotice.style.display = 'none';
+    okNotice.style.display = 'block';
+  }
+}
+
+// ------------------------------------------------------------
+// 名簿テンプレート読み込み（画面内だけの一時利用）
+// ------------------------------------------------------------
+let parsedRoster = [];
+let parsedAdmins = [];
+let selectedClass = '';
+let payload = '';
+let lastManualParams = null;
+let apiRequested = false;
+let apiState = { p: null, design: null, regenFailed: false };
+let apiAbortController = null;
+
+const dropZone = document.getElementById('drop_zone');
+const rosterFileInput = document.getElementById('roster_file');
+const classSelect = document.getElementById('class_select');
+const rosterStatus = document.getElementById('roster_status');
+const rosterSummary = document.getElementById('roster_summary');
+const rosterWarnings = document.getElementById('roster_warnings');
+function rosterMode() {
+  const el = document.querySelector('input[name="roster_mode"]:checked');
+  return el ? el.value : 'WITH_ROSTER';
+}
+function applyRosterMode(clearData) {
+  const none = rosterMode() === 'NO_ROSTER';
+  document.getElementById('roster_panel').style.display = none ? 'none' : '';
+  document.getElementById('no_roster_notice').style.display = none ? 'block' : 'none';
+  if (none && clearData) {
+    parsedRoster = []; parsedAdmins = []; selectedClass = '';
+    rosterFileInput.value = '';
+    classSelect.innerHTML = '<option value="">先に名簿を読み込んでください</option>'; classSelect.disabled = true;
+    rosterStatus.style.display = 'none'; rosterSummary.textContent = ''; rosterWarnings.textContent = '';
+  }
+}
+document.querySelectorAll('input[name="roster_mode"]').forEach(r => r.addEventListener('change', () => applyRosterMode(true)));
+const downloadRosterTemplateBtn = document.getElementById('downloadRosterTemplate');
+
+function normGrade(value) {
+  const v = String(value || '').normalize('NFKC').trim().replace(/\s+/g, '');
+  const m = v.match(/^(?:高校|高)?([123])(?:年|年生)?$/);
+  return m ? '高' + m[1] : v;
+}
+function normNumber(value) {
+  return String(value || '').normalize('NFKC').trim().replace(/番$/u, '').trim();
+}
+function currentGrade() {
+  const el = document.querySelector('input[name="grade"]:checked');
+  return el ? el.value : '高1';
+}
+function parseRole(v) {
+  const role = String(v || '').normalize('NFKC').trim();
+  const aliases = { '生徒':'回答者', '学生':'回答者', '採点':'採点者', '作成者':'管理者', '共有':'共有教員', '共同編集者':'共有教員' };
+  return aliases[role] || role;
+}
+function isShareTeacherMatched(r, targetGrade, targetClass, subject) {
+  if (r.role !== '共有教員') return false;
+  if (r.subject && r.subject !== subject) return false;
+  if (!r.shareTo) {
+    return (!r.grade || r.grade === targetGrade) && Boolean(r.className) && r.className === targetClass;
+  }
+  const normalizedTargetFull = (targetGrade + targetClass).normalize('NFKC').replace(/\s+/g, '');
+  const tokens = r.shareTo.split(/[、,;；]/).map(s => s.normalize('NFKC').trim()).filter(Boolean);
+  return tokens.some(t => {
+    const clean = t.replace(/\s+/g, '');
+    return ((!r.grade || r.grade === targetGrade) && t === targetClass) || clean === normalizedTargetFull;
+  });
+}
+function updateRosterStatus() {
+  const grade = currentGrade();
+  const className = classSelect.value || selectedClass;
+  const inClass = parsedRoster.filter(r => r.grade === grade && r.className === className);
+  const respondents = inClass.filter(r => r.role === '回答者');
+  const autoNumberedCount = respondents.filter(r => r.autoNumbered).length;
+  const totalAutoNumbered = parsedRoster.filter(r => r.role === '回答者' && r.autoNumbered).length;
+  const subject = document.getElementById('subject').value;
+  const graders = parsedRoster.filter(r => (!r.grade || r.grade === grade) && r.role === '採点者' && (!r.subject || r.subject === subject));
+  const admins = parsedRoster.filter(r => r.role === '管理者');
+  const shareTeachers = parsedRoster.filter(r => isShareTeacherMatched(r, grade, className, subject));
+  parsedAdmins = [...new Set([...graders, ...admins].map(r => r.email).filter(Boolean))];
+  rosterStatus.style.display = parsedRoster.length ? 'block' : 'none';
+  if (parsedRoster.length) {
+    rosterSummary.textContent = `読み込み人数：${parsedRoster.length}人／対象：${grade} ${className || '未選択'}／対象クラスの回答者：${respondents.length}人／採点者：${graders.length}人／管理者：${admins.length}人／共有教員：${shareTeachers.length}人`;
+    const warns = [];
+    if (window.__NEPM_XLSX_SOURCE === '0.18.5-fallback') {
+      warns.push('⚠️ 公式CDN(0.20.3)へ接続できなかったためSheetJS互換版(0.18.5)で動作中です。信頼できる名簿ファイルのみを読み込んでください。');
+    }
+    if (autoNumberedCount > 0) {
+      warns.push(`⚠️ 対象クラスに出席番号が空欄の回答者が${autoNumberedCount}人います（番号重複を防ぐため未使用番号で仮採番しました。実際の出席番号と異なる場合は名簿ファイルに入力して再読み込みしてください）。`);
+    } else if (!className && totalAutoNumbered > 0) {
+      warns.push(`⚠️ 名簿内に出席番号が空欄の回答者が${totalAutoNumbered}人います（未使用番号で仮採番済み）。`);
+    }
+    rosterWarnings.textContent = warns.join(' ');
+  } else {
+    rosterWarnings.textContent = '';
+  }
+}
+function refreshClassOptions() {
+  const classes = [...new Set(parsedRoster.filter(r => r.role === '回答者' && r.grade === currentGrade() && r.className).map(r => r.className))].sort((a,b) => a.localeCompare(b, 'ja', {numeric:true}));
+  classSelect.innerHTML = '';
+  if (!classes.length) {
+    classSelect.add(new Option('この学年のクラスが名簿にありません', ''));
+    classSelect.disabled = true; selectedClass = ''; updateRosterStatus(); return;
+  }
+  classSelect.add(new Option('クラスを選択してください', ''));
+  classes.forEach(c => classSelect.add(new Option(c, c)));
+  classSelect.disabled = false;
+  if (classes.includes(selectedClass)) classSelect.value = selectedClass;
+  else { selectedClass = ''; classSelect.value = ''; }
+  updateRosterStatus();
+}
+function handleRosterFile(file) {
+  if (!file || !/\.xlsx$/i.test(file.name)) { alert('名簿テンプレート（.xlsx）を選択してください。'); return; }
+  if (!window.XLSX) { alert('Excel読込ライブラリ(SheetJS)を読み込めませんでした。ネットワーク接続を確認してください。'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const workbook = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header:1, defval:'', raw:false});
+      if (rows.length < 2) throw new Error('名簿データがありません');
+      const headers = rows[0].map(v => String(v).normalize('NFKC').trim());
+      const findCol = (...names) => headers.findIndex(h => names.includes(h));
+      const idx = {grade:findCol('学年'), cls:findCol('クラス'), name:findCol('氏名'), email:findCol('メールアドレス'), role:findCol('役割'), subject:findCol('教科'), share:findCol('共有先クラス'), number:findCol('出席番号','番号')};
+      ['学年','クラス','氏名','メールアドレス','役割'].forEach(h => { if (!headers.includes(h)) throw new Error('必要な見出し「'+h+'」がありません'); });
+      const result = [], seenRespondents = new Set(), usedNumbersByClass = new Map();
+      for (let i=1; i<rows.length; i++) {
+        const row = rows[i];
+        const name=String(row[idx.name]||'').trim();
+        const email=String(row[idx.email]||'').normalize('NFKC').trim().toLowerCase();
+        const rawGrade=String(row[idx.grade]||'').trim();
+        const className=String(row[idx.cls]||'').normalize('NFKC').trim();
+        const role=parseRole(row[idx.role]);
+        if (!name && !email && !rawGrade && !className && !role) continue;
+        if (name.startsWith('【入力例') || email.endsWith('@example.jp')) continue;
+        if (!['回答者','採点者','管理者','共有教員'].includes(role)) {
+          throw new Error((i+1)+'行目：役割は「回答者」「採点者」「管理者」「共有教員」のいずれかにしてください');
+        }
+        if (!name || !email) throw new Error((i+1)+'行目：氏名・メールアドレスは必須です');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error((i+1)+'行目：メールアドレスの形式を確認してください');
+
+        const grade = rawGrade ? normGrade(rawGrade) : '';
+        if (role !== '管理者' && !['高1','高2','高3'].includes(grade)) {
+          throw new Error((i+1)+'行目：学年は「高1」「高2」「高3」（または1〜3年）で入力してください');
+        }
+        const number = idx.number>=0 ? normNumber(row[idx.number]) : '';
+
+        if (role === '回答者') {
+          if (!className) throw new Error((i+1)+'行目：回答者にはクラスの入力が必須です');
+          if (seenRespondents.has(email)) throw new Error('回答者のメールアドレスが重複しています：'+email);
+          seenRespondents.add(email);
+          const clsKey = `${grade}__${className}`;
+          if (!usedNumbersByClass.has(clsKey)) usedNumbersByClass.set(clsKey, new Set());
+          if (number) {
+            const numSet = usedNumbersByClass.get(clsKey);
+            if (numSet.has(number)) throw new Error(`${i+1}行目：${grade} ${className} の出席番号「${number}」が重複しています`);
+            numSet.add(number);
+          }
+        }
+        result.push({
+          grade,
+          className,
+          number,
+          autoNumbered: false,
+          name,
+          email,
+          role,
+          subject: idx.subject >= 0 ? String(row[idx.subject] || '').normalize('NFKC').trim() : '',
+          shareTo: idx.share >= 0 ? String(row[idx.share] || '').normalize('NFKC').trim() : ''
+        });
+      }
+      if (!result.length) throw new Error('有効な名簿行がありません');
+
+      // 出席番号が空欄の回答者には、同一クラス内の既存番号と衝突しない最小の未使用番号を付与
+      result.forEach(r => {
+        if (r.role === '回答者' && !r.number) {
+          const clsKey = `${r.grade}__${r.className}`;
+          const numSet = usedNumbersByClass.get(clsKey) || new Set();
+          let candidate = 1;
+          while (numSet.has(String(candidate))) candidate++;
+          r.number = String(candidate);
+          r.autoNumbered = true;
+          numSet.add(r.number);
+        }
+      });
+
+      parsedRoster=result; selectedClass=''; refreshClassOptions();
+      document.getElementById('editStatus').textContent = '';
+    } catch(err) { parsedRoster=[]; parsedAdmins=[]; refreshClassOptions(); alert('名簿の読み込みに失敗しました。\n'+err.message); }
+  };
+  reader.onerror=()=>alert('ファイルを読み込めませんでした。');
+  reader.readAsArrayBuffer(file);
+}
+dropZone.addEventListener('click',()=>rosterFileInput.click());
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');if(e.dataTransfer.files.length)handleRosterFile(e.dataTransfer.files[0]);});
+rosterFileInput.addEventListener('change',e=>{if(e.target.files.length)handleRosterFile(e.target.files[0]);});
+classSelect.addEventListener('change',()=>{selectedClass=classSelect.value;updateRosterStatus();});
+document.querySelectorAll('input[name="grade"]').forEach(el=>el.addEventListener('change',refreshClassOptions));
+document.getElementById('subject').addEventListener('change',updateRosterStatus);
+
+downloadRosterTemplateBtn.addEventListener('click',()=>{
+  if (!window.XLSX) { alert('Excelテンプレート機能を読み込めませんでした。ネットワーク接続を確認してください。'); return; }
+  const rows=[
+    ['学年','クラス','氏名','メールアドレス','役割','教科','共有先クラス','出席番号'],
+    ['高1','1組','【入力例・削除】山田 花子','student01@example.jp','回答者','','','1'],
+    ['高1','1組','【入力例・削除】佐藤 太郎','teacher01@example.jp','採点者','数学','高1 2組',''],
+    ['高1','','【入力例・削除】鈴木 一郎','admin01@example.jp','管理者','','',''],
+    ['高1','2組','【入力例・削除】田中 花子','teacher02@example.jp','共有教員','数学','高1 1組','']
+  ];
+  const wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:12},{wch:14},{wch:24},{wch:32},{wch:16},{wch:18},{wch:22},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws,'名簿');
+  const guide=[['NEPM_作問 名簿テンプレートの使い方'],['このファイルには個人情報が含まれます。厳重に保管し、第三者に渡したり、公開場所へ保存したりしないでください。'],['既存の名簿から必要な情報をコピーして入力してください。入力例の行は実データを入れる前に削除してください。'],['1行につき1人。1行目の見出しは変更しないでください。'],['役割は「回答者」「採点者」「管理者」「共有教員」のいずれかを入力してください。'],['回答者には「学年」「クラス」「氏名」「メールアドレス」「出席番号」を入力してください。管理者・採点者はクラス空欄でも構いません。'],['作成後、Web画面のリセットを押してください。名簿をJSON等で保存する機能はありません。']];
+  const gi=XLSX.utils.aoa_to_sheet(guide);gi['!cols']=[{wch:110}];XLSX.utils.book_append_sheet(wb,gi,'はじめに');
+  XLSX.writeFile(wb,'NEPM_作問_名簿テンプレート.xlsx');
+});
+
+function clearMergedOutput() {
+  document.getElementById('merged_gas_output').textContent = '';
+  document.getElementById('merged_result_box').style.display = 'none';
+  document.getElementById('copyMergedStatus').textContent = '';
+}
+
+function resetSensitiveState(){
+  if(!confirm('名簿・入力内容・生成したGASコードを消去します。必要なコードをコピー済みですか？'))return;
+  if(apiAbortController) { try { apiAbortController.abort(); } catch(_) {} apiAbortController = null; }
+  parsedRoster=[];parsedAdmins=[];selectedClass='';payload='';lastManualParams=null;rosterFileInput.value='';clearApiState();
+  classSelect.innerHTML='<option value="">先に名簿を読み込んでください</option>';classSelect.disabled=true;
+  rosterStatus.style.display='none';rosterSummary.textContent='';rosterWarnings.textContent='';
+  document.getElementById('model_fetch_status').textContent='';
+  document.getElementById('maker').reset();applyRosterMode(false);document.getElementById('gemini_gas_input').value='';
+  clearMergedOutput();
+  document.getElementById('preview').textContent='';document.getElementById('preview').hidden=true;document.getElementById('result').style.display='none';
+  document.getElementById('copyStatus').textContent='';
+  updateWrittenModeNotice(document.querySelector('input[name="written_mode"]:checked').value);
+  document.getElementById('editStatus').textContent='画面上の一時データを消去しました。';
+}
+document.getElementById('resetAllBtn').addEventListener('click',resetSensitiveState);
+
+// ------------------------------------------------------------
+// GAS生成テンプレート（AI送信用プロンプト：名簿は100%空枠配列）
+// ------------------------------------------------------------
+const getTemplateGAS = (titleStr, modeStr, score, qCount, gradeStr) => `# Nakata Educational Prompt Method™ (NEPM™)
+## Secure & Strict Verification Specification (Ver. ${NEPM_VERSION.version})
+
+Role: 先生のための対話型作問・Googleフォーム作成アシスタントです。
+
+---
+
+### 【絶対順守の動作ルール】
+
+1. 下記のルール・テンプレート構造は、解釈の追加や変更をせず厳格に適用してください。
+2. **【JavaScript構文安全ルール】**:
+   - 選択問題の正答位置（\`answerIndex\`）は特定の位置（0など）に偏らせず、ランダム配置させてください。
+   - すべての設問に **\`explanation\`（解説テキスト）** を必ず作成してください（空文字は不可）。
+   - \`DESIGN\` オブジェクト内の文字列でダブルクォーテーションを使う場合は必ず \`\\"\` とエスケープしてください。改行は必ず \`\\n\` 表記で出力してください。
+   - **\`const DESIGN = {\` は1行コメント等と同一行に結合させず、必ず独立した行で開始してください。**
+   - **\`DESIGN\` は厳密なJSON形式で出力してください。キー名（questions, type, text, choices, answerIndex, point, explanation）も必ずダブルクォーテーションで囲み、シングルクォーテーション・末尾カンマ・コメントは使わないでください。**
+3. **【作問モード・設問構造ルール】**:
+   - モードが \`WITH_WRITTEN\` の場合、選択問題（${qCount - 1}問）＋ **記述問題（短文形式 \`type: "WRITTEN"\` 厳密に1問）** で構成してください。記述問題の位置は最後に配置してください。
+   - モードが \`CHOICE_ONLY\` の場合、すべての設問（${qCount}問）を \`type: "CHOICE"\` で作成してください。
+4. **【問題数ルール】**:
+   - \`questions\` 配列の要素数は、指定された \`Total Item Count\`（${qCount}問）と必ず一致させてください。
+5. **【配点設定ルール】**:
+   - **必ずすべての設問（CHOICE, WRITTEN問わず）に \`point\` プロパティ（1以上の整数）を設定**し、全設問の \`point\` の合計が指定された \`Total Score\`（${score}点）と必ず一致するように調整してください。
+
+---
+
+### 【対話フローと出力ステップ】
+
+#### ■ ステップ 1: 問題・正答・解説の一覧表示
+プロンプトを受け取ったら、まず最初に以下の構成で画面に出力してください。
+
+1. 先頭にモード明記:
+   - CHOICE_ONLYの場合 ➔ 「【作問モード】選択問題のみ（フォームクイズ自動採点）」
+   - WITH_WRITTENの場合 ➔ 「【作問モード】記述あり（スプレッドシート半自動採点）」
+2. **【問題・配点・正答・解説の一覧】**
+   - 設問ごとに「問題文」「配点」「選択肢」「正答」「解説」を表示します。
+   - 末尾に「問題数：○問／配点合計：○点（指定 ${score}点）」を検算結果として明記してください。
+3. **確認と承認の案内ブロック**:
+   ## ⚠️ ここで一度確認してください
+   問題文・正答・配点・解説を確認してください。
+   - 📝 修正する ➔ 直したい内容をそのまま入力
+   - ✅ この内容で進む ➔ **「承認」** と入力
+
+#### ■ ステップ 2: 完成版GASコードと手順案内の出力（「承認」入力時）
+先生が「承認」と入力したら、会話文を含めず完成版GASコードを出力してください。
+
+---
+
+### 【固定テンプレートGAS】
+
+\`\`\`javascript
+/*
+ * © N. Nakata NEPM™ Form Builder Ver ${NEPM_VERSION.version}
+ * Strict Security & Verification Scoring Engine
+ */
+
+const NEPM_VER = ${JSON.stringify(NEPM_VERSION.version)};
+const FORM_TITLE = ${JSON.stringify(titleStr)};
+const FORM_MODE = ${JSON.stringify(modeStr)};
+const TARGET_SCORE = ${score};
+const QUESTION_COUNT = ${qCount};
+const TARGET_GRADE = ${JSON.stringify(gradeStr || '高1')};
+const TARGET_CLASS = "";
+
+// ★名簿データ（AI非送信・画面上で読み込んだ後にローカル合成）
+// {grade, className, number, name, email, role, subject, shareTo}
+const ROSTER = [];
+const FORM_EDITOR_EMAILS = [];
+const SHEET_EDITOR_EMAILS = [];
+const SHARE_TEACHER_EMAILS = [];
+
+const DESIGN = {
+  "questions": [
+    {
+      "type": "CHOICE",
+      "text": "問題文",
+      "choices": ["選択肢A", "選択肢B", "選択肢C", "選択肢D"],
+      "answerIndex": 0,
+      "point": 10,
+      "explanation": "ここに解法・解説テキストが入ります。"
+    }
+  ]
+};
+
+function createFormAndSheet() {
+  validateDesign(DESIGN);
+
+  var form = null;
+  var ss = null;
+  var sharedTemplateFile = null;
+
+  try {
+    form = FormApp.create(FORM_TITLE);
+    form.setIsQuiz(FORM_MODE === "CHOICE_ONLY");
+
+    // 🔒 セキュリティ制限設定（Google Workspace環境外での例外を個別に保護）
+    try {
+      form.setRequireLogin(true);
+    } catch (loginErr) {
+      console.warn("組織ドメイン限定(setRequireLogin)はGoogle Workspace環境外のためスキップされました: " + loginErr.message);
+    }
+    try {
+      form.setCollectEmail(true);
+    } catch (emailErr) {
+      console.warn("メールアドレス収集設定(setCollectEmail)で警告: " + emailErr.message);
+    }
+    try {
+      form.setLimitOneResponsePerUser(true);
+    } catch (limitErr) {
+      console.warn("1人1回回答制限(setLimitOneResponsePerUser)は環境制約によりスキップされました: " + limitErr.message);
+    }
+
+    // 🏫 氏名隠蔽型出席番号選択欄（生徒画面に他人の氏名一覧を出さない）
+    if (Array.isArray(ROSTER) && ROSTER.length > 0) {
+      var rawNums = ROSTER.map(function(r, idx) {
+        var n = String(r.number || "").trim().replace(/番$/u, "").trim();
+        return (n ? n : String(idx + 1)) + "番";
+      });
+      var numChoices = Array.from(new Set(rawNums)).sort(function(a, b) {
+        return a.localeCompare(b, "ja", { numeric: true });
+      });
+      form.addListItem()
+        .setTitle("出席番号（半角選択）")
+        .setChoiceValues(numChoices)
+        .setRequired(true);
+    } else {
+      form.addTextItem().setTitle("氏名").setRequired(true);
+    }
+
+    for (var i = 0; i < DESIGN.questions.length; i++) {
+      var qData = DESIGN.questions[i];
+      var qNum = i + 1;
+      var qTitle = "問" + qNum + ". " + qData.text;
+
+      if (qData.type === "CHOICE") {
+        var mcItem = form.addMultipleChoiceItem();
+        mcItem.setTitle(qTitle).setRequired(true);
+
+        var choicesObj = [];
+        for (var j = 0; j < qData.choices.length; j++) {
+          var isCorrect = (j === qData.answerIndex);
+          if (FORM_MODE === "CHOICE_ONLY") {
+            choicesObj.push(mcItem.createChoice(qData.choices[j], isCorrect));
+          } else {
+            choicesObj.push(mcItem.createChoice(getChoiceLabel(qData, j)));
+          }
+        }
+        mcItem.setChoices(choicesObj);
+        if (FORM_MODE === "CHOICE_ONLY") {
+          mcItem.setPoints(qData.point);
+          if (qData.explanation) {
+            var feedback = FormApp.createFeedback().setText(qData.explanation).build();
+            mcItem.setFeedbackForCorrect(feedback);
+            mcItem.setFeedbackForIncorrect(feedback);
+          }
+        }
+
+      } else if (qData.type === "WRITTEN") {
+        var wrItem = form.addTextItem();
+        wrItem.setTitle(qTitle).setRequired(true);
+      }
+    }
+
+    // 🛡️ ドライブの共有権限を自動制限（本番は採点者・管理者のみ。共有教員には回答先紐付け前のテンプレートコピーを分離発行）
+    try {
+      var formFile = DriveApp.getFileById(form.getId());
+      formFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
+
+      function normalizeEmailList(emails, ownerEmail) {
+        return Array.from(new Set((emails || []).map(function(x) {
+          return String(x || "").trim().toLowerCase();
+        }).filter(function(x) { return x && x.indexOf("@") > 0 && x !== ownerEmail; })));
+      }
+
+      function addEditorsStrict(file, emails, label) {
+        var ownerEmail = "";
+        try {
+          ownerEmail = (file.getOwner() && file.getOwner().getEmail() || "").trim().toLowerCase();
+        } catch (_) {}
+        var uniqueEmails = normalizeEmailList(emails, ownerEmail);
+        for (var a = 0; a < uniqueEmails.length; a++) {
+          try {
+            file.addEditor(uniqueEmails[a]);
+          } catch (permissionErr) {
+            throw new Error(label + "の権限設定に失敗しました (" + uniqueEmails[a] + "): " + permissionErr.message);
+          }
+        }
+      }
+
+      // 共有教員が指定されている場合は、本番回答シートを紐付ける前にテンプレートコピーを作成し、回答受付停止状態にする
+      if (Array.isArray(SHARE_TEACHER_EMAILS) && SHARE_TEACHER_EMAILS.length > 0) {
+        sharedTemplateFile = formFile.makeCopy(FORM_TITLE + " [共有教員配布用テンプレート]");
+        sharedTemplateFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
+        try {
+          var sharedForm = FormApp.openById(sharedTemplateFile.getId());
+          sharedForm.setAcceptingResponses(false);
+        } catch (tplErr) {
+          console.warn("共有教員用テンプレートの初期設定警告: " + tplErr.message);
+        }
+        addEditorsStrict(sharedTemplateFile, SHARE_TEACHER_EMAILS, "共有教員用テンプレートフォーム");
+      }
+
+      // 回答用スプレッドシート作成と本番フォームへの紐付け
+      ss = SpreadsheetApp.create(FORM_TITLE + " (回答)");
+      var ssFile = DriveApp.getFileById(ss.getId());
+      ssFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.NONE);
+      form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
+
+      // 本番フォーム・採点用シートは採点者と管理者にのみ共有（生徒の個別回答・メールを保護）
+      addEditorsStrict(formFile, (FORM_EDITOR_EMAILS || []).concat(SHEET_EDITOR_EMAILS || []), "本番フォーム");
+      addEditorsStrict(ssFile, SHEET_EDITOR_EMAILS || [], "採点用スプレッドシート");
+    } catch(driveErr) {
+      throw new Error("権限設定を完了できないため処理を中止します: " + driveErr.message);
+    }
+
+    // シート同期待ち（openByIdで再取得し、タイムスタンプ・メール・番号＋設問列の最低列数が揃うまで待機）
+    var respSheet = null;
+    var expectedMinCols = DESIGN.questions.length + 3;
+    for (var wait = 0; wait < 6; wait++) {
+      SpreadsheetApp.flush();
+      Utilities.sleep(2000);
+      ss = SpreadsheetApp.openById(ss.getId());
+      var sheets = ss.getSheets();
+      for (var s = 0; s < sheets.length; s++) {
+        var lastCol = sheets[s].getLastColumn();
+        if (lastCol < 1) continue;
+        var topCell = sheets[s].getRange(1, 1).getValue().toString().trim().toLowerCase();
+        if (topCell === "タイムスタンプ" || topCell === "timestamp" || topCell.indexOf("メール") !== -1) {
+          respSheet = sheets[s];
+          break;
+        }
+      }
+      if (respSheet && respSheet.getLastColumn() >= expectedMinCols) break;
+    }
+
+    if (!respSheet) throw new Error("スプレッドシートの同期に失敗しました。");
+
+    // 不要な初期「シート1」の自動削除
+    try {
+      var allSheets = ss.getSheets();
+      for (var d = 0; d < allSheets.length; d++) {
+        if (allSheets[d].getSheetId() !== respSheet.getSheetId() && allSheets[d].getDataRange().isBlank()) {
+          ss.deleteSheet(allSheets[d]);
+        }
+      }
+    } catch(_) {}
+
+    // 🏫 独立した「採点」シートの作成（名簿照合 & 出席番号クロス照合）
+    var scoreSheet = ss.insertSheet("採点");
+    var safeRespSheetName = respSheet.getName().replace(/'/g, "''").replace(/"/g, '""');
+    var ind = function (col) { return 'INDIRECT("' + "'" + safeRespSheetName + "'!" + col + "2:" + col + '")'; };
+
+    // 名簿テーブルを隠しシートとして保存（A列:メールアドレス, B列:氏名, C列:出席番号表記）
+    if (Array.isArray(ROSTER) && ROSTER.length > 0) {
+      var rosterSheet = ss.insertSheet("_名簿データ");
+      rosterSheet.appendRow(["メールアドレス", "氏名", "出席番号"]);
+      var rosterRows = ROSTER.map(function(r, idx) {
+        var numStr = String(r.number || "").trim().replace(/番$/u, "").trim();
+        var numLabel = (numStr ? numStr : String(idx + 1)) + "番";
+        return [String(r.email || "").trim().toLowerCase(), String(r.name || "").trim(), numLabel];
+      });
+      rosterSheet.getRange(2, 1, rosterRows.length, 3).setValues(rosterRows);
+      rosterSheet.hideSheet();
+    }
+
+    // 採点シート見出し構築（設問列「問N.」を除外し、最初の一致で確定）
+    var headers = respSheet.getRange(1, 1, 1, respSheet.getLastColumn()).getValues()[0];
+    var emailColIdx = -1, numColIdx = -1;
+    for (var h = 0; h < headers.length; h++) {
+      var hText = headers[h].toString().trim();
+      if (/^問\d+\./.test(hText)) continue;
+      if (emailColIdx === -1 && (hText.indexOf("メール") !== -1 || hText.toLowerCase().indexOf("email") !== -1)) {
+        emailColIdx = h + 1;
+      }
+      if (numColIdx === -1 && (hText.indexOf("出席番号") !== -1 || hText.indexOf("氏名") !== -1)) {
+        numColIdx = h + 1;
+      }
+    }
+
+    var emailColLetter = emailColIdx !== -1 ? getColumnLetter(emailColIdx) : "B";
+    var numColLetter = numColIdx !== -1 ? getColumnLetter(numColIdx) : "C";
+
+    // 1列目（A列）：回答者メールアドレス（回答シートからINDIRECT取得）
+    scoreSheet.getRange(1, 1).setValue('={"回答者メール"; ARRAYFORMULA(IF(LEN(' + ind("A") + '), LOWER(TRIM(' + ind(emailColLetter) + ')), ""))}').setBackground("#f4f7fb");
+
+    // 2列目（B列）：入力出席番号／氏名（回答シートからINDIRECT取得）
+    scoreSheet.getRange(1, 2).setValue('={"入力番号・氏名"; ARRAYFORMULA(IF(LEN(' + ind("A") + '), TRIM(' + ind(numColLetter) + '&""), ""))}').setBackground("#f4f7fb");
+
+    // 3列目（C列）：名簿照合＆出席番号クロス照合（自シートのA2:AとB2:Bのみを参照し行数不一致#VALUE!を防止）
+    if (Array.isArray(ROSTER) && ROSTER.length > 0) {
+      var verifyFormula = '={"名簿特定氏名"; ARRAYFORMULA(IF(LEN(A2:A), IFERROR(VLOOKUP(A2:A, ' + "'_名簿データ'" + '!A:B, 2, FALSE) & IF(VLOOKUP(A2:A, ' + "'_名簿データ'" + '!A:C, 3, FALSE)=B2:B, "", " ⚠️番号不一致(入力:"&B2:B&"/名簿:"&VLOOKUP(A2:A, ' + "'_名簿データ'" + '!A:C, 3, FALSE)&")"), "⛔未登録・無効回答"), ""))}';
+      scoreSheet.getRange(1, 3).setValue(verifyFormula).setBackground("#eef5ff").setFontWeight("bold");
+    } else {
+      scoreSheet.getRange(1, 3).setValue('={"氏名（生徒入力・未照合）"; ARRAYFORMULA(IF(LEN(A2:A), B2:B, ""))}').setBackground("#f4f7fb");
+    }
+
+    var outStartCol = 4;
+    var qLen = DESIGN.questions.length;
+    var sumFormulaParts = [];
+    var writtenColLetters = [];
+
+    for (var m = 0; m < qLen; m++) {
+      var q = DESIGN.questions[m];
+      var searchTarget = "問" + (m + 1) + ".";
+      var ansColIdx = -1;
+
+      for (var h2 = 0; h2 < headers.length; h2++) {
+        if (headers[h2].toString().trim().indexOf(searchTarget) === 0) {
+          ansColIdx = h2 + 1;
+          break;
+        }
+      }
+      if (ansColIdx === -1) {
+        ansColIdx = (numColIdx !== -1 ? numColIdx + 1 : 4) + m;
+      }
+
+      var ansColLetter = getColumnLetter(ansColIdx);
+      var outColIdx = outStartCol + m;
+      var outColLetter = getColumnLetter(outColIdx);
+      var cell = scoreSheet.getRange(1, outColIdx);
+
+      if (q.type === "CHOICE") {
+        var safeAns = getChoiceLabel(q, q.answerIndex).replace(/"/g, '""');
+        cell.setValue('={"問' + (m+1) + ' 自動採点"; ARRAYFORMULA(IF(LEN(' + ind("A") + '), IF(' + ind(ansColLetter) + '&""="' + safeAns + '", ' + q.point + ', 0), ""))}');
+        cell.setBackground("#eef5ff");
+      } else {
+        cell.setValue("問" + (m+1) + " 記述手動採点\\n(MAX: " + q.point + "点)");
+        cell.setBackground("#fff8e7");
+        writtenColLetters.push(outColLetter);
+      }
+      sumFormulaParts.push("IFERROR(" + outColLetter + "2:" + outColLetter + "*1, 0)");
+    }
+
+    var sumExpr = sumFormulaParts.length > 0 ? sumFormulaParts.join(" + ") : "0";
+    var totalExpr = sumExpr;
+    if (writtenColLetters.length > 0) {
+      var blankCond = writtenColLetters.map(function(w){ return '(' + w + '2:' + w + '="")'; }).join("+");
+      totalExpr = 'IF(' + blankCond + '>0, "未採点", ' + sumExpr + ')';
+    }
+
+    // 合計点列（自シートのA2:A, C2:C, D2:D...のみを参照して計算し、行数不一致#VALUE!を完全防止）
+    var totalCell = scoreSheet.getRange(1, outStartCol + qLen);
+    if (Array.isArray(ROSTER) && ROSTER.length > 0) {
+      totalCell.setValue('={"合計点"; ARRAYFORMULA(IF(LEN(A2:A), IF(C2:C="⛔未登録・無効回答", "無効", ' + totalExpr + '), ""))}').setBackground("#edf8f1").setFontWeight("bold");
+    } else {
+      totalCell.setValue('={"合計点"; ARRAYFORMULA(IF(LEN(A2:A), ' + totalExpr + ', ""))}').setBackground("#edf8f1").setFontWeight("bold");
+    }
+
+    // 先生用「問題・解答・解説」シートの自動追加
+    var expSheet = ss.insertSheet("問題・解答・解説");
+    var headerData = ["問", "種別", "問題文", "配点", "選択肢", "正答", "解説"];
+    expSheet.appendRow(headerData);
+    expSheet.getRange(1, 1, 1, 7).setFontWeight("bold").setBackground("#dce4ef");
+
+    var rows = [];
+    for (var k = 0; k < DESIGN.questions.length; k++) {
+      var qq = DESIGN.questions[k];
+      var choicesText = "";
+      var correctText = "";
+
+      if (qq.type === "CHOICE") {
+        var cList = [];
+        for (var cIdx = 0; cIdx < qq.choices.length; cIdx++) {
+          cList.push(FORM_MODE === "WITH_WRITTEN" ? getChoiceLabel(qq, cIdx) : (cIdx + 1) + ". " + qq.choices[cIdx]);
+        }
+        choicesText = cList.join("\\n");
+        correctText = FORM_MODE === "WITH_WRITTEN" ? getChoiceLabel(qq, qq.answerIndex) : (qq.answerIndex + 1) + ". " + qq.choices[qq.answerIndex];
+      } else {
+        choicesText = "-";
+        correctText = "（手動採点）";
+      }
+
+      rows.push([k + 1, qq.type === "CHOICE" ? "選択" : "記述", (qq.text || "").toString(), qq.point || "-", choicesText, correctText, (qq.explanation || "").toString()]);
+    }
+
+    if (rows.length > 0) {
+      var baseRows = rows.map(function (row) { return [row[0], row[1], "", row[3], "", "", ""]; });
+      expSheet.getRange(2, 1, rows.length, 7).setValues(baseRows);
+      var questionRich = rows.map(function (row) { return [SpreadsheetApp.newRichTextValue().setText(row[2]).build()]; });
+      var detailRich = rows.map(function (row) {
+        return [4, 5, 6].map(function (idx) { return SpreadsheetApp.newRichTextValue().setText(row[idx]).build(); });
+      });
+      expSheet.getRange(2, 3, rows.length, 1).setRichTextValues(questionRich);
+      expSheet.getRange(2, 5, rows.length, 3).setRichTextValues(detailRich);
+      expSheet.getRange(1, 1, rows.length + 1, 7).setVerticalAlignment("top");
+      expSheet.getRange(2, 3, rows.length, 5).setWrap(true);
+      expSheet.setColumnWidth(1, 40);
+      expSheet.setColumnWidth(2, 60);
+      expSheet.setColumnWidth(3, 240);
+      expSheet.setColumnWidth(4, 50);
+      expSheet.setColumnWidth(5, 200);
+      expSheet.setColumnWidth(6, 140);
+      expSheet.setColumnWidth(7, 260);
+    }
+
+    scoreSheet.setFrozenRows(1);
+
+    var logMsg = "正常に完了しました。 (NEPM Secure Form Builder v" + NEPM_VER + ")\\n" +
+      "【生徒配布用URL】" + form.getPublishedUrl() + "\\n" +
+      "【本番フォーム編集URL】" + form.getEditUrl() + "\\n" +
+      "【採点・回答シートURL】" + ss.getUrl();
+    if (sharedTemplateFile) {
+      logMsg += "\\n【共有教員用テンプレートURL（回答非共有・受付停止済）】" + sharedTemplateFile.getUrl();
+    }
+    console.log(logMsg);
+
+  } catch (e) {
+    console.error("エラーが発生しました: " + e.message);
+    if (form) try { DriveApp.getFileById(form.getId()).setTrashed(true); } catch(_) {}
+    if (ss) try { DriveApp.getFileById(ss.getId()).setTrashed(true); } catch(_) {}
+    if (sharedTemplateFile) try { sharedTemplateFile.setTrashed(true); } catch(_) {}
+    throw e;
+  }
+}
+
+function getChoiceLabel(question, index) {
+  return FORM_MODE === "WITH_WRITTEN" ? "選択肢" + (index + 1) + "：" + question.choices[index] : question.choices[index];
+}
+
+function getColumnLetter(colIndex) {
+  var temp, letter = '';
+  while (colIndex > 0) {
+    temp = (colIndex - 1) % 26;
+    letter = String.fromCharCode(temp + 65) + letter;
+    colIndex = (colIndex - temp - 1) / 26;
+  }
+  return letter;
+}
+
+function validateDesign(design) {
+  if (FORM_MODE !== "CHOICE_ONLY" && FORM_MODE !== "WITH_WRITTEN") throw new Error("検証エラー: FORM_MODEが不正です。");
+  if (!Number.isInteger(TARGET_SCORE) || TARGET_SCORE <= 0) throw new Error("検証エラー: TARGET_SCOREが不正です。");
+  if (!Number.isInteger(QUESTION_COUNT) || QUESTION_COUNT < 1 || QUESTION_COUNT > 10) throw new Error("検証エラー: QUESTION_COUNTが不正です。");
+  if (!design || typeof design !== "object") throw new Error("検証エラー: DESIGNデータが不適切です。");
+  if (!Array.isArray(design.questions) || design.questions.length === 0) throw new Error("検証エラー: 設問がありません。");
+  if (design.questions.length !== QUESTION_COUNT) throw new Error("設問数(" + design.questions.length + "問)が指定問題数(" + QUESTION_COUNT + "問)と一致しません。");
+
+  var writtenCount = 0;
+  var totalPoints = 0;
+
+  for (var i = 0; i < design.questions.length; i++) {
+    var q = design.questions[i];
+    var qNo = i + 1;
+    if (!q) throw new Error("問" + qNo + " のデータが不正です。");
+    if (typeof q.text !== "string" || q.text.trim() === "") throw new Error("問" + qNo + " の問題文が空です。");
+    if (typeof q.explanation !== "string" || q.explanation.trim() === "") throw new Error("問" + qNo + " の解説(explanation)が空です。");
+    if (typeof q.point !== "number" || q.point <= 0 || !Number.isInteger(q.point)) throw new Error("問" + qNo + " の配点(point)が不正です。");
+    totalPoints += q.point;
+
+    if (q.type === "WRITTEN") {
+      writtenCount++;
+      if (i !== design.questions.length - 1) throw new Error("記述問題は最後の設問に配置してください。");
+    } else if (q.type === "CHOICE") {
+      if (!Array.isArray(q.choices) || q.choices.length < 2 || q.choices.length > 5) throw new Error("問" + qNo + " の選択肢数は2〜5個にしてください。");
+      if (!Number.isInteger(q.answerIndex) || q.answerIndex < 0 || q.answerIndex >= q.choices.length) throw new Error("問" + qNo + " の正答位置(answerIndex)が不正です。");
+
+      var seen = new Set();
+      for (var c = 0; c < q.choices.length; c++) {
+        var ch = q.choices[c];
+        if (typeof ch !== "string" || ch.trim() === "") throw new Error("問" + qNo + " の選択肢" + (c + 1) + "が空です。");
+        if (ch !== ch.trim()) throw new Error("問" + qNo + " の選択肢" + (c + 1) + "の前後に空白があります。");
+        var key = ch.toLowerCase();
+        if (seen.has(key)) throw new Error("問" + qNo + " の選択肢に重複があります。");
+        seen.add(key);
+      }
+    } else {
+      throw new Error("問" + qNo + " の設問種別(type)が不正です。");
+    }
+  }
+
+  if (totalPoints !== TARGET_SCORE) throw new Error("配点合計(" + totalPoints + "点)が目標満点(" + TARGET_SCORE + "点)と一致しません。");
+  if (FORM_MODE === "CHOICE_ONLY" && writtenCount > 0) throw new Error("CHOICE_ONLYモードに記述問題が含まれています。");
+  if (FORM_MODE === "WITH_WRITTEN" && writtenCount !== 1) throw new Error("WITH_WRITTENモードには記述問題が厳密に1問必要です。");
+}
+\`\`\`
+`;
+
+const form = document.getElementById('maker');
+const result = document.getElementById('result');
+const preview = document.getElementById('preview');
+const copyBtn = document.getElementById('copyBtn');
+const previewBtn = document.getElementById('previewBtn');
+const copyStatus = document.getElementById('copyStatus');
+
+function collectCurrentParams() {
+  const writtenMode = document.querySelector('input[name="written_mode"]:checked').value;
+  const grade = document.querySelector('input[name="grade"]:checked').value;
+  const subject = document.getElementById('subject').value;
+  const unit = document.getElementById('unit').value.trim();
+  const purpose = document.querySelector('input[name="purpose"]:checked').value;
+  const source = document.querySelector('input[name="source"]:checked').value;
+  const qCount = Number(document.querySelector('input[name="q_count"]:checked').value);
+  const score = Number(document.getElementById('score').value);
+  const time = document.getElementById('time_range').value;
+  const teacherIntent = document.getElementById('teacher_intent').value.trim();
+  const additionalInstruction = document.getElementById('additional_instruction').value.trim();
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+  const title = `${dateStr} ${subject} ${unit} テスト`;
+  return { writtenMode, grade, subject, unit, purpose, source, time, score, qCount, dateStr, title, teacherIntent, additionalInstruction };
+}
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const p = collectCurrentParams();
+
+  if (rosterMode() === 'WITH_ROSTER') {
+    if (!parsedRoster.length) {
+      apiRequested = false;
+      return alert('先にSTEP 0で名簿テンプレートを読み込んでください。（名簿を使わない場合は「名簿なし（簡易モード）」を選んでください）');
+    }
+    if (!classSelect.value) {
+      apiRequested = false;
+      classSelect.focus();
+      return alert('STEP 0で対象クラスを選択してください。');
+    }
+    if (!parsedRoster.some(r => r.role === '回答者' && r.grade === p.grade && r.className === classSelect.value)) {
+      apiRequested = false;
+      return alert('選択した学年・クラスに回答者がいません。名簿を確認してください。');
+    }
+  }
+  if (!p.subject || !p.unit) {
+    apiRequested = false;
+    return alert('教科と単元を入力してください。');
+  }
+  if (!Number.isInteger(p.score) || p.score < p.qCount) {
+    apiRequested = false;
+    return alert('目標満点は問題数以上の整数を入力してください。');
+  }
+
+  clearMergedOutput();
+  lastManualParams = p;
+
+  if (apiRequested) { apiRequested = false; setManualUI(false); startApi(p); return; }
+  setManualUI(true);
+
+  // AIに送信するプロンプトには名簿・クラス名は渡さない（物理遮断）
+  payload = `# NEPM 作問Web＋ 配信フォーム自動作成 パッケージ
+Web UI Version: ${NEPM_VERSION.version}
+Date: ${p.dateStr}
+Written Mode: ${p.writtenMode}
+Grade: ${p.grade}
+Subject: ${p.subject}
+Unit: ${p.unit}
+Total Score: ${p.score}
+Time Range: ${p.time} minutes
+Total Item Count: ${p.qCount}
+Exam Purpose: ${p.purpose}
+Source Depth: ${p.source}
+${p.teacherIntent ? 'Teacher Intent: ' + p.teacherIntent + '\n' : ''}${p.additionalInstruction ? 'Additional Instruction: ' + p.additionalInstruction + '\n' : ''}---
+
+${getTemplateGAS(p.title, p.writtenMode, p.score, p.qCount, p.grade)}
+
+---
+## 実行開始指示
+上記パラメータを入力値として使用し、連続した作問フローを開始してください。
+
+### 名簿・権限要件（必須）
+- ROSTERには、選択された Target Grade / Target Class の role が「回答者」の人だけが後からローカル合成されます。全学年・全クラスの名簿をGASへ含めてはいけません。
+- SHEET_EDITOR_EMAILSには、対象学年・教科に該当する「採点者」と「管理者」のメールアドレスだけが入ります。
+- FORM_EDITOR_EMAILSには、SHEET_EDITOR_EMAILSと同じ採点者・管理者を設定します。
+- SHARE_TEACHER_EMAILSには、対象学年・教科・共有先クラスが合致する「共有教員」のメールアドレスだけが入ります。
+- 本番回答フォームおよび採点用スプレッドシートは、指定された採点者・管理者にのみ共有し、回答者や共有教員には共有しないでください。
+- 共有教員には、回答データを含まない配布用テンプレートのコピーのみを共有してください。
+- 名簿の氏名・メールアドレスを含む完成コードをAIサービスへ再送信しないでください。`;
+
+  preview.textContent = payload;
+  result.style.display = 'block';
+  copyStatus.textContent = '';
+  result.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+async function copyPayload() {
+  if (!payload) return;
+  try {
+    await navigator.clipboard.writeText(payload);
+    copyStatus.textContent = '✓ 作成データをコピーしました。これは作問条件と空の名簿枠のみです。';
+  } catch (_) {
+    copyStatus.textContent = '自動コピーできませんでした。「実行パッケージの内容を確認」を開き手動でコピーしてください。';
+    preview.hidden = false;
+  }
+}
+
+copyBtn.addEventListener('click', copyPayload);
+previewBtn.addEventListener('click', () => {
+  preview.hidden = !preview.hidden;
+});
+
+// ------------------------------------------------------------
+// ローカル合体（マージ）処理エンジン（手動・API共通の安全なテンプレート再構築）
+// ------------------------------------------------------------
+const geminiGasInput = document.getElementById('gemini_gas_input');
+const mergeBtn = document.getElementById('mergeBtn');
+const mergedResultBox = document.getElementById('merged_result_box');
+const mergedGasOutput = document.getElementById('merged_gas_output');
+const copyMergedBtn = document.getElementById('copyMergedBtn');
+const copyMergedStatus = document.getElementById('copyMergedStatus');
+
+function stripCodeFences(rawText) {
+  const trimmed = String(rawText || '').trim();
+  const fenced = trimmed.match(/```(?:javascript|js)?\s*\n([\s\S]*?)\n```/i);
+  if (fenced) return fenced[1].trim();
+  return trimmed.replace(/^```(?:javascript|js)?\s*/i, '').replace(/\s*```$/, '').trim();
+}
+
+// JavaScriptオブジェクトリテラル風の文字列（キーの引用符なし・単引用符・末尾カンマ・コメント）を、
+// コードを実行せずに文字単位で厳密JSONへ変換して読み取る（eval/Function不使用）
+function relaxedParse(text) {
+  const src = String(text || '');
+  const n = src.length;
+  let out = '', i = 0;
+  const unescapeJs = (body) => {
+    let r = '';
+    for (let k = 0; k < body.length; k++) {
+      const c = body[k];
+      if (c !== '\\') { r += c; continue; }
+      const d = body[++k];
+      if (d === 'n') r += '\n';
+      else if (d === 't') r += '\t';
+      else if (d === 'r') r += '\r';
+      else if (d === 'b') r += '\b';
+      else if (d === 'f') r += '\f';
+      else if (d === 'u' && /^[0-9a-fA-F]{4}$/.test(body.substr(k + 1, 4))) { r += String.fromCharCode(parseInt(body.substr(k + 1, 4), 16)); k += 4; }
+      else if (d === '\n') { /* 行継続 */ }
+      else r += d;
+    }
+    return r;
+  };
+  while (i < n) {
+    const c = src[i];
+    if (c === '"' || c === "'" || c === '`') {
+      let j = i + 1;
+      while (j < n && src[j] !== c) { if (src[j] === '\\') j++; j++; }
+      if (j >= n) throw new Error('文字列が閉じられていません');
+      out += JSON.stringify(unescapeJs(src.slice(i + 1, j)));
+      i = j + 1;
+    } else if (c === '/' && src[i + 1] === '/') {
+      while (i < n && src[i] !== '\n') i++;
+    } else if (c === '/' && src[i + 1] === '*') {
+      const e = src.indexOf('*/', i + 2);
+      if (e === -1) throw new Error('コメントが閉じられていません');
+      i = e + 2;
+    } else if (/[0-9]/.test(c) || (c === '-' && /[0-9]/.test(src[i + 1] || ''))) {
+      const mm = src.slice(i).match(/^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/);
+      out += mm[0]; i += mm[0].length;
+    } else if (/[A-Za-z_$]/.test(c)) {
+      const mm = src.slice(i).match(/^[A-Za-z_$][A-Za-z0-9_$]*/);
+      const id = mm[0];
+      let k = i + id.length;
+      while (k < n && /\s/.test(src[k])) k++;
+      if (src[k] === ':') out += JSON.stringify(id);
+      else if (id === 'true' || id === 'false' || id === 'null') out += id;
+      else throw new Error('想定外の記述: ' + id);
+      i += id.length;
+    } else if (c === ',') {
+      let k = i + 1;
+      while (k < n && /\s/.test(src[k])) k++;
+      if (src[k] === '}' || src[k] === ']') { i++; } else { out += ','; i++; }
+    } else {
+      out += c; i++;
+    }
+  }
+  return JSON.parse(out);
+}
+
+// 貼り付けられたGASコードまたはJSONから DESIGN オブジェクトのみを安全に抽出
+function extractDesignFromCode(codeText) {
+  const m = codeText.match(/(?:const|let|var)\s+DESIGN\s*=\s*(\{[\s\S]*?\})\s*;\s*(?:function\s+createFormAndSheet|\/\*|\/\/|$)/);
+  if (m) {
+    try {
+      return relaxedParse(m[1]);
+    } catch (_) {}
+  }
+  const startIdx = codeText.search(/(?:const|let|var)\s+DESIGN\s*=\s*\{/);
+  if (startIdx !== -1) {
+    const braceStart = codeText.indexOf('{', startIdx);
+    let depth = 0, inStr = false, quote = '', esc = false;
+    for (let i = braceStart; i < codeText.length; i++) {
+      const ch = codeText[i];
+      if (inStr) {
+        if (esc) { esc = false; }
+        else if (ch === '\\') { esc = true; }
+        else if (ch === quote) { inStr = false; }
+      } else {
+        if (ch === '"' || ch === "'" || ch === '`') { inStr = true; quote = ch; }
+        else if (ch === '{') { depth++; }
+        else if (ch === '}') {
+          depth--;
+          if (depth === 0) {
+            const candidate = codeText.slice(braceStart, i + 1);
+            try { return relaxedParse(candidate); } catch (_) {}
+            break;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function executeLocalMerge(rawInputCode, explicitDesign, explicitParams) {
+  const noRoster = rosterMode() === 'NO_ROSTER';
+  if (!noRoster) {
+    if (!parsedRoster.length) { alert('先に名簿テンプレートを読み込んでください。'); return false; }
+    if (!classSelect.value) { alert('対象クラスを選択してください。'); return false; }
+  }
+
+  const p = explicitParams || lastManualParams || collectCurrentParams();
+  const uiGrade = currentGrade();
+  if (p.grade && p.grade !== uiGrade) {
+    if (!confirm(`作成データ生成時の学年（${p.grade}）と現在選択中の学年（${uiGrade}）が異なります。
+現在選択中の「${noRoster ? uiGrade : uiGrade + ' ' + classSelect.value}」で合体してよろしいですか？`)) {
+      return false;
+    }
+  }
+  const targetGrade = uiGrade;
+  const targetClass = noRoster ? '' : classSelect.value;
+  const subject = (document.getElementById('subject').value || p.subject || '').trim();
+
+  const targetRespondents = noRoster ? [] : parsedRoster.filter(r =>
+    r.role === '回答者' && r.grade === targetGrade && r.className === targetClass
+  );
+  if (!noRoster && !targetRespondents.length) {
+    alert('選択された学年・クラスに回答者がいません。名簿と対象クラスを確認してください。');
+    return false;
+  }
+
+  let designObj = explicitDesign || null;
+  if (!designObj) {
+    const inputCode = stripCodeFences(rawInputCode);
+    if (!inputCode) { alert('Geminiが出力したGASコードを貼り付けてください。'); return false; }
+    designObj = extractDesignFromCode(inputCode);
+    if (!designObj) {
+      alert('貼り付けられたコードから有効な設問データ（const DESIGN = {...}）を検出できませんでした。Geminiが出力した完成版GASコード全文を貼り付けてください。');
+      return false;
+    }
+    designObj = sanitizeDesign(designObj);
+    const vErr = validateDesignJS(designObj, p);
+    if (vErr) {
+      alert('貼り付けられた設問データの検査で不備が見つかりました：\n' + vErr + '\n\nGeminiに修正を指示してから再度貼り付けてください。');
+      return false;
+    }
+  }
+
+  // AIが出力した関数本体は使わず、常にブラウザ内の検証済み固定GASテンプレートから安全に再構築する
+  let merged = '';
+  try {
+    merged = buildGasFromDesign(p, designObj);
+  } catch (err) {
+    alert(err.message);
+    return false;
+  }
+
+  const targetGraders = noRoster ? [] : parsedRoster.filter(r =>
+    r.role === '採点者' && (!r.grade || r.grade === targetGrade) && (!r.subject || r.subject === subject)
+  );
+  const targetAdmins = noRoster ? [] : parsedRoster.filter(r => r.role === '管理者');
+  const targetShareTeachers = noRoster ? [] : parsedRoster.filter(r =>
+    isShareTeacherMatched(r, targetGrade, targetClass, subject)
+  );
+
+  // GAS側へ埋め込むROSTERからは内部フラグ(autoNumbered)を除外して出力
+  const cleanRespondents = targetRespondents.map(({grade, className, number, name, email, role, subject, shareTo}) => ({
+    grade, className, number, name, email, role, subject, shareTo
+  }));
+  const rosterJson = JSON.stringify(cleanRespondents);
+  const sheetEditors = [...new Set([...targetGraders, ...targetAdmins].map(r => r.email).filter(Boolean))];
+  const sheetEditorJson = JSON.stringify(sheetEditors);
+  const formEditorJson = JSON.stringify(sheetEditors);
+  const shareTeacherJson = JSON.stringify([...new Set(targetShareTeachers.map(r => r.email).filter(Boolean))]);
+
+  function replaceEmptyArrayConstant(source, constantName, value) {
+    const targetLine = `const ${constantName} = [];`;
+    if (source.includes(targetLine)) {
+      return source.replace(targetLine, () => `const ${constantName} = ${value};`);
+    }
+    return `const ${constantName} = ${value};\n` + source;
+  }
+
+  merged = replaceEmptyArrayConstant(merged, 'ROSTER', rosterJson);
+  merged = replaceEmptyArrayConstant(merged, 'FORM_EDITOR_EMAILS', formEditorJson);
+  merged = replaceEmptyArrayConstant(merged, 'SHEET_EDITOR_EMAILS', sheetEditorJson);
+  merged = replaceEmptyArrayConstant(merged, 'SHARE_TEACHER_EMAILS', shareTeacherJson);
+  merged = merged.replace('const TARGET_GRADE = ' + JSON.stringify(p.grade || '高1') + ';', () => 'const TARGET_GRADE = ' + JSON.stringify(targetGrade) + ';');
+  merged = merged.replace('const TARGET_CLASS = "";', () => 'const TARGET_CLASS = ' + JSON.stringify(targetClass) + ';');
+
+  mergedGasOutput.textContent = merged;
+  mergedResultBox.style.display = 'block';
+  copyMergedStatus.textContent = '';
+  mergedResultBox.scrollIntoView({behavior:'smooth', block:'start'});
+  return true;
+}
+
+mergeBtn.addEventListener('click', () => {
+  executeLocalMerge(geminiGasInput.value, null, null);
+});
+
+copyMergedBtn.addEventListener('click', async () => {
+  const code = mergedGasOutput.textContent;
+  if (!code) return;
+  try {
+    await navigator.clipboard.writeText(code);
+    copyMergedStatus.textContent = rosterMode() === 'NO_ROSTER'
+      ? '✓ GASコードをコピーしました。Apps Scriptへ貼り付ける前に内容を確認してください。'
+      : '✓ GASコードをコピーしました。コードには名簿情報が含まれます。安全な場所で扱い、AIサービスへ再送信しないでください。Apps Scriptへ貼り付ける前に内容を確認してください。';
+  } catch(_) {
+    copyMergedStatus.textContent = '手動で上のコードを選択してコピーしてください。';
+  }
+});
+
+// ------------------------------------------------------------
+// API自動作問（Gemini）。名簿は一切送らない。キーは保存しない。
+// ------------------------------------------------------------
+const apiKeyEl = document.getElementById('api_key');
+const apiModelEl = document.getElementById('api_model');
+const fetchModelsBtn = document.getElementById('fetchModelsBtn');
+const modelFetchStatusEl = document.getElementById('model_fetch_status');
+const geminiModelsListEl = document.getElementById('gemini_models');
+const apiResultEl = document.getElementById('apiResult');
+const apiStatusEl = document.getElementById('api_status');
+const apiReviewEl = document.getElementById('api_review');
+const apiReviseEl = document.getElementById('api_revise');
+const apiApproveBtn = document.getElementById('api_approve');
+const apiBtns = ['apiBtn', 'api_regen', 'api_approve'].map(id => document.getElementById(id));
+
+// 進捗は通信の実測％ではなく、実際に通過した処理段階を表示する。
+const apiProgressEl = document.getElementById('api_progress');
+const apiProgressTitle = document.getElementById('api_progress_title');
+const apiProgressDetail = document.getElementById('api_progress_detail');
+const apiProgressClock = document.getElementById('api_progress_clock');
+const apiProgressTrack = apiProgressEl.querySelector('[role="progressbar"]');
+const apiProgressStages = ['prepare','request','parse','validate','review'];
+let apiProgressTimer = null, apiProgressStarted = 0;
+function stopApiProgressTimer() {
+  if (apiProgressTimer !== null) clearInterval(apiProgressTimer);
+  apiProgressTimer = null;
+}
+function setApiProgress(stage, detail, state) {
+  apiProgressEl.hidden = false;
+  apiProgressEl.classList.toggle('is-done', state === 'done');
+  apiProgressEl.classList.toggle('is-error', state === 'error');
+  const idx = apiProgressStages.indexOf(stage);
+  apiProgressStages.forEach((key,i) => {
+    const li = apiProgressEl.querySelector('[data-stage="' + key + '"]');
+    li.classList.toggle('is-current', i === idx && state !== 'done' && state !== 'error');
+    li.classList.toggle('is-passed', i < idx || (state === 'done' && i <= idx));
+  });
+  const titles = {prepare:'作問条件を確認しています',request:'Geminiからの応答を待っています',parse:'AIの回答を解析しています',validate:'問題・配点を検査しています',review:'先生の確認をお待ちしています'};
+  apiProgressTitle.textContent = state === 'error' ? '作問処理を完了できませんでした' : (titles[stage] || '処理中');
+  apiProgressDetail.textContent = detail || '';
+  apiProgressTrack.setAttribute('aria-valuetext', state === 'done' ? '作問と形式検査が完了しました' : state === 'error' ? '処理に失敗しました' : titles[stage] || '処理中');
+  if (state === 'done' || state === 'error') stopApiProgressTimer();
+}
+function beginApiProgress() {
+  stopApiProgressTimer();
+  apiProgressStarted = Date.now();
+  apiProgressClock.textContent = '経過 0秒';
+  apiProgressTimer = setInterval(() => {
+    apiProgressClock.textContent = '経過 ' + Math.floor((Date.now() - apiProgressStarted)/1000) + '秒';
+  }, 1000);
+  setApiProgress('prepare','選択した条件をもとに作問を始めます。');
+}
+function hideApiProgress() {
+  stopApiProgressTimer();
+  apiProgressEl.hidden = true;
+  apiProgressEl.classList.remove('is-done','is-error');
+  apiProgressDetail.textContent = '';
+}
+
+
+// APIキーを使って現在利用可能なGeminiモデル一覧を取得
+async function fetchAvailableModels() {
+  const key = apiKeyEl.value.trim();
+  if (!key) { apiKeyEl.focus(); return alert('先にGemini APIキーを入力してください。'); }
+  fetchModelsBtn.disabled = true;
+  modelFetchStatusEl.textContent = '利用可能なモデル一覧を取得中…';
+  try {
+    const apiBase = 'https:' + '//generativelanguage.googleapis.com/v1beta/models';
+    const res = await fetch(apiBase, { headers: { 'x-goog-api-key': key } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const models = (data.models || [])
+      .filter(m => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes('generateContent'))
+      .map(m => String(m.name || '').replace(/^models\//, ''))
+      .filter(name => /^gemini-/i.test(name) && !/embedding|vision|imagen|aqa|tts|audio/i.test(name));
+    if (!models.length) throw new Error('generateContent対応モデルが見つかりませんでした');
+    geminiModelsListEl.innerHTML = '';
+    models.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      geminiModelsListEl.appendChild(opt);
+    });
+    const currentVal = apiModelEl.value.trim();
+    if (!models.includes(currentVal)) {
+      const preferred = models.find(m => /flash/i.test(m) && !/lite|8b/i.test(m)) || models[0];
+      apiModelEl.value = preferred;
+      modelFetchStatusEl.textContent = `✓ ${models.length}件のモデルを取得し、利用可能な「${preferred}」を自動選択しました。`;
+    } else {
+      modelFetchStatusEl.textContent = `✓ ${models.length}件の利用可能モデルを取得しました（現在の「${currentVal}」は有効です）。`;
+    }
+  } catch (e) {
+    modelFetchStatusEl.textContent = '⚠️ モデル一覧の取得に失敗しました（' + e.message + '）。キーやネットワークを確認してください。';
+  } finally {
+    fetchModelsBtn.disabled = false;
+  }
+}
+fetchModelsBtn.addEventListener('click', fetchAvailableModels);
+
+function setManualUI(show) {
+  ['#result .guide', '#copyBtn', '#copyStatus', '#previewBtn', '#preview', '#gemini_gas_input', '#mergeBtn', '#mergeHint'].forEach(sel => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    if (sel === '#preview') { if (!show) el.hidden = true; return; }
+    el.style.display = show ? '' : 'none';
+  });
+  if (show) apiResultEl.style.display = 'none';
+}
+function clearApiState() {
+  apiKeyEl.value = '';
+  apiReviseEl.value = '';
+  apiState = { p: null, design: null, regenFailed: false };
+  apiReviewEl.textContent = '';
+  apiStatusEl.textContent = '';
+  hideApiProgress();
+  apiResultEl.style.display = 'none';
+  setApiBusy(false, '');
+}
+function setApiBusy(busy, msg) {
+  apiBtns.forEach(b => { if (b) b.disabled = busy; });
+  if (!busy && (!apiState || !apiState.design)) {
+    apiApproveBtn.disabled = true;
+  }
+  apiStatusEl.textContent = msg || '';
+}
+
+const API_SYSTEM = `あなたは高校教員のための作問アシスタントです。出力は次の形式のJSONだけにしてください（前置き・説明・コードブロックは不要）。
+{"questions":[{"type":"CHOICE","text":"問題文","choices":["選択肢1","選択肢2","選択肢3","選択肢4"],"answerIndex":0,"point":10,"explanation":"解説"},{"type":"WRITTEN","text":"問題文","point":10,"explanation":"模範解答と採点基準"}]}
+ルール:
+- questionsの要素数は指定された問題数と必ず一致させる。
+- CHOICEの選択肢は4つを基本とし、空文字・前後の空白・改行・重複（大文字小文字違いを含む）を作らない。選択肢に「A.」「1.」などのラベルは付けない。
+- answerIndexは0始まりの整数で、特定の位置に偏らせずランダムに配置する。
+- すべての設問にexplanation（空文字不可）とpoint（1以上の整数）を付け、pointの合計を指定された満点と必ず一致させる。
+- 記述ありの場合は、記述問題(type:"WRITTEN")を厳密に1問、最後に置く。記述の配点は満点の2〜4割程度のキリの良い数字を目安にし、満点が小さい場合は各設問1点以上で合計一致を優先する。端数は難易度の高い選択問題で吸収する。
+- 記述なしの場合は、すべてtype:"CHOICE"にする。
+- 正答と解説は正確にし、不確かな内容は出題しない。改行は文字列内で\\nと書く。`;
+
+function buildUserPrompt(p, prev, revision, err) {
+  let s = `作問条件:
+- 学年: ${p.grade}
+- 教科: ${p.subject}
+- 単元・テーマ: ${p.unit}
+- テストの方向性: ${p.purpose}
+- 出題範囲・深さ: ${p.source}
+- 想定時間: ${p.time}分
+- 問題数: ${p.qCount}問
+- 満点: ${p.score}点
+- 構成: ${p.writtenMode === 'WITH_WRITTEN' ? '選択問題' + (p.qCount - 1) + '問＋記述問題1問（最後）' : '全問選択問題'}
+`;
+  if (p.teacherIntent) s += `- 先生のねらい: ${p.teacherIntent}
+`;
+  if (p.additionalInstruction) s += `- 追加指示: ${p.additionalInstruction}
+`;
+  if (prev) s += `
+現在の問題案(JSON):
+${JSON.stringify(prev)}
+`;
+  if (revision) s += `
+先生からの修正指示: ${revision}
+指示を反映し、全体をJSONで出力し直してください。
+`;
+  if (err) s += `
+前回の出力は次の検査に失敗しました。修正してください: ${err}
+`;
+  return s;
+}
+
+async function callGemini(userText, signal) {
+  const key = apiKeyEl.value.trim();
+  const model = apiModelEl.value.trim();
+  const apiBase = 'https:' + '//generativelanguage.googleapis.com/v1beta/models/';
+  const res = await fetch(apiBase + encodeURIComponent(model) + ':generateContent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+    signal,
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: API_SYSTEM }] },
+      contents: [{ role: 'user', parts: [{ text: userText }] }],
+      generationConfig: { responseMimeType: 'application/json', temperature: 0.7 }
+    })
+  });
+  if (!res.ok) {
+    let m = '';
+    try { m = (await res.json()).error.message; } catch (_) {}
+    if (res.status === 404) {
+      throw new Error('指定されたモデル名「' + model + '」が見つかりません（廃止または名称誤り）。モデル名欄の「🔄 利用可能モデルを取得」ボタンを押して現行モデルを選択してください。詳細: ' + m);
+    }
+    throw new Error('APIエラー(' + res.status + ')：' + m);
+  }
+  const j = await res.json();
+  const candidate = (j.candidates || [])[0] || {};
+  const parts = (candidate.content || {}).parts || [];
+  const nonThoughtParts = parts.filter(x => !x.thought);
+  const t = (nonThoughtParts.length ? nonThoughtParts : parts).map(x => x.text || '').join('');
+  if (!t) {
+    const reason = candidate.finishReason || (j.promptFeedback && j.promptFeedback.blockReason) || '不明';
+    throw new Error('AIの応答が空でした（理由: ' + reason + '）。');
+  }
+  return t;
+}
+
+function parseDesignJson(rawText) {
+  const cleaned = String(rawText || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (_) {
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
+    }
+    throw new Error('JSON parse failed');
+  }
+}
+
+function sanitizeDesign(d) {
+  if (!d || !Array.isArray(d.questions)) return null;
+  return { questions: d.questions.map(q => {
+    const base = {
+      type: q && q.type,
+      text: String((q && q.text) || '').trim(),
+      point: Number(q && q.point),
+      explanation: String((q && q.explanation) || '').trim()
+    };
+    if (q && q.type === 'CHOICE') {
+      return {
+        type: 'CHOICE',
+        text: base.text,
+        choices: Array.isArray(q.choices) ? q.choices.map(c => String(c || '').replace(/[\r\n]+/g, ' ').trim()) : [],
+        answerIndex: Number(q.answerIndex),
+        point: base.point,
+        explanation: base.explanation
+      };
+    }
+    return base;
+  }) };
+}
+
+// GAS側 validateDesign と同等の事前検査
+function validateDesignJS(d, p) {
+  if (!d || !Array.isArray(d.questions)) return 'questions配列がありません。';
+  if (d.questions.length !== p.qCount) return '設問数が' + d.questions.length + '問で、指定の' + p.qCount + '問と一致しません。';
+  let total = 0, written = 0;
+  for (let i = 0; i < d.questions.length; i++) {
+    const q = d.questions[i], n = i + 1;
+    if (!q.text) return '問' + n + 'の問題文が空です。';
+    if (!q.explanation) return '問' + n + 'の解説が空です。';
+    if (!Number.isInteger(q.point) || q.point <= 0) return '問' + n + 'の配点が1以上の整数ではありません。';
+    total += q.point;
+    if (q.type === 'WRITTEN') {
+      written++;
+      if (i !== d.questions.length - 1) return '記述問題は最後の設問（問' + p.qCount + '）に配置してください。';
+    } else if (q.type === 'CHOICE') {
+      if (!Array.isArray(q.choices) || q.choices.length < 2 || q.choices.length > 5) return '問' + n + 'の選択肢は2〜5個にしてください。';
+      const seen = new Set();
+      for (const c of q.choices) {
+        if (!c) return '問' + n + 'に空の選択肢があります。';
+        const k = c.toLowerCase();
+        if (seen.has(k)) return '問' + n + 'の選択肢に重複があります。';
+        seen.add(k);
+      }
+      if (!Number.isInteger(q.answerIndex) || q.answerIndex < 0 || q.answerIndex >= q.choices.length) return '問' + n + 'のanswerIndexが不正です。';
+    } else return '問' + n + 'のtypeが不正です。';
+  }
+  if (total !== p.score) return '配点の合計が' + total + '点で、満点' + p.score + '点と一致しません。';
+  if (p.writtenMode === 'CHOICE_ONLY' && written !== 0) return '記述問題を含めないでください。';
+  if (p.writtenMode === 'WITH_WRITTEN' && written !== 1) return '記述問題は厳密に1問にしてください。';
+  return '';
+}
+
+async function generateDesign(revision) {
+  const p = apiState.p;
+  if (!p) return;
+  if (apiAbortController) { try { apiAbortController.abort(); } catch(_) {} }
+  const controller = new AbortController();
+  apiAbortController = controller;
+
+  const prevDesignBackup = apiState.design;
+  apiState.design = null;
+  apiState.regenFailed = false;
+  clearMergedOutput();
+
+  let err = '';
+  beginApiProgress();
+  setApiBusy(true, 'AIに作問を依頼中です…（通信状況により時間がかかります）');
+  try {
+    for (let i = 0; i < 3; i++) {
+      setApiProgress('request', '試行 ' + (i + 1) + '/3：Geminiへ送信済み。応答を待っています。');
+      const txt = await callGemini(buildUserPrompt(p, prevDesignBackup, revision, err), controller.signal);
+      if (controller.signal.aborted) return;
+      setApiProgress('parse', '試行 ' + (i + 1) + '/3：受信した回答をJSONとして解析します。');
+      let d;
+      try { d = parseDesignJson(txt); }
+      catch (_) { err = 'JSONとして解釈できませんでした。JSONだけを出力してください。'; setApiProgress('request', '試行 ' + (i + 1) + '/3：JSON形式に不備。再作問します。'); continue; }
+      d = sanitizeDesign(d);
+      setApiProgress('validate', '試行 ' + (i + 1) + '/3：設問数・配点・正答・選択肢の形式を検査します。');
+      const v = validateDesignJS(d, p);
+      if (v) { err = v; setApiProgress('request', '試行 ' + (i + 1) + '/3：検査で不備（' + v + '）。再作問します。'); setApiBusy(true, '検査で不備を検出（' + v + '）。AIにやり直させています…'); continue; }
+      apiState.design = d;
+      apiState.regenFailed = false;
+      renderReview(d, p);
+      setApiProgress('review', '設問の形式検査が完了しました。内容・正答・解説を先生が確認してください。', 'done');
+      setApiBusy(false, '✓ 検査を通過しました。問題・正答・配点・解説を確認し、問題なければ承認してください。');
+      return;
+    }
+    throw new Error('3回試しても検査を通りませんでした：' + err);
+  } catch (e) {
+    if (e && e.name === 'AbortError') { hideApiProgress(); return; }
+    apiState.design = prevDesignBackup;
+    apiState.regenFailed = Boolean(prevDesignBackup);
+    const restoreNote = prevDesignBackup ? '（※下の表示は作り直し前の問題案のままです）' : '';
+    setApiProgress('validate', '処理を終了しました：' + e.message + ' ' + restoreNote, 'error');
+    setApiBusy(false, '⚠️ ' + e.message + ' ' + restoreNote);
+  } finally {
+    if (apiAbortController === controller) apiAbortController = null;
+  }
+}
+
+function renderReview(d, p) {
+  apiReviewEl.textContent = '';
+  const add = (tag, text, parent, style) => { const el = document.createElement(tag); el.textContent = text; if (style) el.style.cssText = style; (parent || apiReviewEl).appendChild(el); return el; };
+  add('div', '【作問モード】' + (p.writtenMode === 'WITH_WRITTEN' ? '記述あり（スプレッドシート半自動採点）' : '選択問題のみ（フォームクイズ自動採点）'), null, 'font-weight:800;margin-bottom:8px');
+  let total = 0;
+  d.questions.forEach((q, i) => {
+    total += q.point;
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#f7f9fc;border-radius:10px;padding:10px 12px;margin:8px 0';
+    add('div', '問' + (i + 1) + '（' + (q.type === 'CHOICE' ? '選択' : '記述') + '・' + q.point + '点）', box, 'font-weight:800');
+    add('div', q.text, box, 'white-space:pre-wrap;margin:4px 0');
+    if (q.type === 'CHOICE') q.choices.forEach((c, j) => add('div', (j === q.answerIndex ? '✅ ' : '  ') + (j + 1) + '. ' + c, box, j === q.answerIndex ? 'font-weight:700;color:#0f766e' : ''));
+    add('div', '解説：' + q.explanation, box, 'white-space:pre-wrap;font-size:.88rem;color:var(--muted);margin-top:4px');
+    apiReviewEl.appendChild(box);
+  });
+  add('div', '問題数：' + d.questions.length + '問／配点合計：' + total + '点（指定 ' + p.score + '点）', null, 'font-weight:700');
+}
+
+function startApi(p) {
+  apiState = { p, design: null, regenFailed: false };
+  apiReviewEl.textContent = '';
+  apiReviseEl.value = '';
+  document.getElementById('result').style.display = 'none';
+  apiResultEl.style.display = 'block';
+  apiResultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  generateDesign('');
+}
+
+function buildGasFromDesign(p, design) {
+  const m = getTemplateGAS(p.title, p.writtenMode, p.score, p.qCount, p.grade).match(/```javascript\n([\s\S]*?)\n```/);
+  if (!m) throw new Error('GASテンプレートを取り出せませんでした。');
+  const re = /const DESIGN = \{[\s\S]*?\n\};/;
+  if (!re.test(m[1])) throw new Error('GASテンプレートのDESIGN部分が見つかりません。');
+  return m[1].replace(re, () => 'const DESIGN = ' + JSON.stringify(design, null, 2) + ';');
+}
+
+document.getElementById('apiBtn').addEventListener('click', () => {
+  if (!apiKeyEl.value.trim()) { apiKeyEl.focus(); return alert('Gemini APIキーを入力してください。'); }
+  if (!apiModelEl.value.trim()) { apiModelEl.focus(); return alert('モデル名を入力してください。'); }
+  apiRequested = true;
+  try { form.requestSubmit(); } finally { apiRequested = false; }
+});
+document.getElementById('api_regen').addEventListener('click', () => {
+  if (!apiState.p) return;
+  generateDesign(apiReviseEl.value.trim());
+  apiReviseEl.value = '';
+});
+document.getElementById('api_approve').addEventListener('click', () => {
+  if (!apiState.p || !apiState.design) return alert('先にAPIで作問を実行してください。');
+  if (apiState.regenFailed) {
+    if (!confirm('直前の「作り直し」がエラーで完了していないため、表示されているのは作り直し前の問題案です。\nこのまま作り直し前の内容で承認してよろしいですか？')) {
+      return;
+    }
+  }
+  setManualUI(false);
+  document.getElementById('result').style.display = 'block';
+  if (executeLocalMerge('', apiState.design, apiState.p)) {
+    geminiGasInput.value = '';
+    apiStatusEl.textContent = '✓ 承認しました。下に完成版GASコード（名簿・権限を合体済み）を出力しました。';
+  }
+});
+</script>
+
+<script>
+// 利用手順書はHTMLに内蔵。GitHub PagesにHTML単体を配置してもダウンロード可能。
+(function(){
+  const embeddedGuide = "JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyAvTmFtZSAvRjEgL1N1YnR5cGUgL1R5cGUxIC9UeXBlIC9Gb250Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9CYXNlRm9udCAvSGVpc2VpS2FrdUdvLVc1IC9EZXNjZW5kYW50Rm9udHMgWyA8PAovQmFzZUZvbnQgL0hlaXNlaUtha3VHby1XNSAvQ0lEU3lzdGVtSW5mbyA8PAovT3JkZXJpbmcgKEphcGFuMSkgL1JlZ2lzdHJ5IChBZG9iZSkgL1N1cHBsZW1lbnQgMgo+PiAvRFcgMTAwMCAvRm9udERlc2NyaXB0b3IgPDwKL0FzY2VudCA3NTIgL0NhcEhlaWdodCA3MzcgL0Rlc2NlbnQgLTIyMSAvRmxhZ3MgNCAvRm9udEJCb3ggWyAtOTIgLTI1MCAxMDEwIDkyMiBdIC9Gb250TmFtZSAvSGVpc2VLYWt1R28tVzUgCiAgL0l0YWxpY0FuZ2xlIDAgL1N0ZW1IIDAgL1N0ZW1WIDExNCAvVHlwZSAvRm9udERlc2NyaXB0b3IgL1hIZWlnaHQgNTUzCj4+IC9TdWJ0eXBlIC9DSURGb250VHlwZTAgL1R5cGUgL0ZvbnQgCiAgL1cgWyAxIFsgMjc3IDMwNSA1MDAgNjY4IDY2OCA5MDYgNzI3IDMwNSA0NDUgNDQ1IAogIDUwOCA2NjggMzA1IDM3OSAzMDUgNTM5IF0gMTcgMjYgNjY4IDI3IFsgMzA1IDMwNSA2NjggNjY4IDY2OCA1NjYgODcxIDcyNyA2MzcgNjUyIAogIDY5OSA1NzQgNTU1IDY3NiA2ODcgMjQyIDQ5MiA2NjQgNTgyIDc4OSAKICA3MDcgNzM0IDU4MiA3MzQgNjA1IDYwNSA2NDEgNjY4IDcyNyA5NDUgCiAgNjA5IDYwOSA1NzQgNDQ1IDY2OCA0NDUgNjY4IDY2OCA1OTAgNTU1IAogIDYwOSA1NDcgNjAyIDU3NCAzOTEgNjA5IDU4MiAyMzQgMjc3IDUzOSAKICAyMzQgODk1IDU4MiA2MDUgNjAyIDYwMiAzODcgNTA4IDQ0MSA1ODIgCiAgNTYyIDc4MSA1MzEgNTcwIDU1NSA0NDkgMjQ2IDQ0OSA2NjggXSAyMzEgNjMyIDUwMCBdCj4+IF0gL0VuY29kaW5nIC9VbmlKSVMtVUNTMi1IIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTAgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0NvbnRlbnRzIDkgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgOCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNSAwIG9iago8PAovQ29udGVudHMgMTAgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgOCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKNiAwIG9iago8PAovUGFnZU1vZGUgL1VzZU5vbmUgL1BhZ2VzIDggMCBSIC9UeXBlIC9DYXRhbG9nCj4+CmVuZG9iago3IDAgb2JqCjw8Ci9BdXRob3IgKFwoYW5vbnltb3VzXCkpIC9DcmVhdGlvbkRhdGUgKEQ6MjAyNjExMDcxMzAyMjgrMDAnMDAnKSAvQ3JlYXRvciAoXCh1bnNwZWNpZmllZFwpKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjExMDcxMzAyMjgrMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIFwob3BlbnNvdXJjZVwpKSAKICAvU3ViamVjdCAoXCh1bnNwZWNpZmllZFwpKSAvVGl0bGUgKFwzNzZcMzc3XDAwME5cMDAwRVwwMDBQXDAwME1cMDAwIE9cXFVPXDAwMFdcMDAwZVwwMDBiXDM3N1wwMTNcMDAwIFJcKXVcKGJLXDIzMFwwMDZmXDM3MFwwMDAgXDAwMFZcMDAwZVwwMDByXDAwMC5cMDAwMVwwMDAuXDAwMDNcMDAwMCkgL1RyYXBwZWQgL0ZhbHNlCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9Db3VudCAyIC9LaWRzIFsgNCAwIFIgNSAwIFIgXSAvVHlwZSAvUGFnZXMKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMjg3OQo+PgpzdHJlYW0KR2F1SE1CbGkkPiZIOk5uVGVIbk4lJSlHcmFUPyZrJEMkalI6N1xzQStXQWVdZkVzP3FIX2YiYGdBWjg9cEg8V05aPVFTI0stRXRXW0ZfYjJZIWBFZjpbaUxJKStBYT1kP2YmRyxcL2EjNzctYGoxdG1rOio4VFc7MS5wYk01PFM9SStkMUpHNFdXUjQ4Xm9RTTVoXzkqaj45MDRbQyw2SlVRcF8ka19bImJkSEdVYlovI2ZnIydCWycvcyM1ZUU5QUpCJzg9V2FvJmtJZjRrWmFGNmI1dFUxPHJqXkEwPWkzbDYqXzsuYmJ0LmFKOGxiJkM1OyRlQ1hVRWJeVnBGKmFNMURqMGRmZzFxSks0VC9mJlpaJkosRitBKCVBQFlyOCprSThVdTMzLytfOGtkcjMhO2BYREkjVWVtWzFaPjRsMydlPFdfR2RURUM2UTZWMShMZ2RYSkp0Z0dPSmFlN3FNUDhMWV9LQjFgUVFQVmVJbjZbK0MsJGlWZVY4XW8qVkhBPzlxMVFZVG8lSXI9KjssTD5pVzUsVStLI00lTVE5dUtCPTY4VzVDOmhwYVpgWjI8N25gYTZobzM/OUwlLT9XSUlPOkpNSU4lYiZkaFZyVkdgNy0oYHQ1ZWRCNy5WWnRbOG0qdFhqMyQvUyVZLiZjXVdmLGo6cUBqaTc5X3I7PS9XJ1I5cDVYQzIoL2Y9S2JNZ0xwLl9JQkVWO15pNXMsbWVXUEtbWyldS106UDYzJk1TOzklQ20wXGQkdC5SJU48L3BfOGRjRVAzN2YhOlNtNk5cKjJqMSUqNWIpTUxqQjY7Z1Q2aEYsJiUiajNNJFBaZWRMQmU5ZCY7MSNUUVFSJS5kKjNpR1tdWWlcaEdkNlBuYGI3aDU8XWYxVkBKZ0JKVUE8Ll4ibzBwbEdiMFJUOiZtYTUpTFJTdGpGW25BTUMwNGhpdDk+cT81UzthUXFza1RJJDctUUBCL1JxX3VTQiRfSjxDWGcqYWIhVjtYJl5LOko4UUFjK3JfN0NfRSNxMyloLSdiXiIiXlJ1OHFtOmY/SThIQEk9SktiLWFSPmEta1tGXTpwJ2VIOEwlOmUtUkVyL104SV4/NEIkXls0PWBGSEpRSygmW05MMFFhL0s8Vzc7Ry5gN0lMSy5ZR3JbQi8tUGokOVJrMmFCV2QhTyxnT0FWcj9sZTQ8JD9CPEpKWXI+MlNSN0s9JyNSbDVeUGJeO2JpJUVdOTFhWVlTV1MhXTI/MWw8J1Q7LCwvXUkoOHQmYSNyY1QzOSxebE9BKU9fQiVBTHBCWDpIbS5fb2UudW4hLkdLSypRaVQ8PFw8Wk4iVDtBZisnOipsXDpBV1AxWHIhTT0saFdJXEo+MGVdb05nXTEjRjFpO1BeSGAma1xVUCdeZEw6WERtKSliSEpjTSZyMFddTjwkI1oqZjVoSkhxJGRPLioyJUdBZS46RUtjcVs4aUBxPDkvZz40O1JNNGoqO28va3QjYEZcUipbIVB1ZlxeK0BEL0VaYCtZLENgLmtXKz5KOi9LaV1hay8wUWovMFQ3J0A8TSZOanIiJjAlIl5bazhFMy1vIilFPDBqUG8zdEklSFBUcSR1Sk9Ccz5GKlJRNDAqUUBWM1lGOyY9Wy9daC1kJnJmQFtOJVAwOmZJLEVgWStPQUpEalBZRChPMTRaWDIsQj9YaCkoUlVgMW0vNzJKbW1uYVM6cCRNM3NxXDNnVWlPUkchImhFQjxaIWBkN3VsPC9vUEotb1tHMCNKK21GViddbGFJZG9tKWRfKU5WKUlaKSxEMWYqQjVndCosS0R0Tz0/RWtfSCtGNlZQTSdrVURMc15YW08+TFNeLF5GWElHXnJvcEAoU2NxbTBWRWlTMG5AaVpYcFo8XGkyL01hIWVSKmEscztHRmBRMVQ1SVtLZjxfZXBVPFNrO0FbSTFELyhxNHVKNHBkTUNJNkUhXjoxbGhpZUMwUSk0XCxAR0toQG8hSz5SXFxJRUBzJzlgUj1ISm9TR00pMit1VzlQOlRTTjArXShILj1HQ0oqIzpqbz4pZnMvXiNqcVA7WkdNcldiWD5TZG9NOEspWjUmJDMqYV5oc3NCWyE7UUZeYToqVEEuNSE/OVNDXUBKVSZpTkFbaTVRP3U/NkItUzhzIkZzajpXLWBpKUQnbV5mNz4mU0w8Kj5xNUZKOyVyal5KWWNuaFFiXCVVJ1RhRG0ldEpyNSgjW3JBTzdBIy1XV2FFI2BAVTUhJ05dN1EhXWZvMTMvRVdgXVhZaS1ZSDhFbWMjUzFbIzliRT9sUjRvNzg3RVhcK1hLTi4zRy1ja15ebyg4Y1hKc1pmcCpTS0xFIyplXi5FPUhVX3Ihays3OlledCM5S1U+aDojOz9KUkA2X0tiIzZZSSleKyldLWtCImVaajowaWsyUl86Z0JUSlJwOjg0L3VLY21fZS4+WVtnTk5DUiMlYl9gcyUvWXNfcikwZCRcYS9jKTE+aWNbZyNcXyFtWCZhVUZFbyNpJC0lW2ViRipLUSpEVVhPKm1WW0U9RTVnJktrL1RGRGBwNS5BUUBdU1JRTSgoIS5TIj0jbkssNUs6MiJEU2BcVChOcFknZE1bcDIyKFxQJkRLR1RsLkEtRTwmNiNKc0tMbC5ARVc1SCVlaDxIZlFoZSlOQTEubUgzOUlhOTJ1I1xBIldiTUQyLiNxPG9rQWIvLGdwS0B1PVNoMzc+WlI3J3UjUGhAIkZNLl0+Q1pRYFM7bkQtPWUnaCpUKilNdV8qVGBhRChgOkslWF0tdEQ6Kjw+R3B1T0RGVUotZ2lsNEwqcktQPiYsW0t0WzxyMzRePGZlMDYqK043KUE6ZlRDaVNlQWdwOFhuUFBAN1tgJG5tLiQoKF5nLCxBcic0PUhraT0sZENONThQdVNXL21mQFF1UjcqZF9ZNCshbEw3TjFKNExWIzFSJ0FoO1VYOkJfQyVCJmU3ODcxI11oPypcNyQtT1hNdUxeJms9ai5gcy9GR0ZAWlNkc04nPTtwRDZzKTsyXWBqLEQhZnVORWBtL0xcbFJNIU0ucipoTlJtXiZKRjpdWlAuISs6Ui5CSVRqdEI3WlMkX0MiTmoxTmVbMDNIcjNndFwzVzxDMWw5L1dhL0puZXNdMnAuRmkxVFJSOUpqNC1YTzZFJ2dKWzlrWjU2cFE3Ok1eLWpQMEBWUipuOyVBcSYsbmwqPC89Z1E/MUMxIXIoQz5YPDFgcU0+K3NeVCJINnMnNjo4VVheSExBNF9UKVttLEBfPGBeOyhrMyZNZUBAb3VIRGpVUG1EYlxiZldAIUFQMENKWkRzVCIpdUkuPVZOIilwWlo5QChTKC01Q1BHWGBEKilOcD8tJS1rYXAjY2tHb2hwVGpPMTM1LGdrcSk6Xk1ZSlxLQTxsL1g1KTUpKmgnaFUnKXVzJEJZImVwPDckRzsrYF4rbyZCdEhLRmUiXkQsQSgtXXQ+J2FLWzZQNjZIJldnbEBsdHAnWUUtVVY/JGokRUMqUGU4O24pZVJKTkdGRzhGTCQzZHJFOkUzI2BvSy1bSWZpbCtBYlk2Jl4sMGQpYTVuSmIhQShyI21uVCNWX2ApS1BmbitMRmE2J1s/Zm5rTC1pRXIvPC1LQTVsOi9FUlZTL1I3ZCItXGpBJlM0T2hmMiJZXXEsSGNIOmw8PCZTLEQuZiMlL14zLl04SjcqQT9iWk0uMGozXk1cbEI6XFpeM2paYW9FJU1dMT81VFwxSiI8WyJtVjAyTz5rOyhLRHQnYyk3WHBNXjFXOjpIOzBncEtvKiVuX1VOM3VyKENgSThnbFloSUFdMVNhMGI1QkRmcVtmfj5lbmRzdHJlYW0KZW5kb2JqCjEwIDAgb2JqCjw8Ci9GaWx0ZXIgWyAvQVNDSUk4NURlY29kZSAvRmxhdGVEZWNvZGUgXSAvTGVuZ3RoIDI3MTYKPj4Kc3RyZWFtCkdhdTBGQmxpI3UnKWg2KiFINGZMbUhmU15GKCotODxQKTlcVmVNXHFBNDxIRC1HcjNGOiEjRm84aCY+MGhzUidEVEtuV1kob29iJV5tVyUybGcmW2QrcDdgVDQ6XjddZmlCZCdjYVApMzFAJ29VVGonU0RGZ0giNDpcX0tFLzNSbWtWXydLUmJ0WmQ7M1c/P2ZiQGghS0cnNW0+ImlCYDE5aFFBKzwyTiZWWyJaU0ltaVFCPlg4bWJrKVNWblJPK3BfM3MkN2AwKjwmWEBdMSk4PS9tVExGMFZWdVAtdTAyJS5hOiImVCYxNy4idHBAYCEkQzkzUy0lNShJdWBoSkJrWW06aVlDbmNjYTJKMmYpKzdfJkIkPzhoI2M/cVg7IjxuZXBocS1RSyt1J0puOycjPWImRWlPJ2AhPT5tMWVGNERga19dYm9JTWlWKHI7RGNlRVA6WyNYPEswaS9pJjVhKGYpQUY6cCQzXl1jWjVPJ2FuT2NENmEhJz4tS0VOOjJSJ3VjQjZMcF8mO109ZUc3SSgqZT4xIiZvIWFvJiJUbEUwSjtcNzZrbkFZUVpGcC5QWTlVTS9EZlowVUYsYTtTa0tHPGA7bk1XXSdSLVpmbixfYWJJJFRlMDxmIlJnOUxPdUNyNG1cb2EhXEZgQDZiS2dWSHMrKVhNISRnZ2lzQ01Icj9qUTEyQ1dtdGNxZVNZN0orJElXOCZoZCFuYFBuX0k1UkgjV0sxRyRjanM7ITlaTS5rZzA6W2FrbG9dNDRaUWJkKE5VYTgkTF1OZkAvK2lxT2lWPCljXyJgSUlxRD47alJ1ckIjRDUlP2YzcmBXc11WLXBmZW1JM2V0JmgvL05uTidDbm1HST9gWFlDbStRJWVTNFUtT0pgPjstOUwmKDhgbXQpS1shVmwnMzRjVypWcSlKRldaWWgmK0lMRUlPYVVXXS9dPkJORmYpYFM4KzotWUlzWjw3bHU1XSlfYUg3LTdJMyVNJjhbLUwjIypTZkdYK1w9NGtgM14jblxrN0E0LjFdanVPbG09LkM5K3BBOEoiYk5lTjFJPGI4OypBNG5cPEtnPSY3bkJhKG9gYWtkK2VEdUtEPmglWVhyLExeVy02YCpQKTkjN1szQ1gkLypebjZzR08pQUNlbj1uZmUuaDEnKDhya28rIXMiQjtFdDMwV0RYMGtGNFBvL0xeSUhIM2prS0hQWiQjVTQjNmwqLTdRR2tbPzJOUkBvJSsxdU0kPVZZYS5BIkFSVjpcIXBmKTwpM2VnSEtfUSxyLyhFXWg6bmVVRUkrLlQ5Sks3Yj8lYnRjVUFoVmlZUkEsJG1SUGZORG0hLkUwbDptaERVPEklZCtQNltMJTBEKj5VPGw/a2RJO1hoYC41ZztMRzxMQEJBI25IUmdmXGouM3JEV2lMVlosUy5gQVBRUGpuZjIuNjhcMT9ZWjYyaSZJcV9BXGBGcTlDTG9PLVBBQSdjLWZDQVJoQkhOUydvWHAhVWtJNSs0ZSRyaiQyb3BTJl5vYmVTJysvV0EwLy5TcidGa1twby50dV5dLCpWPmVhcC0sM0UqNHUsNCFbQztiVS5zQVJwK2ozUGtqM0JyYnVIViViaCEyZG45aGlqQ2xmZWJJWSJlMmkkIzBCOSxKWDk+Xz1JN0BfJk4mKDNPLEhLMWxEMTRYPmk9XSZMKEApMGtSSyx0Tlo0Y1ZQTm9EYyhFPVQvc0lzVyM7RUVOWF5ESW4qRlk/UCtfUWkwOictbjNidC47QlMvLjNUYHRIPV8qI09lQkI8L2xWPVY0bnAra2xtJlswYyNaIXMqYy8jMi5kTzZGIWM4QzpTYCEiNSZBSTc9ISVuZWdDbi0kVE4uPjJZSzFLcGFYKSdJLztEcmw7YGRBO0crZE0rUzlgaHNpK2JIRUJDbVg2T0c6LW9tTTNAWkBucV8+K1g8akQpVGpLKXNXVzMqQVNZc0dlVTZURT0qTSxzYkhaTV0wKGNVMTNDW1k4M08iUXIiQTBsbEFWdWNtQFI8RnVIRjRLZ2ZnPGBuI3JEXmNgLlsrUD9RREh1OktkaVg/XGpvZCElYl5oIztYQTIoTCgoKXFSQTpIKms5PV5qVywoRm1cImZtbTNOclFfOm4wOmxyVWwpPDFcPCxUITpwXjcoVm0nYCw1RHJsYlQvakQ8MEpdM1ZdOFIyZSR0MUJZMGg2TWhNY2ZWUTEpVydEInEtK2g0bWhhKyZfJVZlQGVvdFpiYDBXZDRlMyFXWy05OD5hQHAzMFtcJFhIIU9tSTUwQywxY0BfTG9cVG1nZnFuPlNpL0tvQE1XUT4vX05UPkg8I3FlRG0laD4sLWNoYFBDW0JbJmdnOHEhPV85byNZYHBCaFJqW3A9OCdYZWZuK2ZdRS8nQVNFQk9YbFZuTU89PTIqTjFHP2pVI2phXyViNCRBR2kkbkI8PjFqckJRdD0/R29QYkRmaUBTOUxQXSs8MWtVS1FoRVpcIl4qLkRWMy88Si9xUSlaZiZkTW5oZicuclVrInQ9bEpVLyRcRlUtUysyZnF1WjpoPklGZ1owRy0xN2FQRUVkLXBUcXUtbjVdIy1NUmciRTJqaTlgLDVDTlFPJGchKGldTERCVWx0cWlCZ04qMSxCYTpuXHA7Jjk9UlsqVGxIRFVTLSNuaSRGOk4xWVxCaVkuLDNPNTJyLGFlX2wpOy1AJFZbJHVXO3JsK2ErRS02PitaRkhZJldPTmpkKVBBRjJyPVdcb0M2KE47YGUybjArTj82KD1QKmpdNlokUlokaixvQzZhPyYqLzFhbWFYaj9XQlJMOV9NUl8oSDIvTVRVXTVtPChHRHBtQF9IKDVcMVNAM01naUZOblI+c10tLHRBKiVoMzw2XEJPJlNlb1FZUFhmZWA3MUBySnFGbyNYPG9nJWdraFNSUShYcjByYjA/YiNiakdWJionI2xJY2RvRTpBMD5ccnMvZUhAQ0RaJ2NgK1xxQUI5I1krW0dFVC1AYEFBLTxLL21OSEhHK3M+V0ZHaWhRZz06YzZxNzFJJll0Ui5iOCMwYmJeXy84NyFKSDo7amkqYEdsXERCX1w1U2JLV0IncipOUVVvLG1VPENzWWp1X004cUUvTEFBJEdETVAhXSQrcyJtSyMzVkIxM3REOCtuIzVrOSlDblo7RmRaJUtgKkpGZCFUMEtYXiltTWZWJ1pMNnJbbS9JbGpbciVrP1ZBQm1nbzldS3FVc0gmYyI9P2JVW2xWbGgnaUgjJls/QWJSWkJsI0ZhZFtZIzYjcFJgaCtWa3FjRDFbKidOclFbRWQucnE1IUtGS0lxPCZSajciOWJBcVdPbk90VkRTVGFOQjEhX0VnUCJoKlRmVSEuUVcqW0E/LWk3RXJORmdSbCteY05eL0xOdWsyLFlZQE5mPmEpYSpgZ1dyP3VYOTBFNClDIUBDWjZ0ZEpTQE9vIzBfcl9sRWplQVcrQS1ZNyxmaEVoIWdXaiFWSm5bSEYyXlpva2xhX3JdTVFUJ0wlalxQUDtRdUBQOjsjW0BtNDtSTGEvXyVucmJoc0g3KCdeZGNPUGlaX0lvXT9qLFIzay5BUVlockN0KXJuV3BkW1hUZVguLWlYRzBMWERefj5lbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxMQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwNjEgMDAwMDAgbiAKMDAwMDAwMDEwMiAwMDAwMCBuIAowMDAwMDAwMjA5IDAwMDAwIG4gCjAwMDAwMDEwOTkgMDAwMDAgbiAKMDAwMDAwMTMwMiAwMDAwMCBuIAowMDAwMDAxNTA2IDAwMDAwIG4gCjAwMDAwMDE1NzQgMDAwMDAgbiAKMDAwMDAwMTk3MyAwMDAwMCBuIAowMDAwMDAyMDM4IDAwMDAwIG4gCjAwMDAwMDUwMDggMDAwMDAgbiAKdHJhaWxlcgo8PAovSUQgCls8ZjA3YTQ3YTFhZTM1NDFhMGY1MmExZjBhYTJiZTNjMzA+PGYwN2E0N2ExYWUzNTQxYTBmNTJhMWYwYWEyYmUzYzMwPl0KJSBSZXBvcnRMYWIgZ2VuZXJhdGVkIFBERiBkb2N1bWVudCAtLSBkaWdlc3QgKG9wZW5zb3VyY2UpCgovSW5mbyA3IDAgUgovUm9vdCA2IDAgUgovU2l6ZSAxMQo+PgpzdGFydHhyZWYKNzgxNgolJUVPRgo=";
+  document.getElementById('downloadUserGuide').addEventListener('click',function(){
+    const binary=atob(embeddedGuide), bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+    const a=document.createElement('a');a.href=url;a.download='NEPM_作問Web_API版_Ver_1_30_利用手順書.pdf';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+})();
+</script>
+</body>
+</html>
