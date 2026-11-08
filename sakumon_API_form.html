@@ -42,6 +42,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 header{background:linear-gradient(135deg,var(--brand2),var(--brand));color:#fff;padding:30px 18px 26px}
 .header-inner{max-width:920px;margin:auto}
 .eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.08em;opacity:.88}
+.api-version-label{display:inline-flex;align-items:center;gap:7px;background:#fff5d7;color:#173963;border:1px solid #f8d377;border-radius:8px;padding:6px 13px;margin:0 0 12px;font-weight:900;font-size:1rem;letter-spacing:.04em;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.api-version-label::before{content:"●";color:#0f766e;font-size:.72rem}
 h1{font-size:clamp(1.8rem,5vw,2.5rem);margin:4px 0 2px;line-height:1.2}
 .subtitle{margin:4px 0 0;opacity:.94}
 .meta{margin-top:10px;font-size:.86rem;opacity:.85;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
@@ -143,6 +145,7 @@ details.changelog ul{margin:4px 0 0;padding-left:1.2em}
       <a class="home-link" href="./index.html"><span aria-hidden="true">←</span>ホームに戻る</a>
       <button class="home-link guide-download" id="downloadUserGuide" type="button" title="利用手順書PDFをダウンロード">📄 利用手順書（PDF）</button>
     </nav>
+    <div class="api-version-label" aria-label="API対応版">Gemini API対応版</div>
     <div class="eyebrow">NEPM™ / Nakata Educational Prompt Method</div>
     <h1>NEPM 作問Web＋ 配信フォーム自動作成</h1>
     <p class="subtitle">「回答者・採点者・管理者を事前登録し、Googleフォームと採点シートのアクセス権限を安全に分離」</p>
